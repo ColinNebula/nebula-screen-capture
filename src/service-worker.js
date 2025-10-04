@@ -81,6 +81,50 @@ self.addEventListener('message', (event) => {
   }
 });
 
+// Security headers for cached responses
+const SECURITY_HEADERS = {
+  'X-Frame-Options': 'DENY',
+  'X-Content-Type-Options': 'nosniff',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+};
+
+// Add security headers to responses
+const addSecurityHeaders = (response) => {
+  const newHeaders = new Headers(response.headers);
+  
+  Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+    newHeaders.set(key, value);
+  });
+  
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: newHeaders,
+  });
+};
+
+// Intercept fetch requests to add security headers
+self.addEventListener('fetch', (event) => {
+  // Only process same-origin requests
+  if (event.request.url.startsWith(self.location.origin)) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // Only add headers to successful responses
+          if (response && response.status === 200) {
+            return addSecurityHeaders(response);
+          }
+          return response;
+        })
+        .catch(error => {
+          console.error('Fetch error:', error);
+          throw error;
+        })
+    );
+  }
+});
+
 // Any other custom service worker logic can go here.
 // Listen for install prompt
 self.addEventListener('install', (event) => {
@@ -91,6 +135,22 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   console.log('Service Worker activated.');
-  // Claim clients immediately
-  event.waitUntil(self.clients.claim());
+  
+  // Clear old caches
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          // Delete old cache versions
+          if (cacheName.startsWith('nebula-') && cacheName !== 'nebula-v1') {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => {
+      // Claim clients immediately
+      return self.clients.claim();
+    })
+  );
 });

@@ -1,0 +1,59 @@
+# Dependency Security and Update Configuration
+
+name: Dependabot Security Updates
+version: 2
+
+updates:
+  # Enable npm package updates
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    
+    # Security updates
+    security-updates:
+      enabled: true
+    
+    # Version updates
+    versioning-strategy: increase
+    
+    # Auto-merge configuration
+    auto-merge:
+      dependency-type: "all"
+      update-type: "security"
+    
+    # Ignore specific dependencies if needed
+    ignore:
+      # Example: ignore major version updates for stable dependencies
+      # - dependency-name: "react"
+      #   update-types: ["version-update:semver-major"]
+    
+    # Reviewers (optional)
+    reviewers:
+      - "ColinNebula"
+    
+    # Labels for PRs
+    labels:
+      - "dependencies"
+      - "security"
+    
+    # Commit message prefix
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    
+    # Target branch
+    target-branch: "main"
+
+  # Enable GitHub Actions workflow updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github-actions"

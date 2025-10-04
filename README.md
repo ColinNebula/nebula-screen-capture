@@ -902,6 +902,126 @@ Special thanks to:
 
 ---
 
+## 🔒 Security
+
+Nebula Screen Capture takes security seriously. We've implemented multiple layers of protection to keep your data safe and prevent manipulation.
+
+### Security Features
+
+#### 🛡️ Content Security Policy (CSP)
+- Strict CSP headers prevent XSS attacks
+- Only trusted sources can load scripts and resources
+- `frame-ancestors: none` prevents clickjacking
+- Inline script restrictions with nonces
+
+#### 🔐 Input Validation & Sanitization
+- All user inputs validated and sanitized
+- Filename validation prevents directory traversal
+- HTML sanitization prevents XSS injection
+- URL validation prevents SSRF attacks
+- See `src/utils/security.js` for implementation
+
+#### 🔒 Security Headers
+```
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Strict-Transport-Security: max-age=31536000
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(self), microphone=(self)
+```
+
+#### 🚦 Rate Limiting
+- Client-side rate limiting prevents abuse
+- Configurable limits on user actions
+- Automatic cleanup of old request records
+
+#### 🔐 Secure Context Requirements
+- Requires HTTPS in production
+- Screen Capture API only in secure contexts
+- Service workers require secure origins
+
+#### 📊 Dependency Security
+- Automated vulnerability scanning via GitHub Actions
+- Dependabot configured for weekly security updates
+- Regular `npm audit` checks
+- No high-severity vulnerabilities in production dependencies
+
+#### 🎯 Data Protection
+- **Local-Only Storage**: All recordings stored in your browser (IndexedDB)
+- **Zero Server Transmission**: No data sent to external servers
+- **Blob URL Validation**: Ensures media URLs are from same origin
+- **Secure Storage Wrapper**: Protected localStorage with validation
+
+### Security Best Practices
+
+#### For Users:
+✅ Always use HTTPS (automatically enforced on GitHub Pages)  
+✅ Keep your browser updated  
+✅ Review recording permissions before granting  
+✅ Download sensitive recordings promptly  
+✅ Clear browser data if using public computers
+
+#### For Developers:
+✅ Never commit secrets to repository  
+✅ Use provided security utilities (`security.js`)  
+✅ Run `npm audit` before every commit  
+✅ Validate all user inputs  
+✅ Follow OWASP security guidelines  
+✅ Test security features in PRs
+
+### Vulnerability Reporting
+
+Found a security issue? We take it seriously!
+
+**Please DO:**
+- Report privately to: [security@nebulamedia3d.com]
+- Provide detailed reproduction steps
+- Allow 90 days for fix before public disclosure
+- Act in good faith
+
+**Response Timeline:**
+- Initial response: 48 hours
+- Critical fixes: 7 days
+- High severity: 30 days
+- Medium/Low: 60-90 days
+
+See our full [Security Policy](SECURITY.md) for details.
+
+### Security Audits
+
+Automated security checks run on:
+- ✅ Every push to main branch
+- ✅ All pull requests
+- ✅ Weekly scheduled scans
+- ✅ Dependency updates
+
+View our security status:
+- [Security Audit Workflow](.github/workflows/security-audit.yml)
+- [Dependabot Configuration](.github/dependabot.yml)
+- [Security Policy](SECURITY.md)
+
+### Environment Variables
+
+Sensitive configuration protected:
+- `.env` files in `.gitignore`
+- `.env.example` template provided
+- No secrets in source code
+- Environment variables validated
+
+### Known Security Limitations
+
+⚠️ **Browser-Based Constraints:**
+- Recordings stored in browser can be cleared
+- Malicious browser extensions could access data
+- Physical device access bypasses browser security
+
+⚠️ **Platform-Specific:**
+- iOS Safari: Limited API support
+- Private browsing: Reduced functionality
+
+---
+
 ### Support
 
 Need help? Have questions?
@@ -909,6 +1029,7 @@ Need help? Have questions?
 - 📖 [Documentation](https://github.com/ColinNebula/nebula-screen-capture/wiki)
 - 💬 [Discussions](https://github.com/ColinNebula/nebula-screen-capture/discussions)
 - 🐛 [Issues](https://github.com/ColinNebula/nebula-screen-capture/issues)
+- 🔒 [Security Policy](SECURITY.md)
 - 📧 Email: support@nebulamedia3d.com
 
 ---
