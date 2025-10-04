@@ -13,6 +13,8 @@
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-glass);
+  position: relative;
+  z-index: 50000; /* Ensure header has high z-index to contain dropdown properly */
 }
 
 .header-content {

@@ -80,7 +80,7 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  z-index: 1000;
+  z-index: 99999; /* Much higher to overcome stacking context issues */
   animation: dropdownSlide 0.2s ease-out;
 }
 
@@ -255,4 +255,55 @@
     justify-content: space-between;
     text-align: left;
   }
+}
+
+/* Dark theme styles */
+[data-theme="dark"] .profile-dropdown {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .dropdown-stats {
+  border-bottom: 1px solid var(--border-glass);
+}
+
+[data-theme="dark"] .stat-label {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .stat-value {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .storage-bar {
+  border-bottom: 1px solid var(--border-glass);
+}
+
+[data-theme="dark"] .storage-progress {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .storage-text {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .dropdown-button {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .dropdown-button:hover {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .dropdown-button.logout {
+  color: #ff6b6b;
+}
+
+[data-theme="dark"] .dropdown-button.logout:hover {
+  background: rgba(255, 107, 107, 0.1);
+}
+
+[data-theme="dark"] .dropdown-divider {
+  background: var(--border-glass);
 }

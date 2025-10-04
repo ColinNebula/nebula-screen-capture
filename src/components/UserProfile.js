@@ -1,8 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import './UserProfile.css';
 
 const UserProfile = ({ user, onLogout }) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const dropdownRef = useRef(null);
+  const triggerRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+          triggerRef.current && !triggerRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [showDropdown]);
+
+  // Calculate dropdown position when showing
+  useEffect(() => {
+    if (showDropdown && triggerRef.current) {
+      const triggerRect = triggerRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: triggerRect.bottom + 8, // 8px gap
+        left: triggerRect.right - 280, // Align right edge, 280px is dropdown width
+      });
+    }
+  }, [showDropdown]);
+
+  const handleToggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
 
   const formatStorage = (bytes) => {
     const mb = bytes / (1024 * 1024);
@@ -28,29 +67,41 @@ const UserProfile = ({ user, onLogout }) => {
   };
 
   return (
-    <div className="user-profile">
-      <div 
-        className="profile-trigger"
-        onClick={() => setShowDropdown(!showDropdown)}
-      >
-        <img 
-          src={user.avatar} 
-          alt={user.name}
-          className="profile-avatar"
-        />
-        <div className="profile-info">
-          <span className="profile-name">{user.name}</span>
-          <span className="profile-plan" style={{ color: getPlanBadgeColor() }}>
-            {user.plan.charAt(0).toUpperCase() + user.plan.slice(1)}
-          </span>
+    <>
+      <div className="user-profile">
+        <div 
+          ref={triggerRef}
+          className="profile-trigger"
+          onClick={handleToggleDropdown}
+        >
+          <img 
+            src={user.avatar} 
+            alt={user.name}
+            className="profile-avatar"
+          />
+          <div className="profile-info">
+            <span className="profile-name">{user.name}</span>
+            <span className="profile-plan" style={{ color: getPlanBadgeColor() }}>
+              {user.plan.charAt(0).toUpperCase() + user.plan.slice(1)}
+            </span>
+          </div>
+          <svg className={`dropdown-arrow ${showDropdown ? 'open' : ''}`} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 10l5 5 5-5z"/>
+          </svg>
         </div>
-        <svg className={`dropdown-arrow ${showDropdown ? 'open' : ''}`} viewBox="0 0 24 24" fill="currentColor">
-          <path d="M7 10l5 5 5-5z"/>
-        </svg>
       </div>
 
-      {showDropdown && (
-        <div className="profile-dropdown">
+      {showDropdown && createPortal(
+        <div 
+          ref={dropdownRef}
+          className="profile-dropdown profile-dropdown-portal"
+          style={{
+            position: 'fixed',
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+            zIndex: 99999
+          }}
+        >
           <div className="dropdown-header">
             <img src={user.avatar} alt={user.name} className="dropdown-avatar" />
             <div className="dropdown-user-info">
@@ -113,9 +164,10 @@ const UserProfile = ({ user, onLogout }) => {
               Sign out
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
-    </div>
+    </>
   );
 };
 
