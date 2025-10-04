@@ -1,0 +1,117 @@
+/* Premium Feature Styles */
+.premium-feature-wrapper {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.premium-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 12px;
+  border: 2px solid #f59e0b;
+}
+
+.premium-content {
+  text-align: center;
+  padding: 2rem;
+  max-width: 300px;
+}
+
+.premium-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 1rem auto;
+  color: #f59e0b;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+.premium-content h3 {
+  margin: 0 0 0.5rem 0;
+  color: #2d3748;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.premium-content p {
+  margin: 0 0 1rem 0;
+  color: #4a5568;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.plan-badge {
+  display: inline-block;
+  background: linear-gradient(45deg, #f59e0b, #d97706);
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.upgrade-button {
+  background: linear-gradient(45deg, #f59e0b, #d97706);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.upgrade-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+.premium-content-blurred {
+  filter: blur(4px);
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Feature-specific styles */
+.premium-feature-wrapper.small .premium-content {
+  padding: 1rem;
+  max-width: 200px;
+}
+
+.premium-feature-wrapper.small .premium-content h3 {
+  font-size: 1rem;
+}
+
+.premium-feature-wrapper.small .premium-content p {
+  font-size: 0.8rem;
+}
+
+.premium-feature-wrapper.small .upgrade-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+}

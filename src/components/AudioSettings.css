@@ -1,0 +1,212 @@
+/* Audio Settings Styles */
+.audio-settings {
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-top: 1rem;
+}
+
+.audio-settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.audio-settings-header:hover {
+  background: #f1f5f9;
+}
+
+.audio-settings-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.expand-icon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+  transition: transform 0.2s ease;
+}
+
+.expand-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.audio-settings-content {
+  padding: 0 1rem 1rem 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.audio-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.audio-option label {
+  font-weight: 500;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+.audio-option select {
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.audio-option select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.audio-option select:disabled {
+  background: #f7fafc;
+  color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.audio-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-weight: 500;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+.toggle-label input[type="checkbox"] {
+  display: none;
+}
+
+.toggle-slider {
+  position: relative;
+  width: 40px;
+  height: 20px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-label input:checked + .toggle-slider {
+  background: #667eea;
+}
+
+.toggle-label input:checked + .toggle-slider::before {
+  transform: translateX(20px);
+}
+
+.toggle-label input:disabled + .toggle-slider {
+  background: #f7fafc;
+  cursor: not-allowed;
+}
+
+.volume-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.volume-control label {
+  font-weight: 500;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+.volume-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.volume-slider {
+  flex: 1;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  outline: none;
+  appearance: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #667eea;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+  background: #5a67d8;
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #667eea;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.volume-slider:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.volume-value {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 0.9rem;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .audio-settings-header {
+    padding: 0.75rem;
+  }
+  
+  .audio-settings-content {
+    padding: 0 0.75rem 0.75rem 0.75rem;
+  }
+  
+  .audio-toggles {
+    gap: 0.5rem;
+  }
+}

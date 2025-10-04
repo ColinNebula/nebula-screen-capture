@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Nebula Capture",
+  "name": "Nebula Screen Capture - Professional Screen Recording",
+  "description": "Capture your screen with high-quality video and audio, customize recording settings, and manage your recordings with ease.",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,9 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#667eea",
+  "background_color": "#f8fafc",
+  "categories": ["productivity", "utilities", "multimedia"],
+  "scope": "/",
+  "orientation": "portrait-primary"
 }

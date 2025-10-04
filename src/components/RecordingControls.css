@@ -1,0 +1,467 @@
+/* Recording Controls Styles */
+.recording-controls {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: var(--shadow-glass);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: var(--theme-transition);
+}
+
+.recording-controls::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--brand-gradient);
+}
+
+.timer-display {
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+.recording-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.recording-indicator.active {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+  animation: indicatorGlow 1.5s infinite;
+}
+
+@keyframes indicatorGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+  }
+}
+
+.recording-indicator .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.recording-indicator.active .dot {
+  background: #ef4444;
+  animation: dotPulse 1.5s infinite;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+.recording-indicator.active .dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  background: rgba(239, 68, 68, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ripple 1.5s infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2);
+  }
+}
+
+.time {
+  font-size: 3.5rem;
+  font-weight: 300;
+  font-family: 'Courier New', monospace;
+  color: var(--text-primary);
+  margin: 0;
+  text-shadow: var(--shadow-sm);
+  position: relative;
+  transition: var(--theme-transition);
+}
+
+.time::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: var(--brand-gradient);
+  transition: width 0.3s ease;
+}
+
+.recording-indicator.active + .time::after {
+  width: 100%;
+}
+
+.control-buttons {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 2.5rem;
+  border: none;
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+  overflow: hidden;
+  min-width: 180px;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  color: #ffffff !important; /* Explicit white text for all control buttons */
+}
+
+/* Ensure button text is always visible regardless of theme */
+.control-btn,
+.control-btn *,
+.start-btn,
+.start-btn *,
+.pause-btn,
+.pause-btn *,
+.stop-btn,
+.stop-btn * {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.control-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.control-btn:hover::after {
+  width: 200px;
+  height: 200px;
+}
+
+.control-btn svg {
+  width: 22px;
+  height: 22px;
+  transition: transform 0.2s ease;
+}
+
+.control-btn:hover svg {
+  transform: scale(1.1);
+}
+
+.start-btn {
+  background: var(--recording-ready);
+  background: linear-gradient(45deg, var(--recording-ready), #047857);
+  color: #ffffff !important; /* Force white text */
+  box-shadow: 
+    0 4px 20px rgba(16, 185, 129, 0.4),
+    0 0 0 1px rgba(16, 185, 129, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Enhanced text shadow for better readability */
+}
+
+.start-btn * {
+  color: #ffffff !important; /* Ensure all child elements also have white text */
+}
+
+.start-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 8px 30px rgba(16, 185, 129, 0.6),
+    0 0 0 2px rgba(16, 185, 129, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  background: linear-gradient(45deg, #047857, #065f46);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.start-btn:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.start-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.start-btn:hover::before {
+  left: 100%;
+}
+
+/* Enhanced Button States */
+.start-btn.ready {
+  animation: readyPulse 2s infinite;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4), 0 0 0 2px rgba(16, 185, 129, 0.1);
+}
+
+.start-btn.starting {
+  background: var(--recording-paused);
+  background: linear-gradient(45deg, var(--recording-paused), #d97706);
+  animation: startingPulse 0.5s infinite alternate;
+  cursor: not-allowed;
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.5);
+}
+
+.start-btn.recording {
+  background: var(--recording-active);
+  background: linear-gradient(45deg, var(--recording-active), #dc2626);
+  animation: recordingGlow 1.5s infinite;
+}
+
+.start-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+@keyframes readyPulse {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4), 0 0 0 2px rgba(16, 185, 129, 0.1);
+  }
+  50% {
+    box-shadow: 0 6px 25px rgba(16, 185, 129, 0.7), 0 0 0 4px rgba(16, 185, 129, 0.2);
+  }
+}
+
+@keyframes startingPulse {
+  0% {
+    transform: translateY(-2px) scale(1);
+    box-shadow: 0 6px 25px rgba(245, 158, 11, 0.4);
+  }
+  100% {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(245, 158, 11, 0.6);
+  }
+}
+
+@keyframes recordingGlow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.6), 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+}
+
+/* Record Icon Enhancements */
+.record-icon {
+  animation: recordIconPulse 2s infinite;
+}
+
+@keyframes recordIconPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* Countdown Circle */
+.countdown-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: countdownPulse 1s infinite;
+}
+
+.countdown-number {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+}
+
+@keyframes countdownPulse {
+  0%, 100% {
+    transform: scale(1);
+    background: rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  position: relative;
+}
+
+.spinner-ring {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.pause-btn {
+  background: linear-gradient(45deg, #f59e0b, #d97706);
+  color: #ffffff !important;
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+  position: relative;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.pause-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(245, 158, 11, 0.5);
+  background: linear-gradient(45deg, #d97706, #b45309);
+}
+
+.stop-btn {
+  background: linear-gradient(45deg, #ef4444, #dc2626);
+  color: #ffffff !important;
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+  position: relative;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.stop-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(239, 68, 68, 0.5);
+  background: linear-gradient(45deg, #dc2626, #b91c1c);
+}
+
+.stop-btn:hover svg {
+  animation: stopShake 0.5s ease-in-out;
+}
+
+@keyframes stopShake {
+  0%, 100% { transform: scale(1.1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(-2deg); }
+  75% { transform: scale(1.1) rotate(2deg); }
+}
+
+.control-btn:active {
+  transform: translateY(0);
+}
+
+.recording-status {
+  min-height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-text {
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-tertiary);
+  border-radius: 20px;
+  border: 1px solid var(--border-primary);
+  animation: statusFade 0.3s ease-in;
+  transition: var(--theme-transition);
+}
+
+@keyframes statusFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .recording-controls {
+    padding: 1.5rem;
+  }
+  
+  .time {
+    font-size: 2.5rem;
+  }
+  
+  .control-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .control-btn {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+}

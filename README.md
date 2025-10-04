@@ -1,49 +1,124 @@
-# Getting Started with Create React App
+# Nebula Screen Capture
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A professional, feature-rich screen recording application built with React. Capture your screen with high-quality video and audio, customize recording settings, and manage your recordings with an intuitive interface.
 
-## Available Scripts
+![Nebula Screen Capture](https://img.shields.io/badge/version-1.0.0-blue) ![React](https://img.shields.io/badge/React-18+-green) ![License](https://img.shields.io/badge/license-MIT-purple)
 
-In the project directory, you can run:
+## ✨ Features
 
-### `npm start`
+### 🎬 Core Recording
+- **High-Quality Recording**: Support for 720p, 1080p, 1440p, and 4K video quality
+- **Flexible Frame Rates**: 15, 24, 30, and 60 FPS options
+- **Multiple Capture Modes**: Full screen, specific window, browser tab, or custom area
+- **Pause/Resume**: Seamlessly pause and resume recordings
+- **Real-time Timer**: Track recording duration with precision
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 🎵 Advanced Audio
+- **Multiple Audio Sources**: System audio, microphone, or both
+- **Audio Enhancement**: Noise suppression, echo cancellation, auto gain control
+- **Quality Settings**: From 32 kbps to 192 kbps audio quality
+- **Device Selection**: Choose specific microphones from available devices
+- **Volume Control**: Adjust microphone volume levels
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 🎯 Smart Area Selection
+- **Custom Recording Areas**: Select specific regions of your screen
+- **Visual Feedback**: Interactive selection with real-time dimensions
+- **Precise Control**: Pixel-perfect area selection
 
-### `npm test`
+### 📁 File Management
+- **Organized Library**: View all recordings in a searchable, sortable list
+- **Video Previews**: Thumbnail previews with play overlays
+- **Bulk Operations**: Download or delete multiple recordings
+- **Smart Search**: Find recordings by filename
+- **Multiple Sort Options**: Sort by date, size, duration, or name
+- **Storage Info**: View total storage usage and file statistics
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### ⌨️ Keyboard Shortcuts
+- **Ctrl/Cmd + R**: Start/Stop recording
+- **Space**: Pause/Resume recording
+- **Escape**: Cancel recording or area selection
+- **Ctrl/Cmd + D**: Download current recording
 
-### `npm run build`
+### 🛡️ Enhanced User Experience
+- **Error Handling**: Graceful error recovery with user feedback
+- **Browser Compatibility**: Automatic feature detection and optimization
+- **Performance Monitoring**: Smart quality adjustment based on device capabilities
+- **Real-time Notifications**: Status updates and helpful tips
+- **Responsive Design**: Works perfectly on desktop and tablet devices
+- **Help System**: Comprehensive help modal with shortcuts and tips
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🚀 Getting Started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Prerequisites
+- Node.js 14+ and npm/yarn
+- Modern web browser (Chrome 72+, Firefox 66+, Edge 79+)
+- HTTPS connection (required for screen capture APIs)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Installation
 
-### `npm run eject`
+1. **Start the development server**
+```bash
+npm start
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2. **Open your browser**
+Navigate to `http://localhost:3001` 
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Building for Production
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+npm run build
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🎮 How to Use
 
-## Learn More
+### Basic Recording
+1. Click "Start Recording" or press `Ctrl+R`
+2. Grant screen capture permissions when prompted
+3. Select the screen/window you want to record
+4. Use pause/resume controls as needed
+5. Click "Stop" or press `Ctrl+R` again to finish
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Custom Area Recording
+1. In Recording Options, select "Custom Area" from Capture Area
+2. Click "Select Recording Area"
+3. Click and drag to select your desired area
+4. Click "Use This Area" to start recording
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Audio Configuration
+1. Expand the Audio Settings panel
+2. Choose your audio source (system, microphone, or both)
+3. Select specific microphone if needed
+4. Adjust quality and enhancement settings
+
+### File Management
+1. View all recordings in the sidebar
+2. Use search to find specific recordings
+3. Sort by date, size, duration, or name
+4. Click thumbnails to preview recordings
+5. Use download/delete buttons for individual files
+
+## 🛠️ Technical Details
+
+### Architecture
+- **React 18+**: Modern React with hooks and functional components
+- **MediaRecorder API**: Native browser recording capabilities
+- **Screen Capture API**: Direct access to screen content
+- **Web Audio API**: Advanced audio processing and mixing
+- **CSS Grid/Flexbox**: Responsive, modern layouts
+- **Error Boundaries**: Graceful error handling
+
+### Browser Support
+| Browser | Version | Features |
+|---------|---------|----------|
+| Chrome | 72+ | ✅ Full support |
+| Firefox | 66+ | ✅ Full support |
+| Edge | 79+ | ✅ Full support |
+| Safari | 13+ | ⚠️ Limited support |
+
+---
+
+**Made with ❤️ for professional screen recording**
 
 ### Code Splitting
 

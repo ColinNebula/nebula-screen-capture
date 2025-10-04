@@ -1,0 +1,51 @@
+/* Loading Spinner Styles */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+}
+
+.loading-logo {
+  margin-bottom: 1rem;
+}
+
+.spinning-logo {
+  animation: gentleSpin 3s linear infinite;
+  filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.2));
+}
+
+@keyframes gentleSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-message {
+  margin: 0;
+  color: #4a5568;
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Fade in animation */
+.loading-spinner {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
