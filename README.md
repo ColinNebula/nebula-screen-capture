@@ -536,7 +536,126 @@ The app automatically detects browser capabilities and:
 
 ---
 
-## 👨‍💻 Development
+## � Comprehensive Device Support Matrix
+
+### Desktop Devices ✅ Full Support
+
+| Platform | Screen Recording | Camera | Screenshots | Notes |
+|----------|------------------|--------|-------------|-------|
+| **Windows 10/11** | ✅ Full | ✅ | ✅ | Best performance on Chrome/Edge |
+| **macOS** | ✅ Full | ✅ | ✅ | All features supported |
+| **Linux** | ✅ Full | ✅ | ✅ | Chrome/Firefox recommended |
+| **ChromeOS** | ✅ Full | ✅ | ✅ | Native Chrome support |
+
+### Mobile & Tablet Devices
+
+#### Android Smartphones & Tablets ✅ Supported
+
+| Device | Screen Recording | Camera | Screenshots | Notes |
+|--------|------------------|--------|-------------|-------|
+| **Android 10+** | ✅ Chrome 72+ | ✅ | ✅ | Full screen recording support |
+| **Samsung Devices** | ✅ Samsung Internet | ✅ | ✅ | Native browser works great |
+| **Google Pixel** | ✅ Chrome | ✅ | ✅ | Optimal performance |
+| **Other Android** | ⚠️ Varies | ✅ | ✅ | Chrome recommended |
+
+**Android Capabilities:**
+- **Screen Recording**: ✅ Supported on Android 10+ with Chrome
+- **Camera Recording**: ✅ Fully supported - record with front/back camera
+- **Screenshots**: ✅ Can capture screenshots during recording
+- **Installation**: ✅ Can install as PWA on home screen
+
+#### iOS/iPadOS Devices ❌ Limited
+
+| Device | Screen Recording | Camera | Screenshots | Notes |
+|--------|------------------|--------|-------------|-------|
+| **iPhone** | ❌ | ✅ | ✅ | Use native iOS screen recorder |
+| **iPad** | ❌ | ✅ | ✅ | Same Safari limitations |
+| **iPad Pro** | ❌ | ✅ | ✅ | Desktop mode doesn't help |
+
+**iOS Workarounds:**
+1. **Native Screen Recording**: Use iOS Control Center (⏺ button)
+2. **Camera Mode**: Available for recording with iPhone camera
+3. **Desktop Access**: Use the app on Mac/PC for screen recording
+4. **AirPlay Mirroring**: Mirror to Mac and record there
+
+### Smart Devices & Special Cases
+
+#### Chromebook 💻 ✅ Excellent Support
+- Full screen recording capability
+- Camera and webcam support
+- Can install as Chrome app
+- All features work perfectly
+
+#### Surface Devices (Windows) 📱✅ Full Support
+- Complete feature set
+- Touch-optimized interface
+- Tablet and laptop modes supported
+- Edge browser recommended
+
+#### Android Tablets 📲 ✅ Full Support
+- **Samsung Galaxy Tab**: Full support via Samsung Internet/Chrome
+- **Google Pixel Tablet**: Optimal performance
+- **Other Tablets**: Chrome browser recommended
+
+### Feature Availability by Device Type
+
+#### Screen Recording
+- ✅ **Desktop** (Windows, Mac, Linux, ChromeOS)
+- ✅ **Android** smartphones & tablets (OS 10+)
+- ❌ **iOS/iPadOS** (all versions)
+- ✅ **Chromebook** (all versions)
+
+#### Camera Recording
+- ✅ **All devices** with camera access
+- ✅ **Front and back cameras** on mobile
+- ✅ **Webcam** on desktop/laptop
+- ✅ **Multiple camera** selection
+
+#### Screenshots
+- ✅ **All devices** during recording
+- ✅ **High resolution** capture
+- ✅ **Instant download** capability
+- ✅ **Multiple screenshots** per session
+
+### Device-Specific Recommendations
+
+#### For Latest Smartphones (2023-2025)
+
+**Android Users (Samsung Galaxy S23/24, Google Pixel 8/9, OnePlus, etc.):**
+- ✅ **Full Support**: Screen recording works in Chrome
+- ✅ **Install as PWA**: Add to home screen for app-like experience
+- ✅ **Best Browser**: Chrome or Samsung Internet
+- ✅ **All Features**: Screen recording, camera, screenshots
+
+**iPhone Users (iPhone 15, 14, 13, etc.):**
+- ❌ **No Screen Recording**: Use iOS native recorder instead
+- ✅ **Camera Recording**: Works for recording video with camera
+- ✅ **Install as PWA**: Can add to home screen
+- ⚠️ **Limitation**: Safari API restriction, not app limitation
+
+### Adaptive Features
+
+The app automatically detects your device and:
+1. **Shows Available Options**: Only displays features your device supports
+2. **Recommends Best Method**: Suggests optimal recording approach
+3. **Provides Alternatives**: Offers workarounds for unsupported features
+4. **Optimizes Performance**: Adjusts quality based on device capability
+
+### Testing Matrix
+
+We've tested on:
+- ✅ Windows 11 (Chrome, Edge, Firefox)
+- ✅ macOS Sonoma/Ventura (Chrome, Safari, Firefox)
+- ✅ Ubuntu 22.04 (Chrome, Firefox)
+- ✅ ChromeOS (Chrome)
+- ✅ Android 13/14 (Samsung S23, Pixel 8)
+- ✅ iPhone 15/14 Pro (Safari) - Camera mode only
+- ✅ iPad Pro (Safari) - Camera mode only
+- ✅ Samsung Galaxy Tab S9 (Samsung Internet, Chrome)
+
+---
+
+## �👨‍💻 Development
 
 ### Project Structure
 

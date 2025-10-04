@@ -1,0 +1,283 @@
+/* Screenshot Capture Styles */
+.screenshot-capture {
+  position: relative;
+}
+
+.screenshot-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  position: relative;
+}
+
+.screenshot-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.screenshot-button:active {
+  transform: translateY(0);
+}
+
+.screenshot-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.screenshot-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  border: 2px solid white;
+  animation: pulse 0.3s ease;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* Screenshot Preview Modal */
+.screenshot-preview {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.screenshot-preview-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 320px;
+  overflow: hidden;
+  position: relative;
+}
+
+.screenshot-preview-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  color: white;
+  z-index: 10;
+}
+
+.screenshot-preview-close:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.1);
+}
+
+.screenshot-preview-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.screenshot-preview-header {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.screenshot-preview-header svg {
+  width: 24px;
+  height: 24px;
+}
+
+.screenshot-preview-image {
+  padding: 0;
+  background: #f3f4f6;
+  max-height: 300px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.screenshot-preview-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.screenshot-preview-actions {
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+}
+
+.screenshot-download-btn,
+.screenshot-another-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.screenshot-download-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.screenshot-download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.screenshot-another-btn {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.screenshot-another-btn:hover {
+  background: #e5e7eb;
+}
+
+.screenshot-download-btn svg,
+.screenshot-another-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Dark Mode */
+[data-theme="dark"] .screenshot-preview-content {
+  background: #2d3748;
+}
+
+[data-theme="dark"] .screenshot-preview-image {
+  background: #1a202c;
+}
+
+[data-theme="dark"] .screenshot-another-btn {
+  background: #1a202c;
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .screenshot-another-btn:hover {
+  background: #374151;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .screenshot-button span {
+    display: none;
+  }
+
+  .screenshot-button {
+    padding: 0.75rem;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    justify-content: center;
+  }
+
+  .screenshot-preview {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+  }
+
+  .screenshot-preview-content {
+    width: 100%;
+  }
+
+  .screenshot-preview-image {
+    max-height: 200px;
+  }
+
+  .screenshot-preview-actions {
+    flex-direction: column;
+  }
+
+  .screenshot-download-btn,
+  .screenshot-another-btn {
+    width: 100%;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .screenshot-preview {
+    width: 280px;
+  }
+
+  .screenshot-preview-content {
+    width: 100%;
+  }
+}
+
+/* Animation for screenshot taken */
+@keyframes flash {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.screenshot-flash {
+  animation: flash 0.3s ease;
+}
