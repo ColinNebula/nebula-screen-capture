@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/nebula-screen-capture/static/css/main.2e59fb48.css",
-    "main.js": "/nebula-screen-capture/static/js/main.6a78a382.js",
+    "main.css": "/nebula-screen-capture/static/css/main.805fdde3.css",
+    "main.js": "/nebula-screen-capture/static/js/main.1bd86db5.js",
     "static/js/453.5ac610b2.chunk.js": "/nebula-screen-capture/static/js/453.5ac610b2.chunk.js",
     "service-worker.js": "/nebula-screen-capture/service-worker.js",
     "index.html": "/nebula-screen-capture/index.html",
-    "main.2e59fb48.css.map": "/nebula-screen-capture/static/css/main.2e59fb48.css.map",
-    "main.6a78a382.js.map": "/nebula-screen-capture/static/js/main.6a78a382.js.map",
+    "main.805fdde3.css.map": "/nebula-screen-capture/static/css/main.805fdde3.css.map",
+    "main.1bd86db5.js.map": "/nebula-screen-capture/static/js/main.1bd86db5.js.map",
     "453.5ac610b2.chunk.js.map": "/nebula-screen-capture/static/js/453.5ac610b2.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.2e59fb48.css",
-    "static/js/main.6a78a382.js"
+    "static/css/main.805fdde3.css",
+    "static/js/main.1bd86db5.js"
   ]
 }
