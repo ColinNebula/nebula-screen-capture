@@ -3,6 +3,8 @@ import ScreenRecorder from './components/ScreenRecorder';
 import AuthContainer from './components/AuthContainer';
 import ErrorBoundary from './components/ErrorBoundary';
 import SplashScreen from './components/SplashScreen';
+import InstallPrompt from './components/InstallPrompt';
+import IOSNotice from './components/IOSNotice';
 import { ThemeProvider } from './contexts/ThemeContext';
 import './styles/themes.css';
 import './App.css';
@@ -69,6 +71,8 @@ function App() {
           ) : (
             <AuthContainer onAuthenticated={handleLogin} />
           )}
+          <InstallPrompt />
+          <IOSNotice />
         </ErrorBoundary>
       </div>
     </ThemeProvider>

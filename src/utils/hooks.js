@@ -87,16 +87,32 @@ export const formatDuration = (seconds) => {
 };
 
 export const checkBrowserSupport = () => {
+  // Check if running on iOS
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+  const isAppleDevice = isIOS || isPadOS;
+  
   const support = {
     mediaRecorder: typeof MediaRecorder !== 'undefined',
     getDisplayMedia: navigator.mediaDevices && typeof navigator.mediaDevices.getDisplayMedia === 'function',
     getUserMedia: navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function',
-    webRTC: !!(window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection)
+    webRTC: !!(window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection),
+    isIOS: isAppleDevice
   };
   
-  const isSupported = Object.values(support).every(Boolean);
+  // iOS devices don't support getDisplayMedia, so mark as unsupported
+  const isSupported = isAppleDevice ? false : Object.values(support).every(Boolean);
   
-  return { isSupported, support };
+  return { 
+    isSupported, 
+    support,
+    platform: isAppleDevice ? 'iOS' : 'other',
+    message: isAppleDevice 
+      ? 'iOS Safari does not support screen recording. Please use iOS native screen recording or access on a desktop/Android device.' 
+      : isSupported 
+        ? 'Browser fully supported' 
+        : 'Some features may not be available in this browser'
+  };
 };
 
 export const optimizeRecordingSettings = (videoQuality, frameRate) => {

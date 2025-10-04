@@ -487,14 +487,46 @@ Organize multiple recordings:
 
 | Browser | Min Version | Limitations |
 |---------|-------------|-------------|
-| **Safari** | 13+ | Limited audio options, no system audio |
-| **Mobile Safari** | iOS 14+ | No screen recording (iOS limitation) |
+| **Safari (Desktop)** | 13+ | Limited audio options, no system audio capture |
+| **Safari (iOS/iPhone)** | iOS 14+ | **❌ No screen recording** - iOS Safari does not support Screen Capture API |
+| **Safari (iPad)** | iPadOS 14+ | **❌ No screen recording** - Same iOS limitation |
 | **Samsung Internet** | 11+ | Full support on desktop mode |
 
 ### Not Supported ❌
 - Internet Explorer (all versions)
 - Legacy Edge (pre-Chromium)
 - Opera Mini
+- **All iOS browsers** (Chrome, Firefox, Edge on iOS use Safari engine - same limitations)
+
+### iOS/iPhone Limitations 📱
+
+**Important Notice for iPhone/iPad Users:**
+
+Unfortunately, Apple's iOS Safari **does not support the Screen Capture API** (`getDisplayMedia`), which is required for screen recording. This is a **platform limitation**, not an app limitation.
+
+**Why iOS doesn't work:**
+- Apple restricts browser access to screen recording APIs for security/privacy
+- All browsers on iOS (Chrome, Firefox, Edge) use Safari's WebKit engine
+- Even Chrome or Firefox on iPhone cannot bypass this restriction
+- iOS only allows screen recording through native apps or system features
+
+**Alternatives for iOS users:**
+1. **Use Native iOS Screen Recording:**
+   - Open Control Center (swipe down from top-right on iPhone X+)
+   - Tap the record button (⏺)
+   - Record your screen natively
+   - Access recordings in Photos app
+
+2. **Use the App on Desktop/Android:**
+   - Access on Mac, Windows, Linux, or Chromebook
+   - Use on Android devices (full support)
+   - Install as PWA on supported platforms
+
+3. **Mirror to Desktop:**
+   - Use QuickTime (Mac) to mirror iPhone screen
+   - Record the mirrored display using Nebula Screen Capture
+
+We're actively monitoring iOS updates and will support screen recording immediately when Apple enables the API in Safari.
 
 ### Feature Detection
 The app automatically detects browser capabilities and:
