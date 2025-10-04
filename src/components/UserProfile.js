@@ -13,6 +13,7 @@ const UserProfile = ({ user, onLogout }) => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
           triggerRef.current && !triggerRef.current.contains(event.target)) {
+        console.log('Clicking outside, closing dropdown');
         setShowDropdown(false);
       }
     };
@@ -32,14 +33,25 @@ const UserProfile = ({ user, onLogout }) => {
   useEffect(() => {
     if (showDropdown && triggerRef.current) {
       const triggerRect = triggerRef.current.getBoundingClientRect();
+      const dropdownWidth = 280;
+      
+      // Calculate position with bounds checking
+      const calculatedLeft = triggerRect.right - dropdownWidth;
+      const calculatedTop = triggerRect.bottom + 8;
+      
+      // Ensure dropdown stays within viewport
+      const viewportWidth = window.innerWidth;
+      const finalLeft = Math.max(8, Math.min(calculatedLeft, viewportWidth - dropdownWidth - 8));
+      
       setDropdownPosition({
-        top: triggerRect.bottom + 8, // 8px gap
-        left: triggerRect.right - 280, // Align right edge, 280px is dropdown width
+        top: calculatedTop,
+        left: finalLeft,
       });
     }
   }, [showDropdown]);
 
   const handleToggleDropdown = () => {
+    console.log('Toggling dropdown, current state:', showDropdown);
     setShowDropdown(!showDropdown);
   };
 
@@ -99,7 +111,7 @@ const UserProfile = ({ user, onLogout }) => {
             position: 'fixed',
             top: `${dropdownPosition.top}px`,
             left: `${dropdownPosition.left}px`,
-            zIndex: 99999
+            zIndex: 2147483647 // Maximum possible z-index value
           }}
         >
           <div className="dropdown-header">

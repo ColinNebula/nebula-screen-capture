@@ -6,12 +6,10 @@ import FileManager from './FileManager';
 import AreaSelector from './AreaSelector';
 import NotificationCenter from './NotificationCenter';
 import HelpModal from './HelpModal';
-import UserProfile from './UserProfile';
 import PremiumFeature from './PremiumFeature';
 import UpgradeModal from './UpgradeModal';
 import AnalyticsDashboard from './AnalyticsDashboard';
-import NebulaLogo from './NebulaLogo';
-import ThemeToggle from './ThemeToggle';
+import DynamicHeader from './DynamicHeader';
 import { useKeyboardShortcuts, usePerformanceMonitoring, checkBrowserSupport, optimizeRecordingSettings } from '../utils/hooks';
 import { checkFeatureAccess, getPlanLimits } from '../utils/planFeatures';
 import './ScreenRecorder.css';
@@ -400,30 +398,18 @@ const ScreenRecorder = ({ user, onLogout }) => {
 
   return (
     <div className="screen-recorder">
-      <header className="recorder-header">
-        <div className="header-content">
-          <div className="header-left">
-            <NebulaLogo size={48} color="#ffffff" className="header-logo" animated={true} />
-          </div>
-          <div className="header-text">
-            <h1>Nebula Screen Capture</h1>
-            <p>Professional screen recording made simple</p>
-          </div>
-          <div className="header-right">
-            <ThemeToggle />
-            <UserProfile user={user} onLogout={onLogout} />
-            <button 
-              className="help-btn"
-              onClick={() => setShowHelp(true)}
-              title="Help & Shortcuts"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </header>
+      <DynamicHeader
+        user={user}
+        onLogout={onLogout}
+        isRecording={isRecording}
+        isPaused={isPaused}
+        recordingTime={recordingTime}
+        notifications={notifications}
+        onShowHelp={() => setShowHelp(true)}
+        onShowUpgrade={() => setShowUpgrade(true)}
+        recordedVideos={recordedVideos}
+        currentRecording={currentRecording}
+      />
 
       <div className="recorder-content">
         <div className="recorder-main">
