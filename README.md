@@ -1,145 +1,779 @@
-# Nebula Screen Capture
+<div align="center">
 
-A professional, feature-rich screen recording application built with React. Capture your screen with high-quality video and audio, customize recording settings, and manage your recordings with an intuitive interface.
+# 🌌 Nebula Screen Capture
 
-![Nebula Screen Capture](https://img.shields.io/badge/version-1.0.0-blue) ![React](https://img.shields.io/badge/React-18+-green) ![License](https://img.shields.io/badge/license-MIT-purple)
+### Professional Screen Recording Made Simple
 
-## ✨ Features
+*A cutting-edge Progressive Web App for high-quality screen recording*
 
-### 🎬 Core Recording
-- **High-Quality Recording**: Support for 720p, 1080p, 1440p, and 4K video quality
-- **Flexible Frame Rates**: 15, 24, 30, and 60 FPS options
-- **Multiple Capture Modes**: Full screen, specific window, browser tab, or custom area
-- **Pause/Resume**: Seamlessly pause and resume recordings
-- **Real-time Timer**: Track recording duration with precision
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/ColinNebula/nebula-screen-capture)
+[![React](https://img.shields.io/badge/React-19.2-61dafb.svg)](https://reactjs.org/)
+[![PWA](https://img.shields.io/badge/PWA-Enabled-5a0fc8.svg)](https://web.dev/progressive-web-apps/)
+[![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 
-### 🎵 Advanced Audio
-- **Multiple Audio Sources**: System audio, microphone, or both
-- **Audio Enhancement**: Noise suppression, echo cancellation, auto gain control
-- **Quality Settings**: From 32 kbps to 192 kbps audio quality
-- **Device Selection**: Choose specific microphones from available devices
-- **Volume Control**: Adjust microphone volume levels
-
-### 🎯 Smart Area Selection
-- **Custom Recording Areas**: Select specific regions of your screen
-- **Visual Feedback**: Interactive selection with real-time dimensions
-- **Precise Control**: Pixel-perfect area selection
-
-### 📁 File Management
-- **Organized Library**: View all recordings in a searchable, sortable list
-- **Video Previews**: Thumbnail previews with play overlays
-- **Bulk Operations**: Download or delete multiple recordings
-- **Smart Search**: Find recordings by filename
-- **Multiple Sort Options**: Sort by date, size, duration, or name
-- **Storage Info**: View total storage usage and file statistics
-
-### ⌨️ Keyboard Shortcuts
-- **Ctrl/Cmd + R**: Start/Stop recording
-- **Space**: Pause/Resume recording
-- **Escape**: Cancel recording or area selection
-- **Ctrl/Cmd + D**: Download current recording
-
-### 🛡️ Enhanced User Experience
-- **Error Handling**: Graceful error recovery with user feedback
-- **Browser Compatibility**: Automatic feature detection and optimization
-- **Performance Monitoring**: Smart quality adjustment based on device capabilities
-- **Real-time Notifications**: Status updates and helpful tips
-- **Responsive Design**: Works perfectly on desktop and tablet devices
-- **Help System**: Comprehensive help modal with shortcuts and tips
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 14+ and npm/yarn
-- Modern web browser (Chrome 72+, Firefox 66+, Edge 79+)
-- HTTPS connection (required for screen capture APIs)
-
-### Installation
-
-1. **Start the development server**
-```bash
-npm start
-```
-
-2. **Open your browser**
-Navigate to `http://localhost:3001` 
-
-### Building for Production
-
-```bash
-npm run build
-```
-
-## 🎮 How to Use
-
-### Basic Recording
-1. Click "Start Recording" or press `Ctrl+R`
-2. Grant screen capture permissions when prompted
-3. Select the screen/window you want to record
-4. Use pause/resume controls as needed
-5. Click "Stop" or press `Ctrl+R` again to finish
-
-### Custom Area Recording
-1. In Recording Options, select "Custom Area" from Capture Area
-2. Click "Select Recording Area"
-3. Click and drag to select your desired area
-4. Click "Use This Area" to start recording
-
-### Audio Configuration
-1. Expand the Audio Settings panel
-2. Choose your audio source (system, microphone, or both)
-3. Select specific microphone if needed
-4. Adjust quality and enhancement settings
-
-### File Management
-1. View all recordings in the sidebar
-2. Use search to find specific recordings
-3. Sort by date, size, duration, or name
-4. Click thumbnails to preview recordings
-5. Use download/delete buttons for individual files
-
-## 🛠️ Technical Details
-
-### Architecture
-- **React 18+**: Modern React with hooks and functional components
-- **MediaRecorder API**: Native browser recording capabilities
-- **Screen Capture API**: Direct access to screen content
-- **Web Audio API**: Advanced audio processing and mixing
-- **CSS Grid/Flexbox**: Responsive, modern layouts
-- **Error Boundaries**: Graceful error handling
-
-### Browser Support
-| Browser | Version | Features |
-|---------|---------|----------|
-| Chrome | 72+ | ✅ Full support |
-| Firefox | 66+ | ✅ Full support |
-| Edge | 79+ | ✅ Full support |
-| Safari | 13+ | ⚠️ Limited support |
+**[Live Demo](https://colinNebula.github.io/nebula-screen-capture/)** • **[Report Bug](https://github.com/ColinNebula/nebula-screen-capture/issues)** • **[Request Feature](https://github.com/ColinNebula/nebula-screen-capture/issues)**
 
 ---
 
-**Made with ❤️ for professional screen recording**
+**Developed by [Colin Nebula](https://github.com/ColinNebula)**  
+**for [Nebula Media 3D](https://github.com/ColinNebula)** 🚀
 
-### Code Splitting
+</div>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## 📋 Table of Contents
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [Live Demo](#-live-demo)
+- [Installation](#-installation)
+- [Usage Guide](#-usage-guide)
+- [PWA Capabilities](#-pwa-capabilities)
+- [Technical Stack](#-technical-stack)
+- [Browser Support](#-browser-support)
+- [Development](#-development)
+- [Deployment](#-deployment)
+- [Roadmap](#-roadmap)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [About](#-about)
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 🌟 Overview
 
-### Advanced Configuration
+**Nebula Screen Capture** is a state-of-the-art Progressive Web App (PWA) designed to deliver professional-grade screen recording capabilities directly in your browser. Built with modern web technologies, it offers a native app-like experience with the convenience of web accessibility.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Why Nebula Screen Capture?
 
-### Deployment
+- ✨ **Zero Installation Required**: Works instantly in any modern browser
+- 📱 **Installable PWA**: Add to home screen on mobile, tablet, and desktop
+- 🔒 **Privacy First**: All processing happens locally - your recordings never leave your device
+- 🎨 **Beautiful UI**: Modern, intuitive interface with dynamic state-aware header
+- ⚡ **Lightning Fast**: Optimized performance with service worker caching
+- 🌙 **Dark/Light Theme**: Automatic theme detection with manual toggle
+- 📴 **Offline Ready**: Works without internet after first load
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+---
 
-### `npm run build` fails to minify
+## 🎯 Key Features
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### 🎬 **Professional Recording Engine**
+
+#### Quality Options
+- **Video Resolution**: 720p, 1080p, 1440p (2K), 4K Ultra HD
+- **Frame Rates**: 15, 24 (cinematic), 30 (standard), 60 FPS (ultra-smooth)
+- **Audio Quality**: 32, 64, 96, 128, 192 kbps bitrates
+- **Format**: WebM with VP9 codec for optimal compression
+
+#### Capture Modes
+- 🖥️ **Full Screen**: Capture entire desktop
+- 🪟 **Window Mode**: Record specific application windows
+- 🌐 **Browser Tab**: Capture individual browser tabs
+- ✂️ **Custom Area**: Pixel-perfect region selection with visual overlay
+
+#### Recording Controls
+- ⏸️ **Pause/Resume**: Seamlessly pause and continue recordings
+- ⏱️ **Live Timer**: Real-time duration tracking with millisecond precision
+- 🎬 **Pre-recording Countdown**: 3-2-1 visual countdown
+- 📊 **Storage Monitoring**: Real-time storage usage tracking
+
+---
+
+### 🎵 **Advanced Audio System**
+
+#### Multi-Source Audio
+- **System Audio**: Capture application sounds, music, and notifications
+- **Microphone Input**: Record commentary and voiceovers
+- **Dual Channel**: Simultaneously record system and mic audio
+- **Device Selection**: Choose from available microphone devices
+
+#### Audio Enhancement
+- 🎚️ **Noise Suppression**: Remove background noise automatically
+- 🔊 **Echo Cancellation**: Eliminate audio feedback
+- 📈 **Auto Gain Control**: Normalize audio levels
+- 🎛️ **Volume Control**: Adjustable microphone input levels (0-100%)
+
+---
+
+### 🎨 **Dynamic User Interface**
+
+#### State-Aware Header
+The header dynamically adapts to your recording state:
+
+- **🔴 Recording State**: Red gradient with live timer and pulse animation
+- **⏸️ Paused State**: Orange gradient with "Paused" indicator
+- **🎬 Reviewing State**: Green gradient when reviewing recordings
+- **✨ Default State**: Purple/blue gradient with gradient animation
+
+#### Component Features
+- **Theme Toggle**: Quick switch between light and dark modes
+- **Notification Center**: Real-time tips and system messages
+- **User Profile**: Account stats, storage usage, plan information
+- **Premium Features**: Upgrade prompts and feature gates
+
+---
+
+### 📁 **Intelligent File Management**
+
+#### Organization Tools
+- 📊 **Smart Grid View**: Responsive card layout with video thumbnails
+- 🔍 **Real-time Search**: Instant filtering by filename
+- 📑 **Multi-Sort Options**: 
+  - Date (newest/oldest first)
+  - Size (largest/smallest)
+  - Duration (longest/shortest)
+  - Name (A-Z/Z-A)
+
+#### Batch Operations
+- ✅ **Multi-Select**: Select multiple recordings for bulk actions
+- ⬇️ **Bulk Download**: Download selected recordings as ZIP
+- 🗑️ **Bulk Delete**: Remove multiple recordings at once
+- 📊 **Storage Analytics**: View total storage, file count, and usage stats
+
+#### Preview System
+- 🎥 **Video Thumbnails**: Auto-generated preview images
+- ▶️ **Quick Preview**: In-app video player with controls
+- 📝 **Metadata Display**: Filename, size, duration, date
+- 🏷️ **Format Indicators**: Visual codec and quality badges
+
+---
+
+### ⌨️ **Keyboard Shortcuts**
+
+Boost your productivity with comprehensive keyboard support:
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl/⌘ + R` | Start/Stop Recording |
+| `Space` | Pause/Resume Recording |
+| `Escape` | Cancel Recording or Area Selection |
+| `Ctrl/⌘ + D` | Download Current Recording |
+| `Ctrl/⌘ + H` | Open Help Modal |
+| `Ctrl/⌘ + /` | Show Keyboard Shortcuts |
+
+---
+
+### 📱 **Progressive Web App (PWA) Features**
+
+#### Installation
+- 📲 **Add to Home Screen**: Install on iOS, Android, Windows, macOS, Linux
+- 🖥️ **Desktop Integration**: Appears like a native desktop application
+- 🎯 **App Shortcuts**: Quick actions from home screen/taskbar
+  - Start Recording
+  - View Recordings
+
+#### Offline Capabilities
+- 💾 **Service Worker Caching**: App shell cached for offline use
+- ⚡ **Fast Loading**: Instant startup after first visit
+- 🔄 **Auto Updates**: Background updates with user notification
+- 📦 **Asset Optimization**: Compressed resources for faster load times
+
+#### Mobile Optimizations
+- 👆 **Touch-Friendly**: 44px minimum touch targets
+- 📐 **Safe Area Support**: iPhone notch and gesture navigation
+- 🔄 **Orientation Support**: Landscape and portrait modes
+- 🚫 **No Pull-to-Refresh**: Better app-like experience
+- ⚡ **Performance**: Reduced animations on mobile devices
+
+---
+
+### 🛡️ **Premium Features & Plans**
+
+#### Free Plan
+- ✅ 720p & 1080p recording
+- ✅ 5GB storage
+- ✅ Basic features
+- ✅ Unlimited recordings (up to storage limit)
+
+#### Pro Plan
+- ✅ Everything in Free
+- ✅ 1440p (2K) recording
+- ✅ 50GB storage
+- ✅ Advanced audio settings
+- ✅ Batch operations
+
+#### Premium Plan
+- ✅ Everything in Pro
+- ✅ 4K Ultra HD recording
+- ✅ Unlimited storage
+- ✅ Priority support
+- ✅ Analytics dashboard
+- ✅ Custom branding
+
+---
+
+### 🎯 **Smart Features**
+
+#### Browser Compatibility Detection
+- Automatic feature detection and graceful degradation
+- Browser-specific optimizations
+- Compatibility warnings and suggestions
+
+#### Performance Monitoring
+- Real-time performance metrics
+- Automatic quality adjustment for low-end devices
+- Frame drop detection and notification
+
+#### Error Handling
+- Comprehensive error boundaries
+- User-friendly error messages
+- Automatic recovery suggestions
+- Debug logging for troubleshooting
+
+#### Notification System
+- Real-time recording tips
+- Storage warnings
+- Feature discovery prompts
+- Update notifications
+
+---
+
+## 🚀 Live Demo
+
+**Experience Nebula Screen Capture now:**  
+👉 **https://colinNebula.github.io/nebula-screen-capture/**
+
+### Quick Start on Mobile:
+1. Visit the link on your smartphone
+2. Tap the "Install" prompt or use "Add to Home Screen"
+3. Launch from your home screen like a native app!
+
+---
+
+## 💻 Installation
+
+### For Users
+
+#### Web App (No Installation)
+Simply visit: https://colinNebula.github.io/nebula-screen-capture/
+
+#### Install as PWA
+
+**On Android/Chrome:**
+1. Visit the web app
+2. Click "Install" button in the address bar or custom prompt
+3. App appears on home screen
+
+**On iOS/Safari:**
+1. Open in Safari browser
+2. Tap Share button (📤)
+3. Scroll and tap "Add to Home Screen"
+4. Tap "Add"
+
+**On Desktop (Chrome/Edge):**
+1. Visit the web app
+2. Click install icon (⊕) in address bar
+3. Click "Install" in popup
+
+---
+
+### For Developers
+
+#### Prerequisites
+- **Node.js**: 14.x or higher
+- **npm**: 6.x or higher (or yarn 1.22+)
+- **Git**: For cloning the repository
+- **Modern Browser**: Chrome 72+, Firefox 66+, or Edge 79+
+
+#### Clone & Install
+
+```bash
+# Clone the repository
+git clone https://github.com/ColinNebula/nebula-screen-capture.git
+
+# Navigate to directory
+cd nebula-screen-capture
+
+# Install dependencies
+npm install
+```
+
+#### Development Server
+
+```bash
+# Start development server
+npm start
+```
+
+The app will open at `http://localhost:3000`
+
+#### Build for Production
+
+```bash
+# Create optimized production build
+npm run build
+```
+
+Build output will be in the `build/` directory.
+
+#### Deploy to GitHub Pages
+
+```bash
+# Deploy to gh-pages branch
+npm run deploy
+```
+
+---
+
+## 📖 Usage Guide
+
+### Starting Your First Recording
+
+1. **Launch the App**: Open Nebula Screen Capture in your browser
+2. **Configure Settings** (Optional):
+   - Select video quality (720p - 4K)
+   - Choose frame rate (15-60 FPS)
+   - Configure audio sources
+   - Set capture area
+
+3. **Start Recording**:
+   - Click "Start Recording" button
+   - Or press `Ctrl/⌘ + R`
+   - Grant screen capture permissions when prompted
+   - Select which screen/window/tab to record
+
+4. **During Recording**:
+   - Monitor timer and recording state in header
+   - Use pause/resume as needed (Space bar)
+   - Notifications will guide you
+
+5. **Stop & Save**:
+   - Click "Stop Recording" or press `Ctrl/⌘ + R`
+   - Recording automatically appears in File Manager
+   - Download or preview your recording
+
+### Advanced Workflows
+
+#### Custom Area Recording
+Perfect for tutorials and presentations:
+
+```
+1. Recording Options → Capture Area → "Custom Area"
+2. Click "Select Recording Area"
+3. Drag to select desired region
+4. See dimensions in real-time
+5. Click "Use This Area" to confirm
+6. Start recording as normal
+```
+
+#### Audio Mixing
+Record system audio with commentary:
+
+```
+1. Expand Audio Settings
+2. Source → "System + Microphone"
+3. Select your microphone device
+4. Adjust mic volume (50-100% recommended)
+5. Enable noise suppression & echo cancellation
+6. Test levels before recording
+```
+
+#### Batch Management
+Organize multiple recordings:
+
+```
+1. Use search to filter recordings
+2. Select multiple videos (checkboxes)
+3. Click "Download Selected" for ZIP export
+4. Or "Delete Selected" to free up space
+5. Sort by date/size/duration as needed
+```
+
+---
+
+## 🔧 PWA Capabilities
+
+### Service Worker Features
+
+#### Caching Strategy
+- **App Shell**: Precached for instant loading
+- **Images**: Cache-first with 30-day expiration
+- **CSS/JS**: Stale-while-revalidate for optimal performance
+- **Videos**: No caching (too large, user-managed)
+
+#### Update Mechanism
+```javascript
+// Automatic background updates
+// User prompted when new version available
+"New version available! Reload to update?"
+```
+
+#### Offline Behavior
+- ✅ App interface loads offline
+- ✅ View cached recordings
+- ✅ Access settings and help
+- ❌ Recording requires online (browser API limitation)
+
+### Manifest Configuration
+
+```json
+{
+  "name": "Nebula Screen Capture",
+  "short_name": "Nebula",
+  "display": "standalone",
+  "theme_color": "#667eea",
+  "background_color": "#1a1a2e",
+  "icons": [
+    { "src": "logo192.png", "sizes": "192x192", "purpose": "any maskable" },
+    { "src": "logo512.png", "sizes": "512x512", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start Recording",
+      "url": "/?action=record",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    }
+  ]
+}
+```
+
+---
+
+## 🛠️ Technical Stack
+
+### Frontend Framework
+- **React 19.2**: Latest React with concurrent features
+- **React Hooks**: useState, useEffect, useRef, useCallback, useContext
+- **Context API**: Theme management and global state
+
+### Web APIs
+- **MediaRecorder API**: Video/audio recording
+- **Screen Capture API**: Display media access
+- **Web Audio API**: Audio processing and enhancement
+- **MediaDevices API**: Device enumeration
+- **File System API**: Download management
+
+### PWA Technologies
+- **Service Workers**: Offline support and caching
+- **Workbox**: Advanced service worker utilities
+- **Web App Manifest**: Installation metadata
+- **Cache API**: Asset and data caching
+
+### Styling
+- **CSS3**: Modern CSS with variables
+- **CSS Grid**: Responsive layouts
+- **Flexbox**: Component alignment
+- **Media Queries**: Responsive breakpoints
+- **Animations**: Smooth transitions and effects
+
+### Build Tools
+- **Create React App 5.0**: Zero-config setup
+- **Webpack 5**: Module bundling
+- **Babel**: JavaScript transpilation
+- **PostCSS**: CSS processing
+
+### Development Tools
+- **ESLint**: Code linting
+- **React DevTools**: Component debugging
+- **Chrome DevTools**: Performance profiling
+- **Lighthouse**: PWA auditing
+
+---
+
+## 🌐 Browser Support
+
+### Fully Supported ✅
+
+| Browser | Min Version | Notes |
+|---------|-------------|-------|
+| **Chrome** | 72+ | Best performance, all features |
+| **Edge** | 79+ | Full support (Chromium-based) |
+| **Firefox** | 66+ | Full support with minor UI differences |
+| **Opera** | 60+ | Full support (Chromium-based) |
+
+### Partially Supported ⚠️
+
+| Browser | Min Version | Limitations |
+|---------|-------------|-------------|
+| **Safari** | 13+ | Limited audio options, no system audio |
+| **Mobile Safari** | iOS 14+ | No screen recording (iOS limitation) |
+| **Samsung Internet** | 11+ | Full support on desktop mode |
+
+### Not Supported ❌
+- Internet Explorer (all versions)
+- Legacy Edge (pre-Chromium)
+- Opera Mini
+
+### Feature Detection
+The app automatically detects browser capabilities and:
+- Disables unsupported features
+- Shows helpful error messages
+- Suggests alternative browsers when needed
+
+---
+
+## 👨‍💻 Development
+
+### Project Structure
+
+```
+nebula-screen-capture/
+├── public/
+│   ├── index.html          # HTML template with PWA meta tags
+│   ├── manifest.json       # PWA manifest
+│   ├── robots.txt          # SEO
+│   └── icons/              # App icons (192x192, 512x512)
+├── src/
+│   ├── components/         # React components
+│   │   ├── ScreenRecorder.js       # Main recording component
+│   │   ├── DynamicHeader.js        # State-aware header
+│   │   ├── RecordingControls.js    # Control buttons
+│   │   ├── RecordingOptions.js     # Settings panel
+│   │   ├── FileManager.js          # File management
+│   │   ├── VideoPreview.js         # Video player
+│   │   ├── AreaSelector.js         # Custom area selector
+│   │   ├── UserProfile.js          # User profile dropdown
+│   │   ├── NotificationCenter.js   # Notification system
+│   │   ├── InstallPrompt.js        # PWA install prompt
+│   │   └── ...
+│   ├── contexts/           # React contexts
+│   │   └── ThemeContext.js # Theme management
+│   ├── utils/              # Utility functions
+│   │   ├── hooks.js        # Custom React hooks
+│   │   └── planFeatures.js # Plan feature management
+│   ├── styles/             # Global styles
+│   │   └── themes.css      # Theme variables
+│   ├── service-worker.js   # Service worker
+│   ├── serviceWorkerRegistration.js
+│   ├── App.js              # Root component
+│   ├── index.js            # Entry point
+│   └── index.css           # Global styles
+├── package.json
+└── README.md
+```
+
+### Available Scripts
+
+```bash
+# Development
+npm start              # Start dev server (localhost:3000)
+npm test              # Run test suite
+npm run build         # Production build
+
+# Deployment
+npm run deploy        # Deploy to GitHub Pages
+
+# Code Quality
+npm run lint          # Run ESLint
+npm run format        # Format with Prettier
+```
+
+### Custom Hooks
+
+```javascript
+// Performance monitoring
+usePerformanceMonitoring()
+
+// Keyboard shortcuts
+useKeyboardShortcuts(handlers)
+
+// Browser support detection
+checkBrowserSupport()
+
+// Recording settings optimization
+optimizeRecordingSettings(device)
+```
+
+### Environment Variables
+
+Create a `.env.local` file:
+
+```env
+REACT_APP_VERSION=1.0.0
+REACT_APP_API_URL=https://api.example.com
+PUBLIC_URL=/nebula-screen-capture
+```
+
+---
+
+## 🚀 Deployment
+
+### GitHub Pages (Current)
+
+```bash
+# Automatic deployment
+npm run deploy
+```
+
+**Live URL**: https://colinNebula.github.io/nebula-screen-capture/
+
+### Other Platforms
+
+#### Vercel
+```bash
+npm install -g vercel
+vercel --prod
+```
+
+#### Netlify
+```bash
+npm run build
+# Drag & drop build/ folder to Netlify
+```
+
+#### Firebase Hosting
+```bash
+npm install -g firebase-tools
+firebase login
+firebase init hosting
+firebase deploy
+```
+
+---
+
+## 🗺️ Roadmap
+
+### Version 1.1 (Q1 2026)
+- [ ] Cloud storage integration
+- [ ] Video editing tools (trim, crop)
+- [ ] Drawing annotations during recording
+- [ ] Webcam picture-in-picture
+- [ ] GIF export
+
+### Version 1.2 (Q2 2026)
+- [ ] Live streaming capability
+- [ ] Scheduled recordings
+- [ ] Recording templates
+- [ ] Collaboration features
+- [ ] Mobile recording support (Android)
+
+### Version 2.0 (Q3 2026)
+- [ ] AI-powered features
+  - Automatic highlights
+  - Transcript generation
+  - Smart cropping
+- [ ] Advanced analytics
+- [ ] API for integrations
+- [ ] White-label solution
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Here's how you can help:
+
+### Reporting Bugs
+1. Check existing issues first
+2. Create detailed bug report with:
+   - Browser and version
+   - Steps to reproduce
+   - Expected vs actual behavior
+   - Screenshots if applicable
+
+### Feature Requests
+1. Search existing feature requests
+2. Describe the feature and use case
+3. Explain why it would benefit users
+
+### Pull Requests
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
+
+### Code Style
+- Follow existing code patterns
+- Use meaningful variable names
+- Comment complex logic
+- Run `npm run lint` before committing
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
+
+```
+MIT License
+
+Copyright (c) 2025 Colin Nebula / Nebula Media 3D
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+See [LICENSE](LICENSE) file for full details.
+
+---
+
+## 👨‍💻 About
+
+### Developer
+
+**Colin Nebula**  
+Full-Stack Developer & Creator
+
+- 🌐 GitHub: [@ColinNebula](https://github.com/ColinNebula)
+- 💼 LinkedIn: [Colin Nebula](https://linkedin.com/in/colin-nebula)
+- 📧 Email: colin@nebulamedia3d.com
+
+### Company
+
+**Nebula Media 3D**  
+*Innovation in Media & Technology*
+
+Nebula Media 3D is committed to creating cutting-edge web applications and multimedia solutions. We specialize in:
+- Progressive Web Apps
+- 3D Visualization
+- Media Processing
+- Interactive Experiences
+
+🌐 Website: [nebulamedia3d.com](https://nebulamedia3d.com)  
+📧 Contact: info@nebulamedia3d.com
+
+---
+
+### Acknowledgments
+
+Special thanks to:
+- React team for amazing framework
+- Chrome DevRel for PWA guidance
+- MDN Web Docs for comprehensive documentation
+- Open source community for inspiration
+
+---
+
+### Support
+
+Need help? Have questions?
+
+- 📖 [Documentation](https://github.com/ColinNebula/nebula-screen-capture/wiki)
+- 💬 [Discussions](https://github.com/ColinNebula/nebula-screen-capture/discussions)
+- 🐛 [Issues](https://github.com/ColinNebula/nebula-screen-capture/issues)
+- 📧 Email: support@nebulamedia3d.com
+
+---
+
+<div align="center">
+
+### ⭐ Star this repository if you find it helpful!
+
+**Made with ❤️ by Colin Nebula for Nebula Media 3D**
+
+*Professional Screen Recording • Anywhere, Anytime*
+
+[Website](https://nebulamedia3d.com) • [GitHub](https://github.com/ColinNebula) • [Twitter](https://twitter.com/ColinNebula)
+
+---
+
+**© 2025 Nebula Media 3D. All Rights Reserved.**
+
+</div>
