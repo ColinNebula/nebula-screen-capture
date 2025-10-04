@@ -1,7 +1,7 @@
 {
-  "short_name": "Nebula Capture",
-  "name": "Nebula Screen Capture - Professional Screen Recording",
-  "description": "Capture your screen with high-quality video and audio, customize recording settings, and manage your recordings with ease.",
+  "short_name": "Nebula",
+  "name": "Nebula Screen Capture",
+  "description": "Professional screen recording made simple. Capture your screen with high-quality video and audio, customize recording settings, and manage your recordings with ease.",
   "icons": [
     {
       "src": "favicon.ico",
@@ -11,19 +11,57 @@
     {
       "src": "logo192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/nebula-screen-capture/",
   "display": "standalone",
   "theme_color": "#667eea",
-  "background_color": "#f8fafc",
+  "background_color": "#1a1a2e",
   "categories": ["productivity", "utilities", "multimedia"],
-  "scope": "/",
-  "orientation": "portrait-primary"
+  "scope": "/nebula-screen-capture/",
+  "orientation": "any",
+  "dir": "ltr",
+  "lang": "en-US",
+  "prefer_related_applications": false,
+  "screenshots": [
+    {
+      "src": "logo512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start Recording",
+      "short_name": "Record",
+      "description": "Start a new screen recording",
+      "url": "/nebula-screen-capture/?action=record",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "View Recordings",
+      "short_name": "Videos",
+      "description": "View your recorded videos",
+      "url": "/nebula-screen-capture/?action=videos",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    }
+  ],
+  "share_target": {
+    "action": "/nebula-screen-capture/share",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }
