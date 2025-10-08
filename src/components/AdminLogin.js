@@ -10,10 +10,11 @@ const AdminLogin = ({ onClose, onAdminLogin }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Admin credentials (in production, this should be handled by backend authentication)
+  // Admin credentials from environment variables (in production, this should be handled by backend authentication)
   const ADMIN_CREDENTIALS = {
-    username: 'admin',
-    password: 'Nebula@Admin2025!',
+    username: process.env.REACT_APP_ADMIN_USERNAME || 'admin',
+    password: process.env.REACT_APP_ADMIN_PASSWORD || 'Nebula@Admin2025!',
+    email: process.env.REACT_APP_ADMIN_EMAIL || 'admin@nebula-capture.com',
   };
 
   const handleChange = (field, value) => {
@@ -36,7 +37,7 @@ const AdminLogin = ({ onClose, onAdminLogin }) => {
         const adminUser = {
           id: 'admin-001',
           name: 'Administrator',
-          email: 'admin@nebula-capture.com',
+          email: ADMIN_CREDENTIALS.email,
           avatar: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23dc2626" width="100" height="100"/%3E%3Ctext fill="white" font-size="45" font-weight="bold" x="50%25" y="50%25" text-anchor="middle" dy=".35em"%3EA%3C/text%3E%3C/svg%3E',
           plan: 'admin',
           isAdmin: true,
@@ -163,11 +164,12 @@ const AdminLogin = ({ onClose, onAdminLogin }) => {
 
         <div className="admin-credentials-hint">
           <details>
-            <summary>Default Credentials</summary>
+            <summary>Current Credentials</summary>
             <div className="credentials-box">
-              <p><strong>Username:</strong> admin</p>
-              <p><strong>Password:</strong> Nebula@Admin2025!</p>
-              <small>⚠️ Change these credentials in production!</small>
+              <p><strong>Username:</strong> {ADMIN_CREDENTIALS.username}</p>
+              <p><strong>Password:</strong> {ADMIN_CREDENTIALS.password.replace(/./g, '•')}</p>
+              <p><strong>Email:</strong> {ADMIN_CREDENTIALS.email}</p>
+              <small>⚠️ Credentials are loaded from .env file</small>
             </div>
           </details>
         </div>
