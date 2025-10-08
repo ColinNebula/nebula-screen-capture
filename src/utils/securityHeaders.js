@@ -22,6 +22,7 @@ export const CSP_DIRECTIVES = {
     "'self'",
     "data:", // For inline images
     "blob:", // For blob URLs from recordings
+    "https://ui-avatars.com", // For user avatar generation
   ],
   "media-src": [
     "'self'",

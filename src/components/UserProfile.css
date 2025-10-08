@@ -28,6 +28,13 @@
   border-radius: 50%;
   border: 2px solid var(--border-glass);
   object-fit: cover;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: opacity 0.2s ease;
+}
+
+.profile-avatar:not([src]),
+.profile-avatar[src=""] {
+  opacity: 0.5;
 }
 
 .profile-info {
@@ -84,7 +91,7 @@
 /* Portal version - renders to document.body with fixed positioning */
 .profile-dropdown-portal {
   position: fixed !important;
-  z-index: 2147483647 !important;
+  z-index: 2147483646 !important;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25) !important;
 }
 
@@ -114,6 +121,13 @@
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.3);
   object-fit: cover;
+  background: rgba(255, 255, 255, 0.1);
+  transition: opacity 0.2s ease;
+}
+
+.dropdown-avatar:not([src]),
+.dropdown-avatar[src=""] {
+  opacity: 0.5;
 }
 
 .dropdown-user-info {
@@ -216,6 +230,18 @@
 
 .dropdown-button:hover {
   background: #f8fafc;
+}
+
+.dropdown-button.admin-button {
+  color: #dc2626;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.05) 0%, rgba(153, 27, 27, 0.05) 100%);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.dropdown-button.admin-button:hover {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(153, 27, 27, 0.1) 100%);
+  border-color: rgba(220, 38, 38, 0.3);
 }
 
 .dropdown-button.logout {

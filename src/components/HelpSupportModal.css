@@ -1,0 +1,505 @@
+/* Help & Support Modal Styles */
+.modal-overlay {
+  z-index: 2147483647 !important;
+}
+
+.help-modal {
+  max-width: 800px;
+}
+
+.help-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.help-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: none;
+  color: #6b7280;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  position: relative;
+  top: 1px;
+}
+
+.help-tab svg {
+  width: 18px;
+  height: 18px;
+}
+
+.help-tab:hover {
+  color: #374151;
+  background: #f9fafb;
+}
+
+.help-tab.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+.help-body {
+  max-height: 500px;
+  overflow-y: auto;
+  min-height: 400px;
+}
+
+/* FAQ Section */
+.faq-section {
+  padding: 1.5rem;
+}
+
+.search-box {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.search-box svg {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 3rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.faq-category {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.category-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.faq-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.faq-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+
+.faq-question::-webkit-details-marker {
+  display: none;
+}
+
+.faq-question svg {
+  width: 20px;
+  height: 20px;
+  color: #667eea;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.faq-item[open] .faq-question svg {
+  transform: rotate(90deg);
+}
+
+.faq-answer {
+  padding: 0 1.25rem 1rem 3rem;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.no-results svg {
+  width: 48px;
+  height: 48px;
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+.no-results p {
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.no-results small {
+  font-size: 0.9rem;
+}
+
+/* Tutorials Section */
+.tutorials-section {
+  padding: 1.5rem;
+}
+
+.tutorials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.tutorial-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.tutorial-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
+}
+
+.tutorial-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.tutorial-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem;
+}
+
+.tutorial-description {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0 0 1rem;
+  flex: 1;
+}
+
+.tutorial-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #667eea;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.tutorial-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+.resources-box {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.resources-box h3 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  color: #1f2937;
+}
+
+.resource-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.resource-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #374151;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.resource-link:hover {
+  background: #f9fafb;
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.resource-link svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Contact Section */
+.contact-section {
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 2rem;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.contact-form textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.contact-info h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.contact-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contact-method {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.contact-method svg {
+  width: 24px;
+  height: 24px;
+  color: #667eea;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.contact-method div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.contact-method strong {
+  color: #1f2937;
+  font-size: 0.9rem;
+}
+
+.contact-method span {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.response-time {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  color: #1e3a8a;
+  font-size: 0.9rem;
+}
+
+.response-time svg {
+  width: 24px;
+  height: 24px;
+  color: #3b82f6;
+  flex-shrink: 0;
+}
+
+.response-time strong {
+  color: #1e40af;
+}
+
+/* Dark theme */
+[data-theme="dark"] .help-tabs {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .help-tab {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .help-tab:hover {
+  color: #e2e8f0;
+  background: #334155;
+}
+
+[data-theme="dark"] .help-tab.active {
+  color: #818cf8;
+  border-bottom-color: #818cf8;
+}
+
+[data-theme="dark"] .search-box input {
+  background: #334155;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .category-title {
+  color: #f1f5f9;
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .faq-item {
+  background: #334155;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .faq-item:hover {
+  border-color: #818cf8;
+}
+
+[data-theme="dark"] .faq-question {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .faq-answer {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .tutorial-card {
+  background: #334155;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .tutorial-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .tutorial-description {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .resources-box {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .resources-box h3 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .resource-link {
+  background: #334155;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .resource-link:hover {
+  background: #475569;
+  border-color: #818cf8;
+  color: #818cf8;
+}
+
+[data-theme="dark"] .contact-method {
+  background: #334155;
+}
+
+[data-theme="dark"] .contact-method strong {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .contact-method span {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .response-time {
+  background: #1e3a5f;
+  border-color: #1e40af;
+  color: #dbeafe;
+}
+
+[data-theme="dark"] .response-time strong {
+  color: #93c5fd;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contact-section {
+    grid-template-columns: 1fr;
+  }
+
+  .tutorials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .help-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .help-tab {
+    white-space: nowrap;
+  }
+}

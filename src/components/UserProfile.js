@@ -1,10 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import './UserProfile.css';
+import SettingsModal from './SettingsModal';
+import UpgradePlanModal from './UpgradePlanModal';
+import HelpSupportModal from './HelpSupportModal';
+import AdminPanel from './AdminPanel';
 
 const UserProfile = ({ user, onLogout }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const [imageError, setImageError] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const dropdownRef = useRef(null);
   const triggerRef = useRef(null);
 
@@ -78,6 +87,58 @@ const UserProfile = ({ user, onLogout }) => {
     }
   };
 
+  const handleImageError = () => {
+    console.error('Avatar image failed to load:', user.avatar);
+    setImageError(true);
+  };
+
+  const getAvatarSrc = () => {
+    if (imageError) {
+      // Fallback to initials-based data URI
+      const initials = user.name
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+      return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23667eea' width='100' height='100'/%3E%3Ctext fill='white' font-size='45' font-weight='bold' x='50%25' y='50%25' text-anchor='middle' dy='.35em'%3E${initials}%3C/text%3E%3C/svg%3E`;
+    }
+    return user.avatar;
+  };
+
+  // Modal handlers
+  const handleOpenSettings = () => {
+    setShowDropdown(false);
+    setShowSettingsModal(true);
+  };
+
+  const handleOpenUpgrade = () => {
+    setShowDropdown(false);
+    setShowUpgradeModal(true);
+  };
+
+  const handleOpenHelp = () => {
+    setShowDropdown(false);
+    setShowHelpModal(true);
+  };
+
+  const handleOpenAdminPanel = () => {
+    setShowDropdown(false);
+    setShowAdminPanel(true);
+  };
+
+  const handleSaveSettings = (settings) => {
+    console.log('Saving settings:', settings);
+    // TODO: Implement actual settings save logic
+    setShowSettingsModal(false);
+  };
+
+  const handleUpgradePlan = (plan) => {
+    console.log('Upgrading to plan:', plan);
+    // TODO: Implement actual plan upgrade logic
+    setShowUpgradeModal(false);
+  };
+
   return (
     <>
       <div className="user-profile">
@@ -87,9 +148,11 @@ const UserProfile = ({ user, onLogout }) => {
           onClick={handleToggleDropdown}
         >
           <img 
-            src={user.avatar} 
+            src={getAvatarSrc()} 
             alt={user.name}
             className="profile-avatar"
+            onError={handleImageError}
+            loading="lazy"
           />
           <div className="profile-info">
             <span className="profile-name">{user.name}</span>
@@ -115,7 +178,13 @@ const UserProfile = ({ user, onLogout }) => {
           }}
         >
           <div className="dropdown-header">
-            <img src={user.avatar} alt={user.name} className="dropdown-avatar" />
+            <img 
+              src={getAvatarSrc()} 
+              alt={user.name} 
+              className="dropdown-avatar"
+              onError={handleImageError}
+              loading="lazy"
+            />
             <div className="dropdown-user-info">
               <div className="dropdown-name">{user.name}</div>
               <div className="dropdown-email">{user.email}</div>
@@ -146,26 +215,38 @@ const UserProfile = ({ user, onLogout }) => {
           </div>
 
           <div className="dropdown-actions">
-            <button className="dropdown-button">
+            <button className="dropdown-button" onClick={handleOpenSettings}>
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
               </svg>
               Account Settings
             </button>
             
-            <button className="dropdown-button">
+            <button className="dropdown-button" onClick={handleOpenUpgrade}>
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
               </svg>
               Upgrade Plan
             </button>
             
-            <button className="dropdown-button">
+            <button className="dropdown-button" onClick={handleOpenHelp}>
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
               </svg>
               Help & Support
             </button>
+            
+            {user?.isAdmin && (
+              <>
+                <div className="dropdown-divider"></div>
+                <button className="dropdown-button admin-button" onClick={handleOpenAdminPanel}>
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+                  </svg>
+                  Admin Panel
+                </button>
+              </>
+            )}
             
             <div className="dropdown-divider"></div>
             
@@ -178,6 +259,36 @@ const UserProfile = ({ user, onLogout }) => {
           </div>
         </div>,
         document.body
+      )}
+
+      {/* Modals */}
+      {showSettingsModal && (
+        <SettingsModal
+          user={user}
+          onClose={() => setShowSettingsModal(false)}
+          onSave={handleSaveSettings}
+        />
+      )}
+
+      {showUpgradeModal && (
+        <UpgradePlanModal
+          currentPlan={user.plan}
+          onClose={() => setShowUpgradeModal(false)}
+          onUpgrade={handleUpgradePlan}
+        />
+      )}
+
+      {showHelpModal && (
+        <HelpSupportModal
+          onClose={() => setShowHelpModal(false)}
+        />
+      )}
+
+      {showAdminPanel && user?.isAdmin && (
+        <AdminPanel
+          user={user}
+          onClose={() => setShowAdminPanel(false)}
+        />
       )}
     </>
   );

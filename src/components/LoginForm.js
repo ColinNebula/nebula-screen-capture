@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import NebulaLogo from './NebulaLogo';
+import AdminLogin from './AdminLogin';
 import './LoginForm.css';
 
 const LoginForm = ({ onLogin, onSwitchToRegister }) => {
@@ -9,6 +10,7 @@ const LoginForm = ({ onLogin, onSwitchToRegister }) => {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -160,11 +162,27 @@ const LoginForm = ({ onLogin, onSwitchToRegister }) => {
         </p>
       </div>
 
+      <div className="admin-login-section">
+        <button onClick={() => setShowAdminLogin(true)} className="admin-login-button">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+          </svg>
+          Admin Login
+        </button>
+      </div>
+
       <div className="demo-credentials">
         <h4>Demo Credentials</h4>
         <p><strong>Email:</strong> demo@nebula.com</p>
         <p><strong>Password:</strong> demo123</p>
       </div>
+
+      {showAdminLogin && (
+        <AdminLogin
+          onClose={() => setShowAdminLogin(false)}
+          onAdminLogin={onLogin}
+        />
+      )}
     </div>
   );
 };
