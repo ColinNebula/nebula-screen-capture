@@ -144,8 +144,8 @@ const RegisterForm = ({ onRegister, onSwitchToLogin }) => {
       <div className="login-header">
         <div 
           className="logo-tap-container" 
-          onClick={handleLogoTap}
-          style={{ cursor: 'pointer', position: 'relative', display: 'inline-block' }}
+          onTouchStart={handleLogoTap}
+          style={{ position: 'relative', display: 'inline-block' }}
         >
           <NebulaLogo size={64} color="#667eea" animated={true} />
           {/* Tap counter indicator */}

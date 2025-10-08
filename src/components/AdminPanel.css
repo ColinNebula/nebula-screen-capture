@@ -968,37 +968,47 @@
 
 .quick-actions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
 }
 
-.action-btn {
+.action-btn,
+.quick-action-btn {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  padding: 16px;
+  padding: 12px 10px;
   color: #fff;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   text-align: center;
+  white-space: nowrap;
 }
 
-.action-btn:hover {
+.action-btn:hover,
+.quick-action-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: #667eea;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
-.action-btn svg {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 4px;
+.action-btn svg,
+.quick-action-btn svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.quick-action-btn span {
+  font-size: 11px;
+  line-height: 1.2;
 }
 
 .system-limits {
@@ -1111,6 +1121,23 @@
 
   .quick-actions-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .quick-action-btn,
+  .action-btn {
+    padding: 10px 8px;
+    font-size: 11px;
+  }
+
+  .quick-action-btn svg,
+  .action-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .quick-action-btn span {
+    font-size: 10px;
   }
 
   .admin-panel {
