@@ -10,14 +10,17 @@ import PremiumFeature from './PremiumFeature';
 import UpgradeModal from './UpgradeModal';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import DynamicHeader from './DynamicHeader';
+import ScreenshotCapture from './ScreenshotCapture';
 import { useKeyboardShortcuts, usePerformanceMonitoring, checkBrowserSupport, optimizeRecordingSettings } from '../utils/hooks';
 import { checkFeatureAccess, getPlanLimits } from '../utils/planFeatures';
 import './ScreenRecorder.css';
 
 const ScreenRecorder = ({ user, onLogout }) => {
+  const [activeMode, setActiveMode] = useState('record'); // 'record' or 'screenshot'
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [recordedVideos, setRecordedVideos] = useState([]);
+  const [screenshots, setScreenshots] = useState([]);
   const [currentRecording, setCurrentRecording] = useState(null);
   const [recordingTime, setRecordingTime] = useState(0);
   const [showAreaSelector, setShowAreaSelector] = useState(false);
@@ -64,6 +67,12 @@ const ScreenRecorder = ({ user, onLogout }) => {
       setNotifications(prev => prev.filter(n => n.id !== notification.id));
     }, 5000);
   }, []);
+
+  // Screenshot handler
+  const handleScreenshotTaken = useCallback((screenshot) => {
+    setScreenshots(prev => [screenshot, ...prev]);
+    showNotification('Screenshot captured successfully!', 'success');
+  }, [showNotification]);
 
   // Helper functions for bitrate calculation
   const getVideoBitrate = () => {
@@ -413,24 +422,58 @@ const ScreenRecorder = ({ user, onLogout }) => {
 
       <div className="recorder-content">
         <div className="recorder-main">
-          <RecordingControls
-            isRecording={isRecording}
-            isPaused={isPaused}
-            recordingTime={recordingTime}
-            onStart={startRecording}
-            onStop={stopRecording}
-            onPause={pauseRecording}
-          />
-          
-          <RecordingOptions
-            options={recordingOptions}
-            onChange={setRecordingOptions}
-            disabled={isRecording}
-            selectedArea={selectedArea}
-            onAreaSelect={() => setShowAreaSelector(true)}
-            userPlan={user.plan}
-            onUpgrade={() => setShowUpgrade(true)}
-          />
+          {/* Mode Toggle Tabs */}
+          <div className="mode-toggle-tabs">
+            <button
+              className={`mode-tab ${activeMode === 'record' ? 'active' : ''}`}
+              onClick={() => setActiveMode('record')}
+              disabled={isRecording}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="12" r="8"/>
+              </svg>
+              Record Video
+            </button>
+            <button
+              className={`mode-tab ${activeMode === 'screenshot' ? 'active' : ''}`}
+              onClick={() => setActiveMode('screenshot')}
+              disabled={isRecording}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+              </svg>
+              Take Screenshot
+            </button>
+          </div>
+
+          {activeMode === 'record' ? (
+            <>
+              <RecordingControls
+                isRecording={isRecording}
+                isPaused={isPaused}
+                recordingTime={recordingTime}
+                onStart={startRecording}
+                onStop={stopRecording}
+                onPause={pauseRecording}
+              />
+              
+              <RecordingOptions
+                options={recordingOptions}
+                onChange={setRecordingOptions}
+                disabled={isRecording}
+                selectedArea={selectedArea}
+                onAreaSelect={() => setShowAreaSelector(true)}
+                userPlan={user.plan}
+                onUpgrade={() => setShowUpgrade(true)}
+              />
+            </>
+          ) : (
+            <ScreenshotCapture
+              standalone={true}
+              onScreenshotTaken={handleScreenshotTaken}
+              planLimits={planLimits}
+            />
+          )}
           
           {currentRecording && (
             <PremiumFeature 

@@ -24,6 +24,53 @@
   gap: 2rem;
 }
 
+/* Mode Toggle Tabs */
+.mode-toggle-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.mode-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-tab:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.mode-tab.active {
+  background: white;
+  border-color: white;
+  color: #667eea;
+}
+
+.mode-tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mode-tab svg {
+  width: 20px;
+  height: 20px;
+}
+
 .recorder-sidebar {
   display: flex;
   flex-direction: column;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import NebulaLogo from './NebulaLogo';
 import ThemeToggle from './ThemeToggle';
 import UserProfile from './UserProfile';
@@ -21,6 +21,8 @@ const DynamicHeader = ({
   const [headerState, setHeaderState] = useState('default'); // default, recording, paused, reviewing
   const [showNotifications, setShowNotifications] = useState(false);
   const [lastActivity, setLastActivity] = useState(Date.now());
+  const [tapCount, setTapCount] = useState(0);
+  const tapTimeoutRef = useRef(null);
 
   // Determine header state based on app state
   useEffect(() => {
@@ -84,12 +86,53 @@ const DynamicHeader = ({
   const headerContent = getHeaderContent();
   const hasNotifications = notifications && notifications.length > 0;
 
+  // Secret tap gesture for mobile admin access (5 taps on logo within 2 seconds)
+  const handleLogoTap = () => {
+    if (!user.isAdmin) return;
+    
+    setTapCount(prev => prev + 1);
+    
+    // Clear existing timeout
+    if (tapTimeoutRef.current) {
+      clearTimeout(tapTimeoutRef.current);
+    }
+    
+    // Set new timeout to reset tap count
+    tapTimeoutRef.current = setTimeout(() => {
+      setTapCount(0);
+    }, 2000); // 2 second window
+  };
+
+  // Trigger admin panel when 5 taps detected
+  useEffect(() => {
+    if (tapCount >= 5 && user.isAdmin) {
+      setTapCount(0);
+      // Show admin panel via UserProfile component
+      // We'll need to pass this to UserProfile
+      const event = new CustomEvent('showAdminPanel');
+      window.dispatchEvent(event);
+    }
+  }, [tapCount, user.isAdmin]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (tapTimeoutRef.current) {
+        clearTimeout(tapTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <header className={`dynamic-header ${headerState} ${className}`}>
       <div className="header-content">
         {/* Left Section - Logo and Status */}
         <div className="header-left">
-          <div className="logo-container">
+          <div 
+            className="logo-container" 
+            onClick={handleLogoTap}
+            style={{ cursor: user.isAdmin ? 'pointer' : 'default' }}
+          >
             <NebulaLogo 
               size={48} 
               color="#ffffff" 
@@ -98,6 +141,10 @@ const DynamicHeader = ({
             />
             {headerContent.showPulse && (
               <div className="recording-pulse" />
+            )}
+            {/* Secret tap indicator for admins */}
+            {user.isAdmin && tapCount > 0 && tapCount < 5 && (
+              <div className="tap-indicator">{tapCount}/5</div>
             )}
           </div>
           

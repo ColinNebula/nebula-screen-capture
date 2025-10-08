@@ -26,8 +26,20 @@ const UserProfile = ({ user, onLogout }) => {
       }
     };
 
+    // Listen for mobile tap gesture event
+    const handleShowAdminPanel = () => {
+      if (user.isAdmin) {
+        setShowAdminPanel(true);
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('showAdminPanel', handleShowAdminPanel);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('showAdminPanel', handleShowAdminPanel);
+    };
   }, [user.isAdmin]);
 
   // Close dropdown when clicking outside

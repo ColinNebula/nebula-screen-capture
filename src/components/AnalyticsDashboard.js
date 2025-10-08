@@ -23,17 +23,46 @@ const AnalyticsDashboard = ({ recordings, userPlan, onUpgrade }) => {
     const totalViews = totalRecordings * Math.floor(Math.random() * 50 + 10);
     const avgViewTime = avgDuration * 0.7; // Assume 70% completion rate
 
-    const dailyData = [];
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-      const dayRecordings = filteredRecordings.filter(r => 
-        new Date(r.timestamp).toDateString() === date.toDateString()
-      );
-      dailyData.push({
-        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        recordings: dayRecordings.length,
-        views: dayRecordings.length * Math.floor(Math.random() * 20 + 5)
-      });
+    // Group data intelligently based on timeframe
+    const chartData = [];
+    
+    if (timeframe === '7d') {
+      // Show daily data for 7 days
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        const dayRecordings = filteredRecordings.filter(r => 
+          new Date(r.timestamp).toDateString() === date.toDateString()
+        );
+        chartData.push({
+          date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          recordings: dayRecordings.length,
+          views: dayRecordings.length * Math.floor(Math.random() * 20 + 5)
+        });
+      }
+    } else {
+      // Group by weeks for 30 and 90 day views
+      const weeksToShow = timeframe === '30d' ? 4 : 12;
+      const daysPerGroup = Math.ceil(days / weeksToShow);
+      
+      for (let i = weeksToShow - 1; i >= 0; i--) {
+        const endDate = new Date(now.getTime() - i * daysPerGroup * 24 * 60 * 60 * 1000);
+        const startDateGroup = new Date(endDate.getTime() - daysPerGroup * 24 * 60 * 60 * 1000);
+        
+        const groupRecordings = filteredRecordings.filter(r => {
+          const recDate = new Date(r.timestamp);
+          return recDate >= startDateGroup && recDate <= endDate;
+        });
+        
+        const weekLabel = timeframe === '30d' 
+          ? `Week ${weeksToShow - i}`
+          : `W${weeksToShow - i}`;
+        
+        chartData.push({
+          date: weekLabel,
+          recordings: groupRecordings.length,
+          views: groupRecordings.length * Math.floor(Math.random() * 20 + 5)
+        });
+      }
     }
 
     return {
@@ -43,7 +72,7 @@ const AnalyticsDashboard = ({ recordings, userPlan, onUpgrade }) => {
       avgDuration,
       totalViews,
       avgViewTime,
-      dailyData
+      chartData
     };
   };
 
@@ -149,23 +178,27 @@ const AnalyticsDashboard = ({ recordings, userPlan, onUpgrade }) => {
         </div>
 
         <div className="chart-container">
-          <h4>Daily Activity</h4>
+          <h4>{timeframe === '7d' ? 'Daily Activity' : 'Weekly Activity'}</h4>
           <div className="chart">
-            {data.dailyData.map((day, index) => (
-              <div key={index} className="chart-bar">
-                <div 
-                  className="bar recordings" 
-                  style={{ height: `${Math.max(day.recordings * 20, 5)}px` }}
-                  title={`${day.recordings} recordings`}
-                ></div>
-                <div 
-                  className="bar views" 
-                  style={{ height: `${Math.max(day.views * 2, 5)}px` }}
-                  title={`${day.views} views`}
-                ></div>
-                <div className="chart-label">{day.date}</div>
-              </div>
-            ))}
+            {data.chartData.map((item, index) => {
+              const maxRecordings = Math.max(...data.chartData.map(d => d.recordings), 1);
+              const maxViews = Math.max(...data.chartData.map(d => d.views), 1);
+              return (
+                <div key={index} className="chart-bar">
+                  <div 
+                    className="bar recordings" 
+                    style={{ height: `${Math.max((item.recordings / maxRecordings) * 150, 5)}px` }}
+                    title={`${item.recordings} recordings`}
+                  ></div>
+                  <div 
+                    className="bar views" 
+                    style={{ height: `${Math.max((item.views / maxViews) * 150, 5)}px` }}
+                    title={`${item.views} views`}
+                  ></div>
+                  <div className="chart-label">{item.date}</div>
+                </div>
+              );
+            })}
           </div>
           <div className="chart-legend">
             <div className="legend-item">
@@ -192,7 +225,7 @@ const AnalyticsDashboard = ({ recordings, userPlan, onUpgrade }) => {
             </div>
             <div className="insight-item">
               <span className="insight-icon">📊</span>
-              <span>You've been most active on {data.dailyData.reduce((max, day) => day.recordings > max.recordings ? day : max, {recordings: 0, date: 'N/A'}).date}</span>
+              <span>You've been most active on {data.chartData.reduce((max, item) => item.recordings > max.recordings ? item : max, {recordings: 0, date: 'N/A'}).date}</span>
             </div>
           </div>
         </div>
