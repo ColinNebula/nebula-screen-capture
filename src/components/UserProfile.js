@@ -17,6 +17,19 @@ const UserProfile = ({ user, onLogout }) => {
   const dropdownRef = useRef(null);
   const triggerRef = useRef(null);
 
+  // Add keyboard shortcut for admin panel (Alt + O)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.altKey && e.key.toLowerCase() === 'o' && user.isAdmin) {
+        e.preventDefault();
+        setShowAdminPanel(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [user.isAdmin]);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -235,18 +248,6 @@ const UserProfile = ({ user, onLogout }) => {
               </svg>
               Help & Support
             </button>
-            
-            {user?.isAdmin && (
-              <>
-                <div className="dropdown-divider"></div>
-                <button className="dropdown-button admin-button" onClick={handleOpenAdminPanel}>
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
-                  </svg>
-                  Admin Panel
-                </button>
-              </>
-            )}
             
             <div className="dropdown-divider"></div>
             

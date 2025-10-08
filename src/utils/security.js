@@ -343,6 +343,74 @@ export const preventClickjacking = () => {
   }
 };
 
+/**
+ * Check if input is safe from XSS
+ * @param {string} input - Input to check
+ * @returns {boolean} - True if safe
+ */
+export const isSafeFromXSS = (input) => {
+  if (typeof input !== 'string') return false;
+  
+  const xssPatterns = [
+    /<script[^>]*>.*?<\/script>/gi,
+    /javascript:/gi,
+    /on\w+\s*=/gi,
+    /<iframe/gi,
+    /<object/gi,
+    /<embed/gi,
+  ];
+  
+  return !xssPatterns.some(pattern => pattern.test(input));
+};
+
+/**
+ * Log security event
+ * @param {string} event - Event type
+ * @param {Object} details - Event details
+ */
+export const logSecurityEvent = (event, details = {}) => {
+  const securityLog = {
+    timestamp: new Date().toISOString(),
+    event,
+    details,
+    userAgent: navigator.userAgent,
+    url: window.location.href,
+  };
+  
+  if (process.env.NODE_ENV === 'development') {
+    console.warn('🔒 Security Event:', securityLog);
+  }
+  
+  // Store in session storage for debugging (limit to 100 events)
+  try {
+    const logs = JSON.parse(sessionStorage.getItem('security_logs') || '[]');
+    logs.push(securityLog);
+    if (logs.length > 100) logs.shift();
+    sessionStorage.setItem('security_logs', JSON.stringify(logs));
+  } catch (error) {
+    console.error('Failed to log security event:', error);
+  }
+};
+
+/**
+ * Get all security logs
+ * @returns {Array} - Security logs
+ */
+export const getSecurityLogs = () => {
+  try {
+    return JSON.parse(sessionStorage.getItem('security_logs') || '[]');
+  } catch (error) {
+    return [];
+  }
+};
+
+/**
+ * Clear security logs
+ */
+export const clearSecurityLogs = () => {
+  sessionStorage.removeItem('security_logs');
+};
+
 // Initialize clickjacking protection
 if (typeof window !== 'undefined') {
   preventClickjacking();
@@ -360,6 +428,10 @@ export default {
   sanitizeUserInput,
   isSecureContext,
   preventClickjacking,
+  isSafeFromXSS,
+  logSecurityEvent,
+  getSecurityLogs,
+  clearSecurityLogs,
   RateLimiter,
   SecureStorage,
 };

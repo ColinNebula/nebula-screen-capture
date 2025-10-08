@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import PaymentModal from './PaymentModal';
 import './UpgradePlanModal.css';
 
 const UpgradePlanModal = ({ currentPlan, onClose, onUpgrade }) => {
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const plans = [
     {
       id: 'free',
@@ -57,10 +60,42 @@ const UpgradePlanModal = ({ currentPlan, onClose, onUpgrade }) => {
     },
   ];
 
-  const handleUpgrade = (planId) => {
-    if (planId !== currentPlan) {
+  const handleUpgrade = (planId, planData) => {
+    // Free plan - direct downgrade without payment
+    if (planId === 'free') {
       onUpgrade(planId);
+      return;
     }
+    
+    // Don't show payment for current plan
+    if (planId !== currentPlan) {
+      setSelectedPlan(planData);
+      setShowPaymentModal(true);
+    }
+  };
+
+  const handlePaymentSuccess = (transactionData) => {
+    // Close payment modal
+    setShowPaymentModal(false);
+    
+    // Upgrade the user's plan
+    onUpgrade(selectedPlan.id);
+    
+    // Show success notification (you can enhance this with a toast notification)
+    alert(`Payment successful! Welcome to ${selectedPlan.name}.\nTransaction ID: ${transactionData.transactionId}`);
+    
+    // Reset selected plan
+    setSelectedPlan(null);
+  };
+
+  const handlePaymentError = (error) => {
+    // Payment modal will handle the error display
+    console.error('Payment failed:', error);
+  };
+
+  const handlePaymentClose = () => {
+    setShowPaymentModal(false);
+    setSelectedPlan(null);
   };
 
   return createPortal(
@@ -95,7 +130,7 @@ const UpgradePlanModal = ({ currentPlan, onClose, onUpgrade }) => {
                 )}
 
                 <div className="plan-header">
-                  <h3 className="plan-name" style={{ color: plan.color }}>{plan.name}</h3>
+                  <h3 className="plan-name" data-plan={plan.id}>{plan.name}</h3>
                   <div className="plan-price">
                     <span className="price-amount">{plan.price}</span>
                     <span className="price-period">/{plan.period}</span>
@@ -115,7 +150,7 @@ const UpgradePlanModal = ({ currentPlan, onClose, onUpgrade }) => {
 
                 <button 
                   className={`plan-button ${plan.current ? 'current-plan' : ''}`}
-                  onClick={() => handleUpgrade(plan.id)}
+                  onClick={() => handleUpgrade(plan.id, plan)}
                   disabled={plan.current}
                 >
                   {plan.current ? (
@@ -159,6 +194,16 @@ const UpgradePlanModal = ({ currentPlan, onClose, onUpgrade }) => {
             </div>
           </div>
         </div>
+
+        {/* Payment Modal */}
+        {showPaymentModal && selectedPlan && (
+          <PaymentModal
+            plan={selectedPlan}
+            onClose={handlePaymentClose}
+            onPaymentSuccess={handlePaymentSuccess}
+            onPaymentError={handlePaymentError}
+          />
+        )}
       </div>
     </div>,
     document.body

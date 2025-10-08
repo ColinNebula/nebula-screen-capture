@@ -1,0 +1,31 @@
+# Security: Prevent common attack vectors via git
+
+# Ensure line endings are normalized
+* text=auto
+
+# Prevent binary files from being modified
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.mov binary
+*.mp4 binary
+*.webm binary
+*.pdf binary
+
+# Prevent execution of scripts accidentally
+*.sh text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Protect sensitive files from being committed as text
+.env* binary
+*.key binary
+*.pem binary
+*.p12 binary
+*.pfx binary
+
+# Mark files that should not be merged
+package-lock.json merge=binary
+yarn.lock merge=binary
