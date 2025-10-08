@@ -19,6 +19,39 @@
   margin-bottom: 2rem;
 }
 
+/* Logo Tap Container for Mobile Admin Access */
+.logo-tap-container {
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  display: inline-block;
+  position: relative;
+}
+
+.logo-tap-container .tap-indicator {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  animation: tapBounce 0.3s ease;
+  z-index: 10;
+}
+
+@keyframes tapBounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
 .login-header h2 {
   margin: 1rem 0 0.5rem 0;
   color: #2d3748;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import NebulaLogo from './NebulaLogo';
 import AdminLogin from './AdminLogin';
 import './LoginForm.css';
@@ -11,6 +11,8 @@ const LoginForm = ({ onLogin, onSwitchToRegister }) => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [tapCount, setTapCount] = useState(0);
+  const tapTimeoutRef = useRef(null);
 
   // Add keyboard shortcut for admin login (Alt + O)
   useEffect(() => {
@@ -23,6 +25,38 @@ const LoginForm = ({ onLogin, onSwitchToRegister }) => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Secret tap gesture for mobile admin access (5 taps on logo within 2 seconds)
+  const handleLogoTap = () => {
+    setTapCount(prev => prev + 1);
+    
+    // Clear existing timeout
+    if (tapTimeoutRef.current) {
+      clearTimeout(tapTimeoutRef.current);
+    }
+    
+    // Set new timeout to reset tap count
+    tapTimeoutRef.current = setTimeout(() => {
+      setTapCount(0);
+    }, 2000); // 2 second window
+  };
+
+  // Trigger admin login when 5 taps detected
+  useEffect(() => {
+    if (tapCount >= 5) {
+      setTapCount(0);
+      setShowAdminLogin(true);
+    }
+  }, [tapCount]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (tapTimeoutRef.current) {
+        clearTimeout(tapTimeoutRef.current);
+      }
+    };
   }, []);
 
   const handleChange = (e) => {
@@ -97,7 +131,17 @@ const LoginForm = ({ onLogin, onSwitchToRegister }) => {
   return (
     <div className="login-form">
       <div className="login-header">
-        <NebulaLogo size={64} color="#667eea" animated={true} />
+        <div 
+          className="logo-tap-container" 
+          onClick={handleLogoTap}
+          style={{ cursor: 'pointer', position: 'relative', display: 'inline-block' }}
+        >
+          <NebulaLogo size={64} color="#667eea" animated={true} />
+          {/* Tap counter indicator */}
+          {tapCount > 0 && tapCount < 5 && (
+            <div className="tap-indicator">{tapCount}/5</div>
+          )}
+        </div>
         <h2>Welcome back</h2>
         <p>Sign in to your Nebula Screen Capture account</p>
       </div>

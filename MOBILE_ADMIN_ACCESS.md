@@ -2,19 +2,20 @@
 
 ## 📱 Accessing Admin Panel on Mobile Devices (iPhone/iPad/Android)
 
-Since mobile devices don't have Alt keys, we've implemented a **secret tap gesture** to access the admin panel on touch devices.
+Since mobile devices don't have Alt keys, we've implemented a **secret tap gesture** to access the admin login on touch devices.
 
 ---
 
 ## 🎯 How to Access Admin on Mobile
 
-### Method: Secret Tap Gesture
+### Method: Secret Tap Gesture on Login Screen
 
 **Steps:**
-1. Make sure you're logged in as an admin user
-2. **Tap the Nebula logo** (top-left corner) **5 times quickly**
+1. Open the Nebula Screen Capture app
+2. On the **login screen** (or register screen), **tap the Nebula logo** (at the top) **5 times quickly**
 3. You must complete all 5 taps within **2 seconds**
-4. The admin panel will automatically open
+4. The **Admin Login modal** will automatically open
+5. Enter admin credentials to access the admin panel
 
 ### Visual Feedback
 
@@ -23,7 +24,7 @@ As you tap the logo, you'll see a **tap counter** appear:
 - After 2nd tap: Shows "2/5"
 - After 3rd tap: Shows "3/5"
 - After 4th tap: Shows "4/5"
-- After 5th tap: Admin panel opens!
+- After 5th tap: Admin login modal opens!
 
 The counter has a **green badge** with white border that bounces on each tap.
 
@@ -31,7 +32,7 @@ The counter has a **green badge** with white border that bounces on each tap.
 
 ## 🖥️ Desktop Access (Alternative)
 
-On desktop computers, you can use the keyboard shortcut:
+On desktop computers, you can use the keyboard shortcut on the login screen:
 - **Windows/Linux**: `Alt + O`
 - **Mac**: `Option + O`
 
@@ -39,13 +40,13 @@ On desktop computers, you can use the keyboard shortcut:
 
 ## 📋 Quick Reference
 
-| Platform | Method | Details |
-|----------|--------|---------|
-| iPhone | 5 taps on logo | Tap logo 5 times within 2 seconds |
-| iPad | 5 taps on logo | Tap logo 5 times within 2 seconds |
-| Android | 5 taps on logo | Tap logo 5 times within 2 seconds |
-| Desktop | Alt + O | Hold Alt and press O |
-| Mac | Option + O | Hold Option and press O |
+| Platform | Location | Method | Details |
+|----------|----------|--------|---------|
+| iPhone | Login Screen | 5 taps on logo | Tap logo 5 times within 2 seconds |
+| iPad | Login Screen | 5 taps on logo | Tap logo 5 times within 2 seconds |
+| Android | Login Screen | 5 taps on logo | Tap logo 5 times within 2 seconds |
+| Desktop | Login Screen | Alt + O | Hold Alt and press O |
+| Mac | Login Screen | Option + O | Hold Option and press O |
 
 ---
 
@@ -54,35 +55,35 @@ On desktop computers, you can use the keyboard shortcut:
 ### Step-by-Step on iPhone 15 Pro Max
 
 ```
+Login Screen:
 ┌─────────────────────────────────┐
-│  [🌌 Logo]  Nebula Screen...    │ ← Tap here!
-│  ↑                               │
-│  Tap 5 times quickly             │
+│         [🌌 Logo]               │ ← Tap here!
+│                                 │
+│      Welcome back               │
+│  Sign in to your account        │
+│                                 │
+│  Email: ________________        │
+│  Password: _____________        │
+│                                 │
 └─────────────────────────────────┘
 
 First tap:
 ┌─────────────────────────────────┐
-│  [🌌 Logo] (1/5) Nebula...      │ ← Counter appears
+│      [🌌 Logo] (1/5)            │ ← Counter appears
+│                                 │
+│      Welcome back               │
 └─────────────────────────────────┘
 
-Second tap:
+After 5 taps:
 ┌─────────────────────────────────┐
-│  [🌌 Logo] (2/5) Nebula...      │ ← Counter updates
-└─────────────────────────────────┘
-
-Third tap:
-┌─────────────────────────────────┐
-│  [🌌 Logo] (3/5) Nebula...      │
-└─────────────────────────────────┘
-
-Fourth tap:
-┌─────────────────────────────────┐
-│  [🌌 Logo] (4/5) Nebula...      │
-└─────────────────────────────────┘
-
-Fifth tap:
-┌─────────────────────────────────┐
-│  Admin Panel Opens! ✅           │
+│   Admin Login Modal Opens! ✅    │
+│                                 │
+│   🔐 Admin Access               │
+│                                 │
+│   Email: ________________       │
+│   Password: _____________       │
+│                                 │
+│   [Login as Admin]              │
 └─────────────────────────────────┘
 ```
 
@@ -90,11 +91,10 @@ Fifth tap:
 
 ## ⚠️ Important Notes
 
-### Security
-- ✅ Only works for **admin users** (logged in with admin credentials)
-- ✅ Regular users won't see any response when tapping the logo
-- ✅ No visible indication that this feature exists (hidden from non-admins)
-- ✅ Counter only shows for admin users
+### Location Matters!
+- ✅ **Works on**: Login screen and Register screen
+- ❌ **Does NOT work**: After you're logged in
+- 💡 **Why**: Admin access should be granted at login, not during use
 
 ### Timing
 - ⏱️ You have **2 seconds** to complete all 5 taps
