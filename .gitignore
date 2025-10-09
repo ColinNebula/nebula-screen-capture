@@ -11,6 +11,14 @@
 # production
 /build
 
+# Documentation (keep in repo but separate)
+/documentation
+
+# Temporary files and scripts
+*.ps1
+*.html
+!public/*.html
+
 # misc
 .DS_Store
 
@@ -85,10 +93,14 @@ workbox-*.js.map
 generated/
 *.generated.*
 
-# Android / iOS (Capacitor)
+# Android / iOS (Capacitor) - Large build files
 android/
 ios/
 .capacitor/
+
+# Firebase Functions node_modules (exclude from Git)
+functions/node_modules/
+functions/.env
 
 # Signing keys (CRITICAL - NEVER COMMIT THESE!)
 *.keystore

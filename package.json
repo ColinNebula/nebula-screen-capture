@@ -27,21 +27,16 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build -r https://github.com/ColinNebula/nebula-screen-capture.git",
-    "audit": "npm audit --audit-level=moderate",
-    "audit:fix": "npm audit fix",
-    "audit:full": "npm audit --audit-level=low",
-    "security:check": "npm audit && npm outdated",
-    "security:update": "npm update && npm audit fix",
-    "prebuild": "npm run audit",
-    "android:setup": "powershell -ExecutionPolicy Bypass -File ./setup-android.ps1",
     "android:build": "npm run build && npx cap copy android && npx cap sync android",
     "android:open": "npx cap open android",
-    "android:run": "npx cap run android"
+    "android:run": "npx cap run android",
+    "clean": "rmdir /s /q build android\\app\\build functions\\node_modules 2>nul & rmdir /s /q node_modules 2>nul",
+    "clean:cache": "rmdir /s /q node_modules\\.cache 2>nul"
   },
   "eslintConfig": {
     "extends": [

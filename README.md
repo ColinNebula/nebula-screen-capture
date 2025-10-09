@@ -27,15 +27,14 @@
 - [Overview](#-overview)
 - [Key Features](#-key-features)
 - [Live Demo](#-live-demo)
-- [Installation](#-installation)
+- [Quick Start](#-quick-start)
 - [Usage Guide](#-usage-guide)
 - [PWA Capabilities](#-pwa-capabilities)
 - [Technical Stack](#-technical-stack)
 - [Browser Support](#-browser-support)
 - [Development](#-development)
 - [Deployment](#-deployment)
-- [Google Play Publishing](#-google-play-publishing)
-- [Roadmap](#-roadmap)
+- [Documentation](#-documentation)
 - [Contributing](#-contributing)
 - [License](#-license)
 - [About](#-about)
@@ -778,80 +777,30 @@ firebase deploy
 ```
 
 ---
-
-## � Google Play Publishing
-
-Want to publish this app to Google Play Store? We've got you covered!
-
-### 📚 Complete Publishing Guides
-
-- 📖 **[Quick Start Guide](GOOGLE_PLAY_GUIDE.md)** - Get started in 3 simple steps
-- 🛠️ **[Technical Setup](ANDROID_DEPLOYMENT.md)** - Complete Capacitor & Android configuration  
-- 🎨 **[Store Listing](PLAY_STORE_LISTING.md)** - Optimized descriptions, screenshots, and ASO
-- ⚖️ **[Privacy Policy](PRIVACY_POLICY.md)** - GDPR/CCPA compliant privacy policy
-- 📜 **[Terms of Service](TERMS_OF_SERVICE.md)** - User agreement and legal terms
-- ✅ **[Launch Checklist](LAUNCH_CHECKLIST.md)** - Complete pre-launch checklist
-
-### ⚡ Quick Setup
-
-```bash
-# One-command setup for Android
-npm run android:setup
-
-# Build for Android
-npm run android:build
-
-# Open in Android Studio
-npm run android:open
-```
-
-### � Google Play Publishing
-
-Want to publish this app to Google Play Store? We've got you covered!
-
-### 📚 Complete Publishing Guides
-
-**Setup & Development:**
-- 📖 **[Quick Start Guide](GOOGLE_PLAY_GUIDE.md)** - Get started in 3 simple steps
-- 🛠️ **[Technical Setup](ANDROID_DEPLOYMENT.md)** - Complete Capacitor & Android configuration
-- 🎨 **[Android Studio Setup](ANDROID_STUDIO_SETUP.md)** - Install Android Studio & generate signed AAB
-
-**Store Preparation:**
-- 🖼️ **[App Graphics Guide](APP_GRAPHICS_GUIDE.md)** - Create icons, screenshots, and promotional graphics
-- 🎨 **[Store Listing](PLAY_STORE_LISTING.md)** - Optimized descriptions, screenshots, and ASO
-- 🚀 **[Google Play Console](GOOGLE_PLAY_CONSOLE_GUIDE.md)** - Complete submission walkthrough
-
-**Legal & Compliance:**
-- ⚖️ **[Privacy Policy](PRIVACY_POLICY.md)** - GDPR/CCPA compliant privacy policy
-- 📜 **[Terms of Service](TERMS_OF_SERVICE.md)** - User agreement and legal terms
-- ✅ **[Launch Checklist](LAUNCH_CHECKLIST.md)** - Complete pre-launch checklist
-
 ---
 
-## �🗺️ Roadmap
+## 📚 Documentation
 
-### Version 1.1 (Q1 2026)
-- [ ] Cloud storage integration
-- [ ] Video editing tools (trim, crop)
-- [ ] Drawing annotations during recording
-- [ ] Webcam picture-in-picture
-- [ ] GIF export
+All comprehensive guides and documentation have been moved to the `/documentation` folder for a cleaner repository structure.
 
-### Version 1.2 (Q2 2026)
-- [ ] Live streaming capability
-- [ ] Scheduled recordings
-- [ ] Recording templates
-- [ ] Collaboration features
-- [ ] Mobile recording support (Android)
+### Key Documentation
 
-### Version 2.0 (Q3 2026)
-- [ ] AI-powered features
-  - Automatic highlights
-  - Transcript generation
-  - Smart cropping
-- [ ] Advanced analytics
-- [ ] API for integrations
-- [ ] White-label solution
+**Publishing & Deployment:**
+- 📖 [Google Play Publishing Guide](documentation/GOOGLE_PLAY_GUIDE.md)
+- 🛠️ [Android Deployment](documentation/ANDROID_DEPLOYMENT.md)
+- 🎨 [App Graphics Guide](documentation/APP_GRAPHICS_GUIDE.md)
+- ✅ [Launch Checklist](documentation/LAUNCH_CHECKLIST.md)
+
+**Legal:**
+- ⚖️ [Privacy Policy](documentation/PRIVACY_POLICY.md)
+- 📜 [Terms of Service](documentation/TERMS_OF_SERVICE.md)
+
+**Technical:**
+- 📧 [Email Setup Guide](documentation/EMAIL_SETUP_GUIDE.md)
+- 🔒 [Security Implementation](documentation/SECURITY_IMPLEMENTATION.md)
+- 💳 [Payment Setup](documentation/PAYMENT_SETUP.md)
+
+[View All Documentation →](documentation/)
 
 ---
 
