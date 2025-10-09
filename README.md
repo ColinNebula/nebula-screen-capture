@@ -11,7 +11,7 @@
 [![PWA](https://img.shields.io/badge/PWA-Enabled-5a0fc8.svg)](https://web.dev/progressive-web-apps/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 
-**[Live Demo](https://colinNebula.github.io/nebula-screen-capture/)** • **[Report Bug](https://github.com/ColinNebula/nebula-screen-capture/issues)** • **[Request Feature](https://github.com/ColinNebula/nebula-screen-capture/issues)**
+**[Live Demo](https://nebula3ddev.com)** • **[Report Bug](https://github.com/ColinNebula/nebula-screen-capture/issues)** • **[Request Feature](https://github.com/ColinNebula/nebula-screen-capture/issues)**
 
 ---
 
@@ -34,6 +34,7 @@
 - [Browser Support](#-browser-support)
 - [Development](#-development)
 - [Deployment](#-deployment)
+- [Google Play Publishing](#-google-play-publishing)
 - [Roadmap](#-roadmap)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -233,7 +234,9 @@ Boost your productivity with comprehensive keyboard support:
 ## 🚀 Live Demo
 
 **Experience Nebula Screen Capture now:**  
-👉 **https://colinNebula.github.io/nebula-screen-capture/**
+### 🌐 **Access Anywhere**
+
+👉 **https://nebula3ddev.com**
 
 ### Quick Start on Mobile:
 1. Visit the link on your smartphone
@@ -247,7 +250,9 @@ Boost your productivity with comprehensive keyboard support:
 ### For Users
 
 #### Web App (No Installation)
-Simply visit: https://colinNebula.github.io/nebula-screen-capture/
+### 🌐 Try It Now
+
+Simply visit: https://nebula3ddev.com
 
 #### Install as PWA
 
@@ -748,7 +753,7 @@ PUBLIC_URL=/nebula-screen-capture
 npm run deploy
 ```
 
-**Live URL**: https://colinNebula.github.io/nebula-screen-capture/
+**Live URL**: https://nebula3ddev.com
 
 ### Other Platforms
 
@@ -774,7 +779,56 @@ firebase deploy
 
 ---
 
-## 🗺️ Roadmap
+## � Google Play Publishing
+
+Want to publish this app to Google Play Store? We've got you covered!
+
+### 📚 Complete Publishing Guides
+
+- 📖 **[Quick Start Guide](GOOGLE_PLAY_GUIDE.md)** - Get started in 3 simple steps
+- 🛠️ **[Technical Setup](ANDROID_DEPLOYMENT.md)** - Complete Capacitor & Android configuration  
+- 🎨 **[Store Listing](PLAY_STORE_LISTING.md)** - Optimized descriptions, screenshots, and ASO
+- ⚖️ **[Privacy Policy](PRIVACY_POLICY.md)** - GDPR/CCPA compliant privacy policy
+- 📜 **[Terms of Service](TERMS_OF_SERVICE.md)** - User agreement and legal terms
+- ✅ **[Launch Checklist](LAUNCH_CHECKLIST.md)** - Complete pre-launch checklist
+
+### ⚡ Quick Setup
+
+```bash
+# One-command setup for Android
+npm run android:setup
+
+# Build for Android
+npm run android:build
+
+# Open in Android Studio
+npm run android:open
+```
+
+### � Google Play Publishing
+
+Want to publish this app to Google Play Store? We've got you covered!
+
+### 📚 Complete Publishing Guides
+
+**Setup & Development:**
+- 📖 **[Quick Start Guide](GOOGLE_PLAY_GUIDE.md)** - Get started in 3 simple steps
+- 🛠️ **[Technical Setup](ANDROID_DEPLOYMENT.md)** - Complete Capacitor & Android configuration
+- 🎨 **[Android Studio Setup](ANDROID_STUDIO_SETUP.md)** - Install Android Studio & generate signed AAB
+
+**Store Preparation:**
+- 🖼️ **[App Graphics Guide](APP_GRAPHICS_GUIDE.md)** - Create icons, screenshots, and promotional graphics
+- 🎨 **[Store Listing](PLAY_STORE_LISTING.md)** - Optimized descriptions, screenshots, and ASO
+- 🚀 **[Google Play Console](GOOGLE_PLAY_CONSOLE_GUIDE.md)** - Complete submission walkthrough
+
+**Legal & Compliance:**
+- ⚖️ **[Privacy Policy](PRIVACY_POLICY.md)** - GDPR/CCPA compliant privacy policy
+- 📜 **[Terms of Service](TERMS_OF_SERVICE.md)** - User agreement and legal terms
+- ✅ **[Launch Checklist](LAUNCH_CHECKLIST.md)** - Complete pre-launch checklist
+
+---
+
+## �🗺️ Roadmap
 
 ### Version 1.1 (Q1 2026)
 - [ ] Cloud storage integration

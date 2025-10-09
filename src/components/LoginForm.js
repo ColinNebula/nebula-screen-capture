@@ -117,7 +117,7 @@ const LoginForm = ({ onLogin, onSwitchToRegister }) => {
         plan: 'free',
         recordingsCount: 0,
         storageUsed: 0,
-        maxStorage: 1024 // 1GB for free plan
+        maxStorage: 5120 // 5GB for free plan
       };
       
       onLogin(userData);
@@ -217,12 +217,6 @@ const LoginForm = ({ onLogin, onSwitchToRegister }) => {
             Sign up
           </button>
         </p>
-      </div>
-
-      <div className="demo-credentials">
-        <h4>Demo Credentials</h4>
-        <p><strong>Email:</strong> demo@nebula.com</p>
-        <p><strong>Password:</strong> demo123</p>
       </div>
 
       {showAdminLogin && (

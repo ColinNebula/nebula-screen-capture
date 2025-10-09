@@ -84,3 +84,31 @@ workbox-*.js.map
 # Generated files
 generated/
 *.generated.*
+
+# Android / iOS (Capacitor)
+android/
+ios/
+.capacitor/
+
+# Signing keys (CRITICAL - NEVER COMMIT THESE!)
+*.keystore
+*.jks
+release-key.*
+key.properties
+google-services.json
+GoogleService-Info.plist
+android/key.properties
+android/app/keystore/
+
+# App bundles
+*.apk
+*.aab
+*.ipa
+
+# Graphics working files
+graphics/
+*.psd
+*.ai
+*.sketch
+*.fig
+*.xcf

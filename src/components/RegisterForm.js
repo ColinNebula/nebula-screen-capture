@@ -128,7 +128,7 @@ const RegisterForm = ({ onRegister, onSwitchToLogin }) => {
         plan: 'free',
         recordingsCount: 0,
         storageUsed: 0,
-        maxStorage: 1024 // 1GB for free plan
+        maxStorage: 5120 // 5GB for free plan
       };
       
       onRegister(userData);

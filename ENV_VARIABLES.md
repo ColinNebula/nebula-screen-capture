@@ -168,7 +168,7 @@ REACT_APP_MICROSOFT_CLIENT_ID=xxxxx
 ### GitHub Pages
 ```env
 NODE_ENV=production
-PUBLIC_URL=https://ColinNebula.github.io/nebula-screen-capture
+PUBLIC_URL=https://nebula3ddev.com
 REACT_APP_BASE_URL=/nebula-screen-capture
 GENERATE_SOURCEMAP=false
 REACT_APP_ENABLE_DEBUG_MODE=false

@@ -2,8 +2,20 @@
   "name": "nebula-screen-capture",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://ColinNebula.github.io/nebula-screen-capture",
+  "homepage": "https://nebula3ddev.com",
   "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/app": "^7.1.0",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/filesystem": "^7.1.4",
+    "@capacitor/haptics": "^7.0.2",
+    "@capacitor/keyboard": "^7.0.3",
+    "@capacitor/network": "^7.0.2",
+    "@capacitor/share": "^7.0.2",
+    "@capacitor/splash-screen": "^7.0.3",
+    "@capacitor/status-bar": "^7.0.3",
+    "@capacitor/toast": "^7.0.2",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
@@ -25,7 +37,11 @@
     "audit:full": "npm audit --audit-level=low",
     "security:check": "npm audit && npm outdated",
     "security:update": "npm update && npm audit fix",
-    "prebuild": "npm run audit"
+    "prebuild": "npm run audit",
+    "android:setup": "powershell -ExecutionPolicy Bypass -File ./setup-android.ps1",
+    "android:build": "npm run build && npx cap copy android && npx cap sync android",
+    "android:open": "npx cap open android",
+    "android:run": "npx cap run android"
   },
   "eslintConfig": {
     "extends": [

@@ -1,17 +1,17 @@
 // Premium features configuration
 export const PLAN_FEATURES = {
   free: {
-    maxRecordingDuration: 600, // 10 minutes
+    maxRecordingDuration: 1800, // 30 minutes (increased from 10)
     maxResolution: '1080p',
-    maxFileSize: 100 * 1024 * 1024, // 100MB
-    maxStorage: 1 * 1024 * 1024 * 1024, // 1GB
-    recordingsPerDay: 5,
+    maxFileSize: 250 * 1024 * 1024, // 250MB (increased from 100MB)
+    maxStorage: 5 * 1024 * 1024 * 1024, // 5GB (increased from 1GB)
+    recordingsPerDay: -1, // Unlimited (removed daily limit)
     formats: ['webm'],
     features: {
       basicRecording: true,
       audioRecording: true,
       webcamOverlay: false,
-      areaSelection: false,
+      areaSelection: true, // Now available for free users
       advancedAudio: false,
       cloudStorage: false,
       teamSharing: false,
