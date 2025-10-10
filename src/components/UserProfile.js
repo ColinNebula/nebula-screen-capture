@@ -147,9 +147,22 @@ const UserProfile = ({ user, onLogout }) => {
   };
 
   const handleUpgradePlan = (plan) => {
-    console.log('Upgrading to plan:', plan);
-    // TODO: Implement actual plan upgrade logic
-    setShowUpgradeModal(false);
+    console.log('✅ Plan upgrade completed:', plan);
+    
+    // Update user's plan in localStorage
+    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    const updatedUser = {
+      ...currentUser,
+      plan: plan
+    };
+    
+    // Save to localStorage
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    
+    // Trigger a page reload to update all components with new plan
+    window.location.reload();
+    
+    console.log('User plan upgraded to:', plan);
   };
 
   return (

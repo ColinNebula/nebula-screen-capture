@@ -121,7 +121,7 @@ const RegisterForm = ({ onRegister, onSwitchToLogin }) => {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       const userData = {
-        id: Date.now(),
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         email: formData.email,
         name: formData.name,
         avatar: `https://ui-avatars.com/api/?name=${formData.name}&background=667eea&color=fff`,

@@ -110,7 +110,7 @@ const LoginForm = ({ onLogin, onSwitchToRegister }) => {
       
       // For demo purposes, accept any email/password combo
       const userData = {
-        id: Date.now(),
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         email: formData.email,
         name: formData.email.split('@')[0],
         avatar: `https://ui-avatars.com/api/?name=${formData.email.split('@')[0]}&background=667eea&color=fff`,

@@ -7,7 +7,7 @@ import AreaSelector from './AreaSelector';
 import NotificationCenter from './NotificationCenter';
 import HelpModal from './HelpModal';
 import PremiumFeature from './PremiumFeature';
-import UpgradeModal from './UpgradeModal';
+import UpgradePlanModal from './UpgradePlanModal';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import DynamicHeader from './DynamicHeader';
 import ScreenshotCapture from './ScreenshotCapture';
@@ -51,10 +51,15 @@ const ScreenRecorder = ({ user, onLogout }) => {
   const timerRef = useRef(null);
   const chunksRef = useRef([]);
 
+  // Generate unique ID (timestamp + random string)
+  const generateUniqueId = () => {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  };
+
   // Notification function - defined early to avoid hoisting issues
   const showNotification = useCallback((message, type = 'info') => {
     const notification = {
-      id: Date.now(),
+      id: generateUniqueId(),
       message,
       type,
       timestamp: new Date()
@@ -114,7 +119,8 @@ const ScreenRecorder = ({ user, onLogout }) => {
   };
 
   const handleUpgrade = (newPlan) => {
-    // Simulate upgrade
+    console.log('✅ Payment successful - upgrading user to:', newPlan);
+    // Only called AFTER payment success from UpgradePlanModal
     const updatedUser = { ...user, plan: newPlan };
     localStorage.setItem('nebulaUser', JSON.stringify(updatedUser));
     setShowUpgrade(false);
@@ -305,7 +311,7 @@ const ScreenRecorder = ({ user, onLogout }) => {
         const filename = `screen-recording-${timestamp}.${extension}`;
         
         const newRecording = {
-          id: Date.now(),
+          id: generateUniqueId(), // Use unique ID generator
           filename,
           url,
           blob,
@@ -527,12 +533,13 @@ const ScreenRecorder = ({ user, onLogout }) => {
         onClose={() => setShowHelp(false)}
       />
 
-      <UpgradeModal
-        isVisible={showUpgrade}
-        onClose={() => setShowUpgrade(false)}
-        currentPlan={user.plan}
-        onUpgrade={handleUpgrade}
-      />
+      {showUpgrade && (
+        <UpgradePlanModal
+          currentPlan={user.plan}
+          onClose={() => setShowUpgrade(false)}
+          onUpgrade={handleUpgrade}
+        />
+      )}
     </div>
   );
 };

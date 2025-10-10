@@ -203,6 +203,9 @@
   border-radius: 12px;
   text-decoration: none;
   transition: all 0.2s ease;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
 }
 
 .tutorial-card:hover {
@@ -237,6 +240,257 @@
   color: #667eea;
   font-weight: 600;
   font-size: 0.875rem;
+}
+
+/* Tutorial Detail View */
+.tutorial-detail {
+  padding: 1.5rem;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #374151;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1.5rem;
+}
+
+.back-button:hover {
+  background: #e5e7eb;
+}
+
+.back-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tutorial-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.tutorial-icon-large {
+  font-size: 3rem;
+}
+
+.tutorial-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1f2937;
+}
+
+/* Quick Start Steps */
+.tutorial-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.step-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.step-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+.step-content h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.step-content p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Keyboard Shortcuts */
+.shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.shortcut-item:hover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.shortcut-key {
+  background: #374151;
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid #1f2937;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.shortcut-action {
+  color: #374151;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+/* Advanced Features */
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.feature-item {
+  padding: 1.25rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.feature-item h4 {
+  margin: 0 0 0.75rem;
+  color: #1f2937;
+  font-size: 1rem;
+}
+
+.feature-item > p {
+  margin: 0 0 1rem;
+  color: #4b5563;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.feature-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.875rem;
+  background: rgba(102, 126, 234, 0.1);
+  border-left: 3px solid #667eea;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #1e40af;
+}
+
+.feature-tip svg {
+  width: 18px;
+  height: 18px;
+  color: #667eea;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.feature-tip strong {
+  color: #667eea;
+}
+
+/* Best Practices */
+.practices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.practice-category {
+  padding: 1.25rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.practice-category h3 {
+  margin: 0 0 1rem;
+  color: #1f2937;
+  font-size: 1.125rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.practice-category ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.practice-category li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: #4b5563;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.practice-category li svg {
+  width: 20px;
+  height: 20px;
+  color: #10b981;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .tutorial-link svg {
@@ -439,6 +693,105 @@
 
 [data-theme="dark"] .tutorial-description {
   color: #cbd5e1;
+}
+
+[data-theme="dark"] .back-button {
+  background: #334155;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .back-button:hover {
+  background: #475569;
+}
+
+[data-theme="dark"] .tutorial-header {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .tutorial-header h2 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .step-item {
+  background: #334155;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .step-item:hover {
+  border-color: #818cf8;
+}
+
+[data-theme="dark"] .step-content h4 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .step-content p {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .shortcut-item {
+  background: #334155;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .shortcut-item:hover {
+  background: rgba(129, 140, 248, 0.1);
+  border-color: #818cf8;
+}
+
+[data-theme="dark"] .shortcut-key {
+  background: #1e293b;
+  color: #f1f5f9;
+  border-color: #0f172a;
+}
+
+[data-theme="dark"] .shortcut-action {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .feature-item {
+  background: #334155;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .feature-item h4 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .feature-item > p {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .feature-tip {
+  background: rgba(129, 140, 248, 0.15);
+  border-left-color: #818cf8;
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .feature-tip svg {
+  color: #818cf8;
+}
+
+[data-theme="dark"] .feature-tip strong {
+  color: #c7d2fe;
+}
+
+[data-theme="dark"] .practice-category {
+  background: #334155;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .practice-category h3 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .practice-category li {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .practice-category li svg {
+  color: #6ee7b7;
 }
 
 [data-theme="dark"] .resources-box {

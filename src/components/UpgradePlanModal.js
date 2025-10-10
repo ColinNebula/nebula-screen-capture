@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import PaymentModal from './PaymentModal';
 import './UpgradePlanModal.css';
+
+// PayPal configuration - only load if client ID is available
+const paypalClientId = process.env.REACT_APP_PAYPAL_CLIENT_ID;
+const paypalOptions = paypalClientId ? {
+  "client-id": paypalClientId,
+  currency: "USD",
+  intent: "capture",
+} : null;
 
 const UpgradePlanModal = ({ currentPlan, onClose, onUpgrade }) => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -51,9 +60,7 @@ const UpgradePlanModal = ({ currentPlan, onClose, onUpgrade }) => {
         '100 GB storage',
         'AI-powered editing',
         '24/7 premium support',
-        'API access',
-        'Advanced analytics',
-        'White-label solution',
+        'API access & analytics',
       ],
       color: '#fbbf24',
       current: currentPlan === 'premium',
@@ -64,43 +71,58 @@ const UpgradePlanModal = ({ currentPlan, onClose, onUpgrade }) => {
     // Free plan - direct downgrade without payment
     if (planId === 'free') {
       onUpgrade(planId);
+      onClose();
       return;
     }
     
-    // Don't show payment for current plan
-    if (planId !== currentPlan) {
-      setSelectedPlan(planData);
-      setShowPaymentModal(true);
+    // Same plan - do nothing
+    if (planId === currentPlan) {
+      return;
     }
+    
+    // Paid plan - show payment modal
+    setSelectedPlan(planData);
+    setShowPaymentModal(true);
   };
 
   const handlePaymentSuccess = (transactionData) => {
-    // Close payment modal
+    // Close payment modal first
     setShowPaymentModal(false);
+    
+    // Reset selected plan
+    setSelectedPlan(null);
+    
+    // Show success notification
+    alert(`Payment successful! Welcome to ${selectedPlan.name}.\nTransaction ID: ${transactionData.transactionId}\nAmount: $${transactionData.amount}`);
     
     // Upgrade the user's plan
     onUpgrade(selectedPlan.id);
     
-    // Show success notification (you can enhance this with a toast notification)
-    alert(`Payment successful! Welcome to ${selectedPlan.name}.\nTransaction ID: ${transactionData.transactionId}`);
-    
-    // Reset selected plan
-    setSelectedPlan(null);
+    // Close upgrade modal after a short delay to ensure state updates
+    setTimeout(() => {
+      onClose();
+    }, 100);
   };
 
   const handlePaymentError = (error) => {
+    // Keep payment modal open to show error
     // Payment modal will handle the error display
-    console.error('Payment failed:', error);
   };
 
   const handlePaymentClose = () => {
     setShowPaymentModal(false);
     setSelectedPlan(null);
+    // Don't close upgrade modal, let user try again
   };
 
   return createPortal(
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content upgrade-modal" onClick={e => e.stopPropagation()}>
+    <div className="upgrade-modal-overlay" onClick={(e) => {
+      // Only close if clicking the overlay itself, not child modals
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    }}>
+      <div className="upgrade-modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <div>
             <h2>Upgrade Your Plan</h2>
@@ -195,15 +217,35 @@ const UpgradePlanModal = ({ currentPlan, onClose, onUpgrade }) => {
           </div>
         </div>
 
-        {/* Payment Modal */}
-        {showPaymentModal && selectedPlan && (
-          <PaymentModal
-            plan={selectedPlan}
-            onClose={handlePaymentClose}
-            onPaymentSuccess={handlePaymentSuccess}
-            onPaymentError={handlePaymentError}
-          />
-        )}
+        {/* Payment Modal with PayPal Provider */}
+        {(() => {
+          if (showPaymentModal && selectedPlan) {
+            // Wrap in PayPal provider only if client ID is configured
+            if (paypalOptions) {
+              return (
+                <PayPalScriptProvider options={paypalOptions}>
+                  <PaymentModal
+                    plan={selectedPlan}
+                    onClose={handlePaymentClose}
+                    onPaymentSuccess={handlePaymentSuccess}
+                    onPaymentError={handlePaymentError}
+                  />
+                </PayPalScriptProvider>
+              );
+            } else {
+              // Render without PayPal provider in demo mode
+              return (
+                <PaymentModal
+                  plan={selectedPlan}
+                  onClose={handlePaymentClose}
+                  onPaymentSuccess={handlePaymentSuccess}
+                  onPaymentError={handlePaymentError}
+                />
+              );
+            }
+          }
+          return null;
+        })()}
       </div>
     </div>,
     document.body

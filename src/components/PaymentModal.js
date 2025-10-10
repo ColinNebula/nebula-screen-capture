@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { PayPalButtons } from '@paypal/react-paypal-js';
+import paymentService from '../services/paymentService';
 import './PaymentModal.css';
 
 const PaymentModal = ({ plan, onClose, onPaymentSuccess, onPaymentError }) => {
@@ -113,53 +115,70 @@ const PaymentModal = ({ plan, onClose, onPaymentSuccess, onPaymentError }) => {
 
   const handleStripePayment = async () => {
     try {
-      // In production, integrate with Stripe API
       const stripePublicKey = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY;
       
       if (!stripePublicKey) {
-        console.warn('Stripe not configured - using demo mode');
+        console.warn('⚠️ Stripe not configured - using demo mode');
       }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Process payment through payment service
+      const paymentResult = await paymentService.processStripePayment({
+        plan: {
+          id: plan.id,
+          name: plan.name,
+          price: plan.price
+        },
+        billingInfo,
+        cardDetails,
+        userEmail: billingInfo.email,
+        userName: JSON.parse(localStorage.getItem('nebulaUser') || '{}').name
+      });
 
-      // Mock successful payment
-      const paymentResult = {
-        success: true,
-        transactionId: `stripe_${Date.now()}`,
-        amount: currentPlan.amount,
-        currency: currentPlan.currency,
+      // Send confirmation email
+      await paymentService.sendPaymentConfirmationEmail({
+        email: billingInfo.email,
+        name: JSON.parse(localStorage.getItem('nebulaUser') || '{}').name,
         plan: plan.id,
-        method: 'stripe',
-      };
+        transactionId: paymentResult.transactionId,
+        amount: currentPlan.amount
+      });
 
       return paymentResult;
     } catch (error) {
-      throw new Error('Payment processing failed');
+      console.error('Stripe payment error:', error);
+      throw new Error('Payment processing failed. Please try again.');
     }
   };
 
-  const handlePayPalPayment = async () => {
+  const handlePayPalPayment = async (orderID) => {
     try {
-      // In production, integrate with PayPal SDK
-      console.log('Processing PayPal payment...');
+      console.log('Processing PayPal payment...', orderID);
 
-      // Simulate PayPal checkout
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Process payment through payment service
+      const paymentResult = await paymentService.processPayPalPayment({
+        plan: {
+          id: plan.id,
+          name: plan.name,
+          price: plan.price
+        },
+        billingInfo,
+        orderID,
+        userEmail: billingInfo.email
+      });
 
-      // Mock successful payment
-      const paymentResult = {
-        success: true,
-        transactionId: `paypal_${Date.now()}`,
-        amount: currentPlan.amount,
-        currency: currentPlan.currency,
+      // Send confirmation email
+      await paymentService.sendPaymentConfirmationEmail({
+        email: billingInfo.email,
+        name: JSON.parse(localStorage.getItem('nebulaUser') || '{}').name,
         plan: plan.id,
-        method: 'paypal',
-      };
+        transactionId: paymentResult.transactionId,
+        amount: currentPlan.amount
+      });
 
       return paymentResult;
     } catch (error) {
-      throw new Error('PayPal payment failed');
+      console.error('PayPal payment error:', error);
+      throw new Error('PayPal payment failed. Please try again.');
     }
   };
 
@@ -178,17 +197,20 @@ const PaymentModal = ({ plan, onClose, onPaymentSuccess, onPaymentError }) => {
       if (paymentMethod === 'stripe') {
         paymentResult = await handleStripePayment();
       } else {
-        paymentResult = await handlePayPalPayment();
+        // PayPal is handled by PayPalButtons component
+        setErrors({ general: 'Please use the PayPal button below to complete payment' });
+        setIsProcessing(false);
+        return;
       }
 
-      // Success notification
+      // Success - notify parent with billing info
       onPaymentSuccess({
         ...paymentResult,
         billingInfo,
       });
 
-      onClose();
     } catch (error) {
+      console.error('Payment error:', error);
       setErrors({ general: error.message });
       onPaymentError(error);
     } finally {
@@ -196,9 +218,72 @@ const PaymentModal = ({ plan, onClose, onPaymentSuccess, onPaymentError }) => {
     }
   };
 
+  // PayPal handlers
+  const createPayPalOrder = (data, actions) => {
+    if (!actions || !actions.order) {
+      console.error('PayPal actions not available');
+      return Promise.reject('PayPal not initialized');
+    }
+    
+    return actions.order.create({
+      purchase_units: [
+        {
+          description: `${plan.name} Plan - Monthly Subscription`,
+          amount: {
+            currency_code: currentPlan.currency,
+            value: currentPlan.amount.toFixed(2),
+          },
+        },
+      ],
+      application_context: {
+        shipping_preference: 'NO_SHIPPING'
+      }
+    });
+  };
+
+  const onPayPalApprove = async (data, actions) => {
+    try {
+      setIsProcessing(true);
+      const order = await actions.order.capture();
+      
+      // Process the payment
+      const paymentResult = await handlePayPalPayment(order.id);
+      
+      // Success
+      onPaymentSuccess({
+        ...paymentResult,
+        billingInfo,
+        paypalOrderId: order.id
+      });
+      
+    } catch (error) {
+      console.error('PayPal approval error:', error);
+      setErrors({ general: 'PayPal payment failed. Please try again.' });
+      onPaymentError(error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const onPayPalError = (err) => {
+    console.error('PayPal error:', err);
+    setErrors({ general: 'PayPal encountered an error. Please try another payment method.' });
+    onPaymentError(err);
+  };
+
   return createPortal(
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content payment-modal" onClick={e => e.stopPropagation()}>
+    <div className="payment-modal-overlay" onClick={(e) => {
+      // Prevent clicks from bubbling to parent modals
+      e.stopPropagation();
+      // Only close if clicking the overlay itself, not the modal
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    }}>
+      <div className="modal-content payment-modal" onClick={e => {
+        // Prevent all clicks inside the modal from bubbling
+        e.stopPropagation();
+      }}>
         <div className="modal-header">
           <div>
             <h2>Complete Your Upgrade</h2>
@@ -399,13 +484,57 @@ const PaymentModal = ({ plan, onClose, onPaymentSuccess, onPaymentError }) => {
             )}
 
             {paymentMethod === 'paypal' && (
-              <div className="paypal-info">
+              <div className="paypal-container">
                 <div className="info-box">
                   <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
                   </svg>
-                  <p>You'll be redirected to PayPal to complete your payment securely.</p>
+                  <p>Click the PayPal button below to complete your payment securely.</p>
                 </div>
+                
+                {/* PayPal Button - only render if PayPal is loaded */}
+                {typeof PayPalButtons !== 'undefined' ? (
+                  <div className="paypal-button-container">
+                    <PayPalButtons
+                      style={{
+                        layout: 'vertical',
+                        color: 'gold',
+                        shape: 'rect',
+                        label: 'paypal'
+                      }}
+                      createOrder={createPayPalOrder}
+                      onApprove={onPayPalApprove}
+                      onError={onPayPalError}
+                      disabled={isProcessing || !billingInfo.email || !billingInfo.country}
+                    />
+                  </div>
+                ) : (
+                  <div className="paypal-notice" style={{ marginTop: '1rem' }}>
+                    <p>⚠️ PayPal not configured - Demo mode active</p>
+                    <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>
+                      Payment will be simulated for testing
+                    </p>
+                    <button 
+                      type="button"
+                      onClick={async () => {
+                        setIsProcessing(true);
+                        try {
+                          const mockResult = await handlePayPalPayment('demo_' + Date.now());
+                          onPaymentSuccess({ ...mockResult, billingInfo });
+                        } catch (error) {
+                          setErrors({ general: error.message });
+                        } finally {
+                          setIsProcessing(false);
+                        }
+                      }}
+                      className="btn-pay"
+                      disabled={isProcessing || !billingInfo.email}
+                      style={{ marginTop: '1rem', width: '100%' }}
+                    >
+                      {isProcessing ? 'Processing...' : `Demo: Pay $${currentPlan.amount.toFixed(2)}`}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -434,21 +563,28 @@ const PaymentModal = ({ plan, onClose, onPaymentSuccess, onPaymentError }) => {
               <button type="button" onClick={onClose} className="btn-cancel" disabled={isProcessing}>
                 Cancel
               </button>
-              <button type="submit" className="btn-pay" disabled={isProcessing}>
-                {isProcessing ? (
-                  <>
-                    <div className="spinner"></div>
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
-                    </svg>
-                    Pay ${currentPlan.amount.toFixed(2)}
-                  </>
-                )}
-              </button>
+              {paymentMethod === 'stripe' && (
+                <button type="submit" className="btn-pay" disabled={isProcessing}>
+                  {isProcessing ? (
+                    <>
+                      <div className="spinner"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                      </svg>
+                      Pay ${currentPlan.amount.toFixed(2)}
+                    </>
+                  )}
+                </button>
+              )}
+              {paymentMethod === 'paypal' && (
+                <div className="paypal-notice">
+                  <p>Use the PayPal button above to complete payment</p>
+                </div>
+              )}
             </div>
           </form>
 

@@ -5,6 +5,7 @@ import './HelpSupportModal.css';
 const HelpSupportModal = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState('faq');
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTutorial, setActiveTutorial] = useState(null);
   const [contactForm, setContactForm] = useState({
     subject: '',
     message: '',
@@ -82,30 +83,132 @@ const HelpSupportModal = ({ onClose }) => {
     },
   ];
 
+  const tutorialContent = {
+    quickstart: {
+      title: 'Quick Start Guide',
+      icon: '🚀',
+      steps: [
+        { title: 'Log In', desc: 'Sign in with your credentials or use the demo account (demo@nebula.com / demo123)' },
+        { title: 'Start Recording', desc: 'Click the "Start Recording" button in the header' },
+        { title: 'Select Source', desc: 'Choose to share your entire screen, a specific window, or a browser tab' },
+        { title: 'Configure Options', desc: 'Toggle webcam, microphone, and system audio as needed' },
+        { title: 'Begin Recording', desc: 'Click "Share" to start. Use the floating controls to pause or stop' },
+        { title: 'Save & View', desc: 'Your recording is automatically saved. Access it from "My Recordings"' },
+      ]
+    },
+    shortcuts: {
+      title: 'Keyboard Shortcuts',
+      icon: '⌨️',
+      shortcuts: [
+        { keys: 'Ctrl/Cmd + R', action: 'Start/Stop Recording' },
+        { keys: 'Ctrl/Cmd + P', action: 'Pause/Resume Recording' },
+        { keys: 'Ctrl/Cmd + S', action: 'Take Screenshot' },
+        { keys: 'Ctrl/Cmd + W', action: 'Toggle Webcam' },
+        { keys: 'Ctrl/Cmd + M', action: 'Toggle Microphone' },
+        { keys: 'Ctrl/Cmd + K', action: 'Open Settings' },
+        { keys: 'Ctrl/Cmd + H', action: 'Open Help' },
+        { keys: 'Esc', action: 'Close Modal/Cancel' },
+      ]
+    },
+    advanced: {
+      title: 'Advanced Features',
+      icon: '⚡',
+      features: [
+        {
+          name: 'Custom Video Quality',
+          desc: 'Adjust resolution (720p, 1080p, 4K) and frame rate (24, 30, 60 fps) in Settings',
+          tip: 'Higher quality = larger file sizes. Use 720p for quick sharing, 4K for professional content'
+        },
+        {
+          name: 'Webcam Overlay',
+          desc: 'Drag to reposition, resize with corner handles, customize border and shadow',
+          tip: 'Position webcam in bottom-right for minimal content obstruction'
+        },
+        {
+          name: 'Screenshot Capture',
+          desc: 'Take timestamped screenshots during recording without interruption',
+          tip: 'Perfect for creating presentation slides or documentation from your recording'
+        },
+        {
+          name: 'Audio Mixing',
+          desc: 'Record system audio, microphone, or both simultaneously',
+          tip: 'Test audio levels before important recordings using the preview'
+        },
+        {
+          name: 'Storage Management',
+          desc: 'Monitor storage usage, auto-compress old recordings, bulk delete',
+          tip: 'Download important recordings before deleting to free up space'
+        },
+      ]
+    },
+    practices: {
+      title: 'Best Practices',
+      icon: '💡',
+      tips: [
+        {
+          category: 'Preparation',
+          items: [
+            'Close unnecessary applications to improve performance',
+            'Disable notifications to avoid interruptions',
+            'Test your audio setup before recording',
+            'Plan your content with a script or outline',
+          ]
+        },
+        {
+          category: 'Recording',
+          items: [
+            'Use a quiet environment for clear audio',
+            'Speak clearly and at a moderate pace',
+            'Pause briefly between topics for easier editing',
+            'Use keyboard shortcuts to stay efficient',
+          ]
+        },
+        {
+          category: 'Quality',
+          items: [
+            'Record in 1080p for most professional use cases',
+            'Use 60fps for gaming or fast-motion content',
+            'Ensure good lighting if using webcam',
+            'Keep recordings under 30 minutes for easier sharing',
+          ]
+        },
+        {
+          category: 'After Recording',
+          items: [
+            'Review recordings before sharing',
+            'Download important recordings as backup',
+            'Organize recordings with descriptive names',
+            'Delete old recordings to free up storage',
+          ]
+        },
+      ]
+    }
+  };
+
   const tutorials = [
     {
+      id: 'quickstart',
       title: 'Quick Start Guide',
       description: 'Learn the basics in 2 minutes',
       icon: '🚀',
-      link: '#',
     },
     {
+      id: 'advanced',
       title: 'Advanced Features',
       description: 'Master all recording options',
       icon: '⚡',
-      link: '#',
     },
     {
+      id: 'shortcuts',
       title: 'Keyboard Shortcuts',
       description: 'Speed up your workflow',
       icon: '⌨️',
-      link: '#',
     },
     {
+      id: 'practices',
       title: 'Best Practices',
       description: 'Tips for professional recordings',
       icon: '💡',
-      link: '#',
     },
   ];
 
@@ -218,45 +321,129 @@ const HelpSupportModal = ({ onClose }) => {
 
           {activeTab === 'tutorials' && (
             <div className="tutorials-section">
-              <div className="tutorials-grid">
-                {tutorials.map((tutorial, idx) => (
-                  <a key={idx} href={tutorial.link} className="tutorial-card">
-                    <div className="tutorial-icon">{tutorial.icon}</div>
-                    <h3 className="tutorial-title">{tutorial.title}</h3>
-                    <p className="tutorial-description">{tutorial.description}</p>
-                    <div className="tutorial-link">
-                      Watch tutorial
-                      <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
-                      </svg>
-                    </div>
-                  </a>
-                ))}
-              </div>
+              {!activeTutorial ? (
+                <>
+                  <div className="tutorials-grid">
+                    {tutorials.map((tutorial) => (
+                      <button 
+                        key={tutorial.id} 
+                        className="tutorial-card" 
+                        onClick={() => setActiveTutorial(tutorial.id)}
+                      >
+                        <div className="tutorial-icon">{tutorial.icon}</div>
+                        <h3 className="tutorial-title">{tutorial.title}</h3>
+                        <p className="tutorial-description">{tutorial.description}</p>
+                        <div className="tutorial-link">
+                          View tutorial
+                          <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                          </svg>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
 
-              <div className="resources-box">
-                <h3>Additional Resources</h3>
-                <div className="resource-links">
-                  <a href="#" className="resource-link">
+                  <div className="resources-box">
+                    <h3>Additional Resources</h3>
+                    <div className="resource-links">
+                      <a href="https://github.com/ColinNebula/nebula-screen-capture/blob/main/README.md" className="resource-link" target="_blank" rel="noopener noreferrer">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                        </svg>
+                        Full Documentation
+                      </a>
+                      <a href="https://github.com/ColinNebula/nebula-screen-capture" className="resource-link" target="_blank" rel="noopener noreferrer">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                        GitHub Repository
+                      </a>
+                      <a href="https://github.com/ColinNebula/nebula-screen-capture/discussions" className="resource-link" target="_blank" rel="noopener noreferrer">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+                        </svg>
+                        Community Forum
+                      </a>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="tutorial-detail">
+                  <button className="back-button" onClick={() => setActiveTutorial(null)}>
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
                     </svg>
-                    Full Documentation
-                  </a>
-                  <a href="https://github.com/ColinNebula/nebula-screen-capture" className="resource-link" target="_blank" rel="noopener noreferrer">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                    </svg>
-                    GitHub Repository
-                  </a>
-                  <a href="#" className="resource-link">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
-                    </svg>
-                    Community Forum
-                  </a>
+                    Back to Tutorials
+                  </button>
+
+                  <div className="tutorial-header">
+                    <div className="tutorial-icon-large">{tutorialContent[activeTutorial].icon}</div>
+                    <h2>{tutorialContent[activeTutorial].title}</h2>
+                  </div>
+
+                  {activeTutorial === 'quickstart' && (
+                    <div className="tutorial-steps">
+                      {tutorialContent.quickstart.steps.map((step, idx) => (
+                        <div key={idx} className="step-item">
+                          <div className="step-number">{idx + 1}</div>
+                          <div className="step-content">
+                            <h4>{step.title}</h4>
+                            <p>{step.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {activeTutorial === 'shortcuts' && (
+                    <div className="shortcuts-list">
+                      {tutorialContent.shortcuts.shortcuts.map((shortcut, idx) => (
+                        <div key={idx} className="shortcut-item">
+                          <kbd className="shortcut-key">{shortcut.keys}</kbd>
+                          <span className="shortcut-action">{shortcut.action}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {activeTutorial === 'advanced' && (
+                    <div className="features-list">
+                      {tutorialContent.advanced.features.map((feature, idx) => (
+                        <div key={idx} className="feature-item">
+                          <h4>{feature.name}</h4>
+                          <p>{feature.desc}</p>
+                          <div className="feature-tip">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>
+                            </svg>
+                            <strong>Tip:</strong> {feature.tip}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {activeTutorial === 'practices' && (
+                    <div className="practices-list">
+                      {tutorialContent.practices.tips.map((category, idx) => (
+                        <div key={idx} className="practice-category">
+                          <h3>{category.category}</h3>
+                          <ul>
+                            {category.items.map((item, itemIdx) => (
+                              <li key={itemIdx}>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                </svg>
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
             </div>
           )}
 
