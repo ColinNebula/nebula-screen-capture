@@ -20,7 +20,7 @@
     "build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build",
     "test": "react-scripts test",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d build -r https://github.com/ColinNebula/nebula-screen-capture.git",
     "clean": "rmdir /s /q build 2>nul & rmdir /s /q node_modules 2>nul",
     "clean:cache": "rmdir /s /q node_modules\\.cache 2>nul"
   },
