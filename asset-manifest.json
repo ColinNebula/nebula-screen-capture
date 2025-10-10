@@ -1,16 +1,13 @@
 {
   "files": {
-    "main.css": "https://ColinNebula.github.io/nebula-screen-capture/static/css/main.6b89f7e2.css",
-    "main.js": "https://ColinNebula.github.io/nebula-screen-capture/static/js/main.2ddfb0de.js",
-    "static/js/453.5ac610b2.chunk.js": "https://ColinNebula.github.io/nebula-screen-capture/static/js/453.5ac610b2.chunk.js",
-    "service-worker.js": "https://ColinNebula.github.io/nebula-screen-capture/service-worker.js",
-    "index.html": "https://ColinNebula.github.io/nebula-screen-capture/index.html",
-    "main.6b89f7e2.css.map": "https://ColinNebula.github.io/nebula-screen-capture/static/css/main.6b89f7e2.css.map",
-    "main.2ddfb0de.js.map": "https://ColinNebula.github.io/nebula-screen-capture/static/js/main.2ddfb0de.js.map",
-    "453.5ac610b2.chunk.js.map": "https://ColinNebula.github.io/nebula-screen-capture/static/js/453.5ac610b2.chunk.js.map"
+    "main.css": "https://nebula3ddev.com/static/css/main.8f68a2a2.css",
+    "main.js": "https://nebula3ddev.com/static/js/main.6274ed62.js",
+    "static/js/206.78c9b5b0.chunk.js": "https://nebula3ddev.com/static/js/206.78c9b5b0.chunk.js",
+    "service-worker.js": "https://nebula3ddev.com/service-worker.js",
+    "index.html": "https://nebula3ddev.com/index.html"
   },
   "entrypoints": [
-    "static/css/main.6b89f7e2.css",
-    "static/js/main.2ddfb0de.js"
+    "static/css/main.8f68a2a2.css",
+    "static/js/main.6274ed62.js"
   ]
 }
