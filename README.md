@@ -2,6 +2,194 @@
 
 # 🌌 Nebula Screen Capture
 
+**Professional screen recording made simple** - A modern, feature-rich screen recording application built with React.
+
+[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://ColinNebula.github.io/nebula-screen-capture/)
+[![React](https://img.shields.io/badge/React-19.2.0-blue)](https://reactjs.org/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+---
+
+## ✨ Features
+
+### 🎬 **Recording**
+- 📹 **HD Quality** - Record in stunning 1080p or 4K
+- 🎤 **Audio Capture** - System audio, microphone, or both
+- ✂️ **Flexible Selection** - Full screen, window, or custom area
+- ⏱️ **Unlimited Duration** - Record as long as you need (Pro+)
+- 🎨 **Webcam Overlay** - Picture-in-picture camera feed (Pro+)
+
+### 💾 **Storage & Management**
+- ☁️ **Cloud Storage** - 5GB free, up to 100GB on Premium
+- 📁 **File Manager** - Organize and manage recordings
+- 📊 **Analytics** - Track usage and storage
+- 🔄 **Auto-Sync** - Seamless cloud synchronization
+
+### 🎯 **Premium Features**
+- ✂️ **Video Editing** - Trim, cut, and enhance recordings
+- 🤖 **AI Transcription** - Automatic speech-to-text
+- 📡 **Live Streaming** - Stream directly to platforms
+- 🎨 **Custom Branding** - Add your logo and watermarks
+- 👥 **Team Collaboration** - Share and collaborate
+- 🔌 **API Access** - Integrate with your tools
+
+### 🔐 **Security**
+- 🔒 **Email Verification** - Secure account creation
+- 🛡️ **Data Encryption** - Your recordings are protected
+- 🔑 **Two-Factor Auth** - Extra security layer (coming soon)
+- 📝 **Privacy First** - Your data, your control
+
+---
+
+## 🚀 Quick Start
+
+### **Try It Live**
+Visit [nebula-screen-capture](https://ColinNebula.github.io/nebula-screen-capture/) to start recording instantly!
+
+### **Local Development**
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/ColinNebula/nebula-screen-capture.git
+   cd nebula-screen-capture
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start development server**
+   ```bash
+   npm start
+   ```
+
+4. **Open in browser**
+   ```
+   http://localhost:3000
+   ```
+
+---
+
+## 📦 Build & Deploy
+
+### **Build for Production**
+```bash
+npm run build
+```
+
+### **Deploy to GitHub Pages**
+```bash
+npm run deploy
+```
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React 19.2, Hooks, Context API
+- **Styling:** CSS3, Flexbox, Grid, Animations
+- **Recording:** MediaRecorder API, WebRTC
+- **Storage:** localStorage, Cloud Storage
+- **Payments:** Stripe, PayPal
+- **Email:** Firebase Functions, SendGrid
+- **Hosting:** GitHub Pages
+- **PWA:** Service Workers, Offline Support
+
+---
+
+## 📱 Browser Support
+
+| Browser | Support | Notes |
+|---------|---------|-------|
+| Chrome | ✅ Full | Recommended |
+| Edge | ✅ Full | Chromium-based |
+| Firefox | ✅ Full | Great performance |
+| Safari | ⚠️ Partial | Limited MediaRecorder support |
+| Opera | ✅ Full | Chromium-based |
+
+---
+
+## 🎯 Pricing Plans
+
+### **Free**
+- 📹 1080p recording
+- ⏱️ 30 min sessions
+- 💾 5GB storage
+- 🎤 Audio capture
+- ✂️ Area selection
+
+### **Pro - $9.99/mo**
+- 📹 4K recording
+- ⏱️ 1 hour sessions
+- 💾 10GB storage
+- 🎨 Webcam overlay
+- ✂️ Video editing
+- 🤖 AI transcription
+
+### **Premium - $19.99/mo**
+- ⏱️ Unlimited recording
+- 💾 100GB storage
+- 👥 Team features
+- 📊 Analytics
+- 🎨 Custom branding
+- 📡 Live streaming
+- 🔌 API access
+
+---
+
+## 📚 Documentation
+
+Comprehensive guides available in the `docs/` folder:
+- [Email Verification Setup](docs/EMAIL_VERIFICATION_SETUP.md)
+- [Firebase Deployment](docs/FIREBASE_DEPLOY.md)
+- [Payment Integration](docs/PAYMENT_SETUP.md)
+- [Security Guide](docs/SECURITY_GUIDE.md)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- React team for the amazing framework
+- MediaRecorder API contributors
+- Open source community
+
+---
+
+## 📞 Support
+
+- 📧 Email: support@nebula3ddev.com
+- 🐛 Issues: [GitHub Issues](https://github.com/ColinNebula/nebula-screen-capture/issues)
+- 📖 Docs: [Documentation](docs/)
+
+---
+
+<div align="center">
+
+**Made with ❤️ by Nebula 3D Dev**
+
+[Website](https://nebula3ddev.com) • [Demo](https://ColinNebula.github.io/nebula-screen-capture/) • [GitHub](https://github.com/ColinNebula/nebula-screen-capture)
+
+</div>
+
 ### Professional Screen Recording Made Simple
 
 *A cutting-edge Progressive Web App for high-quality screen recording*

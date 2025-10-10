@@ -19,6 +19,18 @@
 *.html
 !public/*.html
 
+# Test files
+test-*.html
+*.test.html
+
+# Documentation markdown (keep only README.md in root)
+CLEANUP_COMPLETE.md
+VERIFICATION_COMPLETE.md
+*_COMPLETE.md
+*_SETUP.md
+*_DEPLOY.md
+*_GUIDE.md
+
 # misc
 .DS_Store
 
