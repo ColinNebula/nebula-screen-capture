@@ -354,6 +354,161 @@ const getEmailTemplate = (type, data) => {
         </div>
       </body>
       </html>
+    `,
+
+    emailVerification: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          ${baseStyle}
+          .verification-code {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            padding: 20px;
+            text-align: center;
+            border-radius: 12px;
+            margin: 30px 0;
+            font-family: 'Courier New', monospace;
+          }
+          .alternative {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>✨ Verify Your Email</h1>
+          </div>
+          <div class="content">
+            <h2>Hi ${sanitize(data.name)}! 👋</h2>
+            <p>Thanks for signing up for <strong>Nebula Screen Capture</strong>!</p>
+            <p>We just need to verify your email address to complete your registration.</p>
+            
+            <h3>🔐 Your Verification Code:</h3>
+            <div class="verification-code">${sanitize(data.verificationToken)}</div>
+            
+            <p style="text-align: center;">
+              <a href="${sanitize(data.verificationUrl)}" class="button">Verify Email Now</a>
+            </p>
+            
+            <div class="alternative">
+              <p><strong>Alternative Method:</strong></p>
+              <p>Copy and paste this code into the verification page, or click the button above.</p>
+              <p><strong>This code expires in 24 hours.</strong></p>
+            </div>
+            
+            <p>If you didn't create a Nebula account, you can safely ignore this email.</p>
+            
+            <p>See you soon! 🚀<br><strong>The Nebula Team</strong></p>
+          </div>
+          <div class="footer">
+            <p>© 2025 Nebula 3D Dev. All rights reserved.</p>
+            <p>Need help? <a href="mailto:${SUPPORT_EMAIL}">Contact Support</a></p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+
+    welcomeVerified: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          ${baseStyle}
+          .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+          }
+          .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+          }
+          .feature-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+          }
+          @media (max-width: 600px) {
+            .feature-grid {
+              grid-template-columns: 1fr;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🎉 Email Verified!</h1>
+          </div>
+          <div class="content">
+            <h2>Welcome to Nebula, ${sanitize(data.name)}! 🌌</h2>
+            <p><strong>Your email has been verified successfully!</strong></p>
+            <p>You're now ready to start creating amazing screen recordings.</p>
+            
+            <div class="feature-grid">
+              <div class="feature-card">
+                <div class="feature-icon">📹</div>
+                <h3>HD Recording</h3>
+                <p>Record in stunning 1080p quality</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">🎤</div>
+                <h3>Audio Capture</h3>
+                <p>System sound & microphone</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">✂️</div>
+                <h3>Custom Areas</h3>
+                <p>Select what to record</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">💾</div>
+                <h3>5GB Storage</h3>
+                <p>Free cloud storage included</p>
+              </div>
+            </div>
+            
+            <h3>🚀 Quick Start Guide:</h3>
+            <ol style="text-align: left; line-height: 2;">
+              <li><strong>Click "New Recording"</strong> to start</li>
+              <li><strong>Choose your capture area</strong> (screen, window, or custom)</li>
+              <li><strong>Enable audio</strong> if needed</li>
+              <li><strong>Click "Start Recording"</strong> and you're live!</li>
+              <li><strong>Save & Share</strong> your recording</li>
+            </ol>
+            
+            <p style="text-align: center; margin-top: 30px;">
+              <a href="https://ColinNebula.github.io/nebula-screen-capture/" class="button">Start Recording Now</a>
+            </p>
+            
+            <p>Need help? Check out our <a href="https://ColinNebula.github.io/nebula-screen-capture/#help">Help & Support</a> or watch our tutorial videos.</p>
+            
+            <p>Happy recording! 🎬<br><strong>The Nebula Team</strong></p>
+          </div>
+          <div class="footer">
+            <p>© 2025 Nebula 3D Dev. All rights reserved.</p>
+            <p>
+              <a href="https://ColinNebula.github.io/nebula-screen-capture/">Dashboard</a> | 
+              <a href="mailto:${SUPPORT_EMAIL}">Support</a> | 
+              <a href="https://ColinNebula.github.io/nebula-screen-capture/#upgrade">Upgrade</a>
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
     `
   };
 
@@ -572,6 +727,85 @@ exports.sendRecordingShare = functions.https.onRequest((req, res) => {
       return res.status(200).json({ success: true, message: 'Share email sent' });
     } catch (error) {
       functions.logger.error('Error sending share email:', error);
+      return res.status(500).json({ error: 'Failed to send email' });
+    }
+  });
+});
+
+// 7. Email Verification
+exports.sendVerificationEmail = functions.https.onRequest((req, res) => {
+  return cors(req, res, async () => {
+    try {
+      const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+      if (!checkRateLimit(ip)) {
+        return res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
+      }
+
+      const { email, name, verificationToken, verificationUrl } = req.body;
+
+      if (!email || !isValidEmail(email) || !verificationToken || !verificationUrl) {
+        return res.status(400).json({ error: 'Invalid request parameters' });
+      }
+
+      const msg = {
+        to: email,
+        from: NO_REPLY_EMAIL,
+        subject: '✨ Verify Your Nebula Email Address',
+        html: getEmailTemplate('emailVerification', { 
+          name: name || 'there', 
+          verificationToken,
+          verificationUrl 
+        })
+      };
+
+      await sgMail.send(msg);
+      
+      functions.logger.info('Verification email sent to:', email);
+      return res.status(200).json({ 
+        success: true, 
+        message: 'Verification email sent successfully' 
+      });
+    } catch (error) {
+      functions.logger.error('Error sending verification email:', error);
+      return res.status(500).json({ 
+        error: 'Failed to send verification email',
+        details: error.message 
+      });
+    }
+  });
+});
+
+// 8. Welcome Email (after verification)
+exports.sendWelcomeEmailVerified = functions.https.onRequest((req, res) => {
+  return cors(req, res, async () => {
+    try {
+      const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+      if (!checkRateLimit(ip)) {
+        return res.status(429).json({ error: 'Rate limit exceeded' });
+      }
+
+      const { email, name } = req.body;
+
+      if (!email || !isValidEmail(email)) {
+        return res.status(400).json({ error: 'Invalid email address' });
+      }
+
+      const msg = {
+        to: email,
+        from: NO_REPLY_EMAIL,
+        subject: '🎉 Email Verified - Welcome to Nebula!',
+        html: getEmailTemplate('welcomeVerified', { name: name || 'there' })
+      };
+
+      await sgMail.send(msg);
+      
+      functions.logger.info('Welcome (verified) email sent to:', email);
+      return res.status(200).json({ 
+        success: true, 
+        message: 'Welcome email sent' 
+      });
+    } catch (error) {
+      functions.logger.error('Error sending welcome email:', error);
       return res.status(500).json({ error: 'Failed to send email' });
     }
   });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import NebulaLogo from './NebulaLogo';
 import AdminLogin from './AdminLogin';
+import emailVerificationService from '../services/emailVerificationService';
 import './LoginForm.css';
 
 const RegisterForm = ({ onRegister, onSwitchToLogin }) => {
@@ -128,11 +129,25 @@ const RegisterForm = ({ onRegister, onSwitchToLogin }) => {
         plan: 'free',
         recordingsCount: 0,
         storageUsed: 0,
-        maxStorage: 5120 // 5GB for free plan
+        maxStorage: 5120, // 5GB for free plan
+        emailVerified: false,
+        createdAt: Date.now()
       };
+
+      // Send verification email
+      const verificationResult = await emailVerificationService.sendVerificationEmail(userData);
       
-      onRegister(userData);
+      if (verificationResult.success) {
+        // Store user data temporarily (not authenticated yet)
+        localStorage.setItem('nebula_pending_user', JSON.stringify(userData));
+        
+        // Pass user data to parent with verification pending flag
+        onRegister(userData, { requiresVerification: true });
+      } else {
+        setErrors({ general: 'Failed to send verification email. Please try again.' });
+      }
     } catch (error) {
+      console.error('Registration error:', error);
       setErrors({ general: 'Registration failed. Please try again.' });
     } finally {
       setIsLoading(false);

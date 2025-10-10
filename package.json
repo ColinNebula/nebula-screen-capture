@@ -2,7 +2,7 @@
   "name": "nebula-screen-capture",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://nebula3ddev.com",
+  "homepage": "https://ColinNebula.github.io/nebula-screen-capture",
   "dependencies": {
     "@capacitor/android": "^7.4.3",
     "@capacitor/app": "^7.1.0",

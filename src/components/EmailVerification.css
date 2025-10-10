@@ -1,0 +1,471 @@
+/* Email Verification Modal */
+.verification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  animation: fadeIn 0.3s ease;
+  padding: 1rem;
+}
+
+.verification-modal {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.verification-header {
+  text-align: center;
+  padding: 2rem 2rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.verification-header h2 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1.75rem;
+  color: #1f2937;
+}
+
+.verification-header p {
+  margin: 0.5rem 0;
+  color: #6b7280;
+  font-size: 0.9375rem;
+}
+
+.email-display {
+  display: block;
+  color: #667eea;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  word-break: break-all;
+}
+
+.verification-body {
+  padding: 2rem;
+}
+
+.verification-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.verification-icon svg {
+  width: 40px;
+  height: 40px;
+  color: #667eea;
+}
+
+.verification-instructions {
+  margin-bottom: 2rem;
+}
+
+.verification-instructions h3 {
+  margin: 0 0 1rem;
+  font-size: 1.125rem;
+  color: #1f2937;
+  text-align: center;
+}
+
+.verification-instructions ol {
+  padding-left: 1.5rem;
+  margin: 0;
+}
+
+.verification-instructions li {
+  margin: 0.75rem 0;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.verification-error {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #dc2626;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.verification-error svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.verification-message {
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.verification-message.success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #059669;
+}
+
+.verification-message.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}
+
+.verification-divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.verification-divider::before,
+.verification-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.verification-divider span {
+  padding: 0 1rem;
+}
+
+.manual-verification {
+  margin-bottom: 1.5rem;
+}
+
+.manual-verification label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.code-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.code-input-group input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+}
+
+.code-input-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.verify-button {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.verify-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.verify-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.verification-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.resend-button,
+.skip-button {
+  padding: 0.875rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.resend-button {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.resend-button:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.resend-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.resend-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.skip-button {
+  background: transparent;
+  color: #667eea;
+  border: 1px solid #667eea;
+}
+
+.skip-button:hover {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(55, 65, 81, 0.3);
+  border-top-color: #374151;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.verification-help {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.verification-help p {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.verification-help svg {
+  width: 16px;
+  height: 16px;
+  color: #9ca3af;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.inline-link {
+  background: none;
+  border: none;
+  color: #667eea;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.inline-link:hover {
+  color: #764ba2;
+}
+
+.close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: #e5e7eb;
+  transform: rotate(90deg);
+}
+
+.close-button svg {
+  width: 18px;
+  height: 18px;
+  color: #6b7280;
+}
+
+/* Dark Theme */
+[data-theme="dark"] .verification-modal {
+  background: #1e293b;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .verification-header {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .verification-header h2 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .verification-header p {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .email-display {
+  color: #818cf8;
+}
+
+[data-theme="dark"] .verification-icon {
+  background: rgba(129, 140, 248, 0.15);
+}
+
+[data-theme="dark"] .verification-icon svg {
+  color: #818cf8;
+}
+
+[data-theme="dark"] .verification-instructions h3 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .verification-instructions li {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .verification-divider {
+  color: #64748b;
+}
+
+[data-theme="dark"] .verification-divider::before,
+[data-theme="dark"] .verification-divider::after {
+  background: #334155;
+}
+
+[data-theme="dark"] .manual-verification label {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .code-input-group input {
+  background: #334155;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .code-input-group input:focus {
+  border-color: #818cf8;
+  background: rgba(129, 140, 248, 0.1);
+}
+
+[data-theme="dark"] .resend-button {
+  background: #334155;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .resend-button:hover:not(:disabled) {
+  background: #475569;
+}
+
+[data-theme="dark"] .skip-button {
+  border-color: #818cf8;
+  color: #818cf8;
+}
+
+[data-theme="dark"] .skip-button:hover {
+  background: rgba(129, 140, 248, 0.15);
+}
+
+[data-theme="dark"] .verification-help {
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .verification-help p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .close-button {
+  background: #334155;
+}
+
+[data-theme="dark"] .close-button:hover {
+  background: #475569;
+}
+
+[data-theme="dark"] .close-button svg {
+  color: #cbd5e1;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .verification-modal {
+    max-width: 95%;
+    margin: 1rem;
+  }
+
+  .verification-header,
+  .verification-body {
+    padding: 1.5rem;
+  }
+
+  .code-input-group {
+    flex-direction: column;
+  }
+
+  .verify-button {
+    width: 100%;
+  }
+}
