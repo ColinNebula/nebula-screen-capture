@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/nebula-screen-capture/static/css/main.42aab05c.css",
-    "main.js": "/nebula-screen-capture/static/js/main.48345ee4.js",
-    "static/js/206.78c9b5b0.chunk.js": "/nebula-screen-capture/static/js/206.78c9b5b0.chunk.js",
-    "service-worker.js": "/nebula-screen-capture/service-worker.js",
-    "index.html": "/nebula-screen-capture/index.html"
+    "main.css": "/static/css/main.74232d4a.css",
+    "main.js": "/static/js/main.f371c95e.js",
+    "static/js/206.78c9b5b0.chunk.js": "/static/js/206.78c9b5b0.chunk.js",
+    "service-worker.js": "/service-worker.js",
+    "index.html": "/index.html"
   },
   "entrypoints": [
-    "static/css/main.42aab05c.css",
-    "static/js/main.48345ee4.js"
+    "static/css/main.74232d4a.css",
+    "static/js/main.f371c95e.js"
   ]
 }
