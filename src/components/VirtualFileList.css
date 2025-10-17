@@ -1,0 +1,248 @@
+.virtual-file-list {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.virtual-file-list.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.virtual-spacer {
+  position: relative;
+  width: 100%;
+}
+
+.virtual-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  will-change: transform;
+}
+
+.file-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: var(--card-bg, #ffffff);
+  border: 2px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.file-card:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.file-card.active {
+  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.file-thumbnail {
+  width: 160px;
+  min-width: 160px;
+  height: 90px;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.thumbnail-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnail-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.duration-badge {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.file-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.file-name {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-secondary, #64748b);
+}
+
+.file-quality {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.quality-badge,
+.fps-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.quality-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.fps-badge {
+  background: var(--hover-bg, #f1f5f9);
+  color: var(--text-secondary, #64748b);
+}
+
+.file-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--hover-bg, #f1f5f9);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: var(--text-secondary, #64748b);
+}
+
+.action-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.action-btn.download:hover {
+  background: #667eea;
+  color: white;
+  transform: scale(1.1);
+}
+
+.action-btn.delete:hover {
+  background: #ef4444;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .file-card {
+    --card-bg: #1e293b;
+    --border-color: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --hover-bg: #334155;
+  }
+
+  .fps-badge {
+    background: #334155;
+    color: #cbd5e1;
+  }
+}
+
+/* Custom scrollbar */
+.virtual-file-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.virtual-file-list::-webkit-scrollbar-track {
+  background: var(--hover-bg, #f1f5f9);
+  border-radius: 4px;
+}
+
+.virtual-file-list::-webkit-scrollbar-thumb {
+  background: var(--text-secondary, #94a3b8);
+  border-radius: 4px;
+}
+
+.virtual-file-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-primary, #64748b);
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-state p {
+  margin: 16px 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+}
+
+.empty-state span {
+  color: var(--text-tertiary, #94a3b8);
+  font-size: 14px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .file-card {
+    flex-direction: column;
+    height: auto !important;
+  }
+
+  .file-thumbnail {
+    width: 100%;
+    height: 180px;
+  }
+
+  .file-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}

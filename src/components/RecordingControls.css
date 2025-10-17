@@ -212,7 +212,7 @@
 .start-btn {
   background: var(--recording-ready);
   background: linear-gradient(45deg, var(--recording-ready), #047857);
-  color: #ffffff !important; /* Force white text */
+  color: #1f2937 !important; /* Dark text for better readability */
   box-shadow: 
     0 4px 20px rgba(16, 185, 129, 0.4),
     0 0 0 1px rgba(16, 185, 129, 0.3),
@@ -221,11 +221,13 @@
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Enhanced text shadow for better readability */
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3); /* Light shadow for dark text */
 }
 
-.start-btn * {
-  color: #ffffff !important; /* Ensure all child elements also have white text */
+.start-btn *,
+.start-btn svg {
+  color: #1f2937 !important; /* Dark text for all child elements */
+  fill: #1f2937 !important; /* Dark fill for SVG icons */
 }
 
 .start-btn:hover:not(:disabled) {
@@ -380,10 +382,16 @@
 
 .pause-btn {
   background: linear-gradient(45deg, #f59e0b, #d97706);
-  color: #ffffff !important;
+  color: #1f2937 !important;
   box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
   position: relative;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.pause-btn *,
+.pause-btn svg {
+  color: #1f2937 !important;
+  fill: #1f2937 !important;
 }
 
 .pause-btn:hover {
@@ -394,10 +402,16 @@
 
 .stop-btn {
   background: linear-gradient(45deg, #ef4444, #dc2626);
-  color: #ffffff !important;
+  color: #1f2937 !important;
   box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
   position: relative;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.stop-btn *,
+.stop-btn svg {
+  color: #1f2937 !important;
+  fill: #1f2937 !important;
 }
 
 .stop-btn:hover {

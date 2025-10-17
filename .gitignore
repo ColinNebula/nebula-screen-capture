@@ -11,11 +11,22 @@
 # production
 /build
 
+# WebAssembly compiled modules (rebuild with build-wasm.ps1)
+/public/wasm/*.wasm
+/public/wasm/*.js
+/build/wasm/
+
+# WASM source and build artifacts
+src/wasm/*.cpp
+src/wasm/*.hpp
+src/wasm/*.h
+
 # Documentation (keep in repo but separate)
 /documentation
 
 # Temporary files and scripts
 *.ps1
+!build-wasm.ps1
 *.html
 !public/*.html
 
@@ -30,6 +41,9 @@ VERIFICATION_COMPLETE.md
 *_SETUP.md
 *_DEPLOY.md
 *_GUIDE.md
+
+# Emscripten SDK
+/emsdk
 
 # misc
 .DS_Store

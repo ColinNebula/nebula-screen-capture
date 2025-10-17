@@ -1,7 +1,19 @@
 import React, { useState, useRef } from 'react';
 import './VideoPreview.css';
 
-const VideoPreview = ({ recording, onDownload, onDelete, recordings = [], onNavigate }) => {
+const VideoPreview = ({ 
+  recording, 
+  onDownload, 
+  onDelete, 
+  recordings = [], 
+  onNavigate,
+  onOpenAdvancedEditor,
+  onOpenAutoCaptions,
+  onOpenSceneDetection,
+  onOpenBackgroundRemoval,
+  onOpenSmartCrop,
+  onOpenExportOptimizer
+}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -266,6 +278,71 @@ const VideoPreview = ({ recording, onDownload, onDelete, recordings = [], onNavi
           </svg>
           Download
         </button>
+
+        {onOpenAdvancedEditor && (
+          <button 
+            className="action-btn editor-btn"
+            onClick={onOpenAdvancedEditor}
+            title="Advanced Editor"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+            Editor
+          </button>
+        )}
+
+        {onOpenAutoCaptions && (
+          <button 
+            className="action-btn captions-btn"
+            onClick={onOpenAutoCaptions}
+            title="Auto Captions"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 7H9.5v-.5h-2v3h2V13H11v1c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1zm7 0h-1.5v-.5h-2v3h2V13H18v1c0 .55-.45 1-1 1h-3c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1z"/>
+            </svg>
+            Captions
+          </button>
+        )}
+
+        {onOpenSceneDetection && (
+          <button 
+            className="action-btn scenes-btn"
+            onClick={onOpenSceneDetection}
+            title="Scene Detection"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+            </svg>
+            Scenes
+          </button>
+        )}
+
+        {onOpenSmartCrop && (
+          <button 
+            className="action-btn crop-btn"
+            onClick={onOpenSmartCrop}
+            title="Smart Crop"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17 15h2V7c0-1.1-.9-2-2-2H9v2h8v8zM7 17V1H5v4H1v2h4v10c0 1.1.9 2 2 2h10v4h2v-4h4v-2H7z"/>
+            </svg>
+            Crop
+          </button>
+        )}
+
+        {onOpenExportOptimizer && (
+          <button 
+            className="action-btn export-btn"
+            onClick={onOpenExportOptimizer}
+            title="Export Optimizer"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/>
+            </svg>
+            Export
+          </button>
+        )}
         
         <button 
           className="action-btn delete-btn"

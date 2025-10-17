@@ -14,7 +14,7 @@ const AdminLogin = ({ onClose, onAdminLogin }) => {
   const ADMIN_CREDENTIALS = {
     username: process.env.REACT_APP_ADMIN_USERNAME || 'admin',
     password: process.env.REACT_APP_ADMIN_PASSWORD || 'Nebula@Admin2025!',
-    email: process.env.REACT_APP_ADMIN_EMAIL || 'admin@nebula-capture.com',
+    email: process.env.REACT_APP_ADMIN_EMAIL || 'colinnebula@gmail.com',
   };
 
   const handleChange = (field, value) => {
@@ -29,14 +29,16 @@ const AdminLogin = ({ onClose, onAdminLogin }) => {
 
     // Simulate authentication delay
     setTimeout(() => {
-      if (
-        credentials.username === ADMIN_CREDENTIALS.username &&
-        credentials.password === ADMIN_CREDENTIALS.password
-      ) {
+      // Allow login with username OR email
+      const isValidUsername = credentials.username === ADMIN_CREDENTIALS.username || 
+                             credentials.username === ADMIN_CREDENTIALS.email;
+      const isValidPassword = credentials.password === ADMIN_CREDENTIALS.password;
+      
+      if (isValidUsername && isValidPassword) {
         // Create admin user object with full privileges
         const adminUser = {
           id: 'admin-001',
-          name: 'Administrator',
+          name: 'Colin Nebula',
           email: ADMIN_CREDENTIALS.email,
           avatar: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23dc2626" width="100" height="100"/%3E%3Ctext fill="white" font-size="45" font-weight="bold" x="50%25" y="50%25" text-anchor="middle" dy=".35em"%3EA%3C/text%3E%3C/svg%3E',
           plan: 'admin',

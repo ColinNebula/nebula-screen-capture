@@ -14,6 +14,16 @@
 *.webm binary
 *.pdf binary
 
+# WebAssembly and native binaries
+*.wasm binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.apk binary
+*.aab binary
+*.ipa binary
+
 # Prevent execution of scripts accidentally
 *.sh text eol=lf
 *.bat text eol=crlf

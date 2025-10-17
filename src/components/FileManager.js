@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import NebulaLogo from './NebulaLogo';
+import VirtualFileList from './VirtualFileList';
 import './FileManager.css';
 
 const FileManager = ({ 
@@ -132,81 +132,15 @@ const FileManager = ({
         </>
       )}
 
-      <div className="file-list">
-        {sortedAndFilteredRecordings.length === 0 ? (
-          <div className="empty-state">
-            {recordings.length === 0 ? (
-              <div className="empty-message">
-                <NebulaLogo size={64} color="#cbd5e1" />
-                <p>No recordings yet</p>
-                <span>Start your first screen recording above</span>
-              </div>
-            ) : (
-              <div className="empty-message">
-                <NebulaLogo size={48} color="#cbd5e1" />
-                <p>No recordings match your search</p>
-                <span>Try a different search term</span>
-              </div>
-            )}
-          </div>
-        ) : (
-          sortedAndFilteredRecordings.map(recording => (
-            <div 
-              key={recording.id} 
-              className={`file-item ${currentRecording && currentRecording.id === recording.id ? 'active' : ''}`}
-              onClick={() => onSelect(recording)}
-            >
-              <div className="file-thumbnail">
-                <video src={recording.url} muted />
-                <div className="play-overlay">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="5,3 19,12 5,21"/>
-                  </svg>
-                </div>
-              </div>
-              
-              <div className="file-details">
-                <div className="file-name" title={recording.filename}>
-                  {recording.filename}
-                </div>
-                <div className="file-meta">
-                  <span>{formatDuration(recording.duration)}</span>
-                  <span>•</span>
-                  <span>{formatFileSize(recording.size)}</span>
-                </div>
-                <div className="file-date">
-                  {recording.timestamp.toLocaleDateString()}
-                </div>
-              </div>
-
-              <div className="file-actions" onClick={(e) => e.stopPropagation()}>
-                <button 
-                  className="file-action-btn"
-                  onClick={() => onDownload(recording)}
-                  title="Download"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                  </svg>
-                </button>
-                <button 
-                  className="file-action-btn delete"
-                  onClick={() => {
-                    if (window.confirm('Delete this recording?')) {
-                      onDelete(recording.id);
-                    }
-                  }}
-                  title="Delete"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      <VirtualFileList
+        recordings={sortedAndFilteredRecordings}
+        onSelect={onSelect}
+        onDownload={onDownload}
+        onDelete={onDelete}
+        currentRecording={currentRecording}
+        formatFileSize={formatFileSize}
+        formatDuration={formatDuration}
+      />
     </div>
   );
 };

@@ -11,8 +11,20 @@ import UpgradePlanModal from './UpgradePlanModal';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import DynamicHeader from './DynamicHeader';
 import ScreenshotCapture from './ScreenshotCapture';
+import RecordingNamePrompt from './RecordingNamePrompt';
+import RecordingPreview from './RecordingPreview';
+import RecoveryPrompt from './RecoveryPrompt';
+import EnhancedErrorMessage from './EnhancedErrorMessage';
+import AdvancedVideoEditor from './AdvancedVideoEditor';
+import AutoCaptions from './AutoCaptions';
+import SceneDetection from './SceneDetection';
+import BackgroundRemoval from './BackgroundRemoval';
+import SmartCrop from './SmartCrop';
+import ExportOptimizer from './ExportOptimizer';
 import { useKeyboardShortcuts, usePerformanceMonitoring, checkBrowserSupport, optimizeRecordingSettings } from '../utils/hooks';
 import { checkFeatureAccess, getPlanLimits } from '../utils/planFeatures';
+import RecordingRecoveryManager from '../utils/recordingRecovery';
+import storageManager from '../utils/storageManager';
 import './ScreenRecorder.css';
 
 const ScreenRecorder = ({ user, onLogout }) => {
@@ -23,12 +35,23 @@ const ScreenRecorder = ({ user, onLogout }) => {
   const [screenshots, setScreenshots] = useState([]);
   const [currentRecording, setCurrentRecording] = useState(null);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [showAdvancedEditor, setShowAdvancedEditor] = useState(false);
+  const [showAutoCaptions, setShowAutoCaptions] = useState(false);
+  const [showSceneDetection, setShowSceneDetection] = useState(false);
+  const [showBackgroundRemoval, setShowBackgroundRemoval] = useState(false);
+  const [showSmartCrop, setShowSmartCrop] = useState(false);
+  const [showExportOptimizer, setShowExportOptimizer] = useState(false);
   const [showAreaSelector, setShowAreaSelector] = useState(false);
   const [selectedArea, setSelectedArea] = useState(null);
   const [browserSupport, setBrowserSupport] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [showHelp, setShowHelp] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [showNamePrompt, setShowNamePrompt] = useState(false);
+  const [pendingRecordingName, setPendingRecordingName] = useState('');
+  const [showRecoveryPrompt, setShowRecoveryPrompt] = useState(false);
+  const [recoveryData, setRecoveryData] = useState(null);
+  const [recordingError, setRecordingError] = useState(null);
   const [recordingOptions, setRecordingOptions] = useState({
     videoQuality: '1080p',
     frameRate: 30,
@@ -50,6 +73,7 @@ const ScreenRecorder = ({ user, onLogout }) => {
   const streamRef = useRef(null);
   const timerRef = useRef(null);
   const chunksRef = useRef([]);
+  const recoveryManagerRef = useRef(new RecordingRecoveryManager());
 
   // Generate unique ID (timestamp + random string)
   const generateUniqueId = () => {
@@ -74,7 +98,15 @@ const ScreenRecorder = ({ user, onLogout }) => {
   }, []);
 
   // Screenshot handler
-  const handleScreenshotTaken = useCallback((screenshot) => {
+  const handleScreenshotTaken = useCallback(async (screenshot) => {
+    // Save to IndexedDB
+    try {
+      await storageManager.saveScreenshot(screenshot);
+    } catch (error) {
+      console.error('Failed to save screenshot to storage:', error);
+      showNotification('Warning: Screenshot saved to memory only', 'warning');
+    }
+
     setScreenshots(prev => [screenshot, ...prev]);
     showNotification('Screenshot captured successfully!', 'success');
   }, [showNotification]);
@@ -131,15 +163,68 @@ const ScreenRecorder = ({ user, onLogout }) => {
   // Performance monitoring
   usePerformanceMonitoring();
 
-  // Check browser support on mount
+  // Check browser support on mount and load saved data
   useEffect(() => {
-    const support = checkBrowserSupport();
-    setBrowserSupport(support);
-    
-    if (!support.isSupported) {
-      showNotification('Your browser may not support all screen recording features. Please use a modern browser for the best experience.', 'warning');
-    }
+    const initializeApp = async () => {
+      const support = checkBrowserSupport();
+      setBrowserSupport(support);
+      
+      if (!support.isSupported) {
+        showNotification('Your browser may not support all screen recording features. Please use a modern browser for the best experience.', 'warning');
+      }
+
+      // Initialize storage and load saved data
+      try {
+        await storageManager.initialize();
+        
+        // Load recordings
+        const savedRecordings = await storageManager.getAllRecordings();
+        if (savedRecordings.length > 0) {
+          setRecordedVideos(savedRecordings);
+          showNotification(`Loaded ${savedRecordings.length} saved recording(s)`, 'success');
+        }
+
+        // Load screenshots
+        const savedScreenshots = await storageManager.getAllScreenshots();
+        if (savedScreenshots.length > 0) {
+          setScreenshots(savedScreenshots);
+        }
+
+        // Load settings
+        const savedSettings = await storageManager.loadSettings();
+        if (savedSettings) {
+          setRecordingOptions(savedSettings);
+        }
+
+        // Check for recoverable recording
+        if (RecordingRecoveryManager.hasRecoverableRecording()) {
+          const metadata = RecordingRecoveryManager.getRecoveryMetadata();
+          setRecoveryData(metadata);
+          setShowRecoveryPrompt(true);
+        }
+      } catch (error) {
+        console.error('Failed to load saved data:', error);
+        showNotification('Failed to load saved data. Starting fresh.', 'warning');
+      }
+    };
+
+    initializeApp();
   }, [showNotification]);
+
+  // Save settings whenever they change
+  useEffect(() => {
+    const saveSettings = async () => {
+      try {
+        await storageManager.saveSettings(recordingOptions);
+      } catch (error) {
+        console.error('Failed to save settings:', error);
+      }
+    };
+
+    // Debounce saves to avoid excessive writes
+    const timeoutId = setTimeout(saveSettings, 500);
+    return () => clearTimeout(timeoutId);
+  }, [recordingOptions]);
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
@@ -268,6 +353,12 @@ const ScreenRecorder = ({ user, onLogout }) => {
         return;
       }
 
+      // Show name prompt before starting
+      if (!pendingRecordingName) {
+        setShowNamePrompt(true);
+        return;
+      }
+
       // Optimize settings based on device capabilities
       const optimizedSettings = optimizeRecordingSettings(
         recordingOptions.videoQuality, 
@@ -297,21 +388,29 @@ const ScreenRecorder = ({ user, onLogout }) => {
         audioBitsPerSecond: getAudioBitrate()
       });
 
+      // Start recovery manager
+      recoveryManagerRef.current.startAutoSave({
+        name: pendingRecordingName,
+        settings: recordingOptions,
+        mimeType
+      });
+
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunksRef.current.push(event.data);
+          // Add to recovery buffer
+          recoveryManagerRef.current.addChunks([event.data]);
         }
       };
 
       mediaRecorder.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: mimeType });
         const url = URL.createObjectURL(blob);
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const extension = mimeType.includes('webm') ? 'webm' : 'mp4';
-        const filename = `screen-recording-${timestamp}.${extension}`;
+        const filename = `${pendingRecordingName}.${extension}`;
         
         const newRecording = {
-          id: generateUniqueId(), // Use unique ID generator
+          id: generateUniqueId(),
           filename,
           url,
           blob,
@@ -321,23 +420,34 @@ const ScreenRecorder = ({ user, onLogout }) => {
           settings: { ...recordingOptions }
         };
 
+        // Save to IndexedDB
+        storageManager.saveRecording(newRecording).catch(err => {
+          console.error('Failed to save recording to storage:', err);
+          showNotification('Warning: Recording saved to memory only', 'warning');
+        });
+
         setRecordedVideos(prev => [newRecording, ...prev]);
         setCurrentRecording(newRecording);
         showNotification(`Recording saved: ${filename}`, 'success');
+        
+        // Stop recovery manager (successful completion)
+        recoveryManagerRef.current.stopAutoSave();
         
         // Clean up
         stream.getTracks().forEach(track => track.stop());
         streamRef.current = null;
         setRecordingTime(0);
+        setPendingRecordingName('');
       };
 
       mediaRecorder.onerror = (event) => {
         console.error('MediaRecorder error:', event.error);
-        showNotification('Recording error occurred. Please try again.', 'error');
+        setRecordingError(event.error);
+        recoveryManagerRef.current.stopAutoSave();
       };
 
       mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start(100); // Collect data every 100ms
+      mediaRecorder.start(1000); // Collect data every second for better recovery
       
       setIsRecording(true);
       setIsPaused(false);
@@ -346,9 +456,10 @@ const ScreenRecorder = ({ user, onLogout }) => {
       
     } catch (error) {
       console.error('Failed to start recording:', error);
-      showNotification('Failed to start recording. Please make sure you grant screen capture permissions.', 'error');
+      setRecordingError(error);
+      recoveryManagerRef.current.stopAutoSave();
     }
-  }, [getDisplayMedia, recordingTime, startTimer, recordingOptions, selectedArea, showNotification, getVideoBitrate, getAudioBitrate]);
+  }, [getDisplayMedia, recordingTime, startTimer, recordingOptions, selectedArea, showNotification, getVideoBitrate, getAudioBitrate, pendingRecordingName, user.plan, canStartRecording]);
 
   const handleAreaSelected = useCallback((area) => {
     setSelectedArea(area);
@@ -387,7 +498,14 @@ const ScreenRecorder = ({ user, onLogout }) => {
     }
   }, [isRecording, isPaused, startTimer, stopTimer]);
 
-  const deleteRecording = useCallback((id) => {
+  const deleteRecording = useCallback(async (id) => {
+    // Delete from IndexedDB
+    try {
+      await storageManager.deleteRecording(id);
+    } catch (error) {
+      console.error('Failed to delete from storage:', error);
+    }
+
     setRecordedVideos(prev => {
       const updated = prev.filter(video => video.id !== id);
       const deletedVideo = prev.find(video => video.id === id);
@@ -400,7 +518,9 @@ const ScreenRecorder = ({ user, onLogout }) => {
     if (currentRecording && currentRecording.id === id) {
       setCurrentRecording(null);
     }
-  }, [currentRecording]);
+
+    showNotification('Recording deleted', 'success');
+  }, [currentRecording, showNotification]);
 
   const downloadRecording = useCallback((recording) => {
     const a = document.createElement('a');
@@ -410,6 +530,37 @@ const ScreenRecorder = ({ user, onLogout }) => {
     a.click();
     document.body.removeChild(a);
   }, []);
+
+  // Handler for recording name confirmation
+  const handleNameConfirm = useCallback((name) => {
+    setPendingRecordingName(name);
+    setShowNamePrompt(false);
+    // Auto-start recording after name is set
+    setTimeout(() => {
+      startRecording();
+    }, 100);
+  }, [startRecording]);
+
+  // Handler for recovery
+  const handleRecoverRecording = useCallback(() => {
+    setShowRecoveryPrompt(false);
+    showNotification('Recording recovery is not fully implemented yet. Starting fresh recording.', 'info');
+    RecordingRecoveryManager.clearRecovery();
+  }, [showNotification]);
+
+  const handleDiscardRecovery = useCallback(() => {
+    setShowRecoveryPrompt(false);
+    RecordingRecoveryManager.clearRecovery();
+    showNotification('Previous recording discarded.', 'info');
+  }, [showNotification]);
+
+  // Handler for error retry
+  const handleErrorRetry = useCallback(() => {
+    setRecordingError(null);
+    setTimeout(() => {
+      startRecording();
+    }, 100);
+  }, [startRecording]);
 
   return (
     <div className="screen-recorder">
@@ -496,6 +647,12 @@ const ScreenRecorder = ({ user, onLogout }) => {
                 onNavigate={setCurrentRecording}
                 userPlan={user.plan}
                 onUpgrade={() => setShowUpgrade(true)}
+                onOpenAdvancedEditor={() => setShowAdvancedEditor(true)}
+                onOpenAutoCaptions={() => setShowAutoCaptions(true)}
+                onOpenSceneDetection={() => setShowSceneDetection(true)}
+                onOpenBackgroundRemoval={() => setShowBackgroundRemoval(true)}
+                onOpenSmartCrop={() => setShowSmartCrop(true)}
+                onOpenExportOptimizer={() => setShowExportOptimizer(true)}
               />
             </PremiumFeature>
           )}
@@ -526,6 +683,36 @@ const ScreenRecorder = ({ user, onLogout }) => {
         />
       )}
 
+      {showNamePrompt && (
+        <RecordingNamePrompt
+          onConfirm={handleNameConfirm}
+          onCancel={() => setShowNamePrompt(false)}
+        />
+      )}
+
+      {showRecoveryPrompt && recoveryData && (
+        <RecoveryPrompt
+          metadata={recoveryData}
+          onRecover={handleRecoverRecording}
+          onDiscard={handleDiscardRecovery}
+        />
+      )}
+
+      {recordingError && (
+        <EnhancedErrorMessage
+          error={recordingError}
+          onRetry={handleErrorRetry}
+          onDismiss={() => setRecordingError(null)}
+        />
+      )}
+
+      <RecordingPreview
+        stream={streamRef.current}
+        isRecording={isRecording}
+        isPaused={isPaused}
+        recordingTime={recordingTime}
+      />
+
       <NotificationCenter notifications={notifications} />
 
       <HelpModal 
@@ -538,6 +725,80 @@ const ScreenRecorder = ({ user, onLogout }) => {
           currentPlan={user.plan}
           onClose={() => setShowUpgrade(false)}
           onUpgrade={handleUpgrade}
+        />
+      )}
+
+      {showAdvancedEditor && (
+        <AdvancedVideoEditor
+          recordings={recordedVideos}
+          onClose={() => setShowAdvancedEditor(false)}
+          onSave={(editedVideo) => {
+            setRecordedVideos(prev => [editedVideo, ...prev]);
+            setShowAdvancedEditor(false);
+            showNotification('Video exported successfully!', 'success');
+          }}
+        />
+      )}
+
+      {showAutoCaptions && currentRecording && (
+        <AutoCaptions
+          recording={currentRecording}
+          onClose={() => setShowAutoCaptions(false)}
+          onSave={(updatedRecording) => {
+            setRecordedVideos(prev => prev.map(r => 
+              r.id === updatedRecording.id ? updatedRecording : r
+            ));
+            setCurrentRecording(updatedRecording);
+            setShowAutoCaptions(false);
+            showNotification('Captions applied successfully!', 'success');
+          }}
+        />
+      )}
+
+      {showSceneDetection && currentRecording && (
+        <SceneDetection
+          recording={currentRecording}
+          onClose={() => setShowSceneDetection(false)}
+          onExport={(chapters) => {
+            showNotification('Chapters exported successfully!', 'success');
+            setShowSceneDetection(false);
+          }}
+        />
+      )}
+
+      {showBackgroundRemoval && currentRecording && (
+        <BackgroundRemoval
+          recording={currentRecording}
+          onClose={() => setShowBackgroundRemoval(false)}
+          onSave={(processedVideo) => {
+            setRecordedVideos(prev => [processedVideo, ...prev]);
+            setShowBackgroundRemoval(false);
+            showNotification('Background removed successfully!', 'success');
+          }}
+        />
+      )}
+
+      {showSmartCrop && currentRecording && (
+        <SmartCrop
+          recording={currentRecording}
+          onClose={() => setShowSmartCrop(false)}
+          onExport={(croppedVideo) => {
+            setRecordedVideos(prev => [croppedVideo, ...prev]);
+            setShowSmartCrop(false);
+            showNotification('Video cropped successfully!', 'success');
+          }}
+        />
+      )}
+
+      {showExportOptimizer && currentRecording && (
+        <ExportOptimizer
+          recording={currentRecording}
+          onClose={() => setShowExportOptimizer(false)}
+          onExport={(optimizedVideo) => {
+            downloadRecording(optimizedVideo);
+            setShowExportOptimizer(false);
+            showNotification('Video optimized and exported!', 'success');
+          }}
         />
       )}
     </div>
