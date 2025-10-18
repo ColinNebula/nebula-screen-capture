@@ -5,7 +5,7 @@
     
     <!-- Security Headers -->
     <!-- Content Security Policy: Prevent XSS attacks -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; media-src 'self' blob: mediastream:; connect-src 'self' https://api.github.com; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.paypal.com https://www.paypalobjects.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; media-src 'self' blob: mediastream:; connect-src 'self' https://api.github.com https://api.stripe.com https://www.paypal.com; frame-src https://js.stripe.com https://www.paypal.com; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;" />
     
     <!-- X-Frame-Options: Prevent clickjacking -->
     <meta http-equiv="X-Frame-Options" content="DENY" />
@@ -17,7 +17,7 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     
     <!-- Permissions Policy: Control browser features -->
-    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(self), geolocation=(), payment=(), usb=(), interest-cohort=()" />
+    <meta http-equiv="Permissions-Policy" content="camera=(self), microphone=(self), geolocation=(), payment=(self), usb=(), interest-cohort=()" />
     
     <!-- X-XSS-Protection: Enable XSS filter (legacy browsers) -->
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
@@ -75,5 +75,6 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>

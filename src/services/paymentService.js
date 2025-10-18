@@ -2,7 +2,7 @@ import { loadStripe } from '@stripe/stripe-js';
 
 // Initialize Stripe only if key is available
 let stripePromise = null;
-const stripeKey = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY;
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
 if (stripeKey && stripeKey.startsWith('pk_')) {
   stripePromise = loadStripe(stripeKey);
@@ -100,14 +100,14 @@ export const paymentService = {
       };
 
       // In development, log the email that would be sent
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.log('📧 Email would be sent:', emailPayload);
         console.log('Transaction ID:', transactionId);
         return { success: true, message: 'Email logged (development mode)' };
       }
 
       // Call Firebase function to send email
-      const functionsUrl = process.env.REACT_APP_FIREBASE_FUNCTIONS_URL || 'http://localhost:5001/nebula-screen-capture/us-central1';
+      const functionsUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || 'http://localhost:5001/nebula-screen-capture/us-central1';
       
       const response = await fetch(`${functionsUrl}/sendUpgradeConfirmation`, {
         method: 'POST',

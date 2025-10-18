@@ -2,8 +2,8 @@
 .recording-controls {
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 2.5rem;
+  border-radius: 16px;
+  padding: 1.5rem;
   box-shadow: var(--shadow-glass);
   border: 1px solid var(--border-glass);
   color: var(--text-primary);
@@ -23,6 +23,53 @@
   background: var(--brand-gradient);
 }
 
+.recording-active-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.recording-time {
+  font-family: 'Courier New', monospace;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-left: 0.5rem;
+}
+
+.recording-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+
+.control-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.button-text {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.button-icon {
+  width: 18px;
+  height: 18px;
+}
+
 .timer-display {
   margin-bottom: 2.5rem;
   position: relative;
@@ -32,14 +79,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-  font-weight: 700;
-  font-size: 1rem;
-  letter-spacing: 0.15em;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 0.75rem 1.5rem;
-  border-radius: 25px;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -113,11 +160,11 @@
 }
 
 .time {
-  font-size: 3.5rem;
+  font-size: 2.5rem;
   font-weight: 300;
   font-family: 'Courier New', monospace;
   color: var(--text-primary);
-  margin: 0;
+  margin: 0.5rem 0;
   text-shadow: var(--shadow-sm);
   position: relative;
   transition: var(--theme-transition);
@@ -147,14 +194,15 @@
   flex-wrap: wrap;
 }
 
-.control-btn {
+.control-btn,
+.control-button {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1.25rem 2.5rem;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
   border: none;
-  border-radius: 16px;
-  font-size: 1rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -162,10 +210,10 @@
   letter-spacing: 0.05em;
   position: relative;
   overflow: hidden;
-  min-width: 180px;
+  min-width: 140px;
   justify-content: center;
   backdrop-filter: blur(10px);
-  color: #ffffff !important; /* Explicit white text for all control buttons */
+  color: #ffffff !important;
 }
 
 /* Ensure button text is always visible regardless of theme */
@@ -181,7 +229,8 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.control-btn::after {
+.control-btn::after,
+.control-button::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -194,25 +243,29 @@
   transition: width 0.3s ease, height 0.3s ease;
 }
 
-.control-btn:hover::after {
+.control-btn:hover::after,
+.control-button:hover::after {
   width: 200px;
   height: 200px;
 }
 
-.control-btn svg {
-  width: 22px;
-  height: 22px;
+.control-btn svg,
+.control-button svg {
+  width: 18px;
+  height: 18px;
   transition: transform 0.2s ease;
 }
 
-.control-btn:hover svg {
+.control-btn:hover svg,
+.control-button:hover svg {
   transform: scale(1.1);
 }
 
-.start-btn {
+.start-btn,
+.start-button {
   background: var(--recording-ready);
   background: linear-gradient(45deg, var(--recording-ready), #047857);
-  color: #1f2937 !important; /* Dark text for better readability */
+  color: #ffffff !important;
   box-shadow: 
     0 4px 20px rgba(16, 185, 129, 0.4),
     0 0 0 1px rgba(16, 185, 129, 0.3),
@@ -221,16 +274,19 @@
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3); /* Light shadow for dark text */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .start-btn *,
-.start-btn svg {
-  color: #1f2937 !important; /* Dark text for all child elements */
-  fill: #1f2937 !important; /* Dark fill for SVG icons */
+.start-btn svg,
+.start-button *,
+.start-button svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
 }
 
-.start-btn:hover:not(:disabled) {
+.start-btn:hover:not(:disabled),
+.start-button:hover:not(:disabled) {
   transform: translateY(-3px);
   box-shadow: 
     0 8px 30px rgba(16, 185, 129, 0.6),
@@ -240,7 +296,8 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-.start-btn:active:not(:disabled) {
+.start-btn:active:not(:disabled),
+.start-button:active:not(:disabled) {
   transform: translateY(-1px);
 }
 
@@ -279,7 +336,8 @@
   animation: recordingGlow 1.5s infinite;
 }
 
-.start-btn:disabled {
+.start-btn:disabled,
+.start-button:disabled {
   cursor: not-allowed;
   opacity: 0.8;
 }
@@ -380,41 +438,49 @@
   100% { transform: rotate(360deg); }
 }
 
-.pause-btn {
+.pause-btn,
+.pause-button {
   background: linear-gradient(45deg, #f59e0b, #d97706);
-  color: #1f2937 !important;
+  color: #ffffff !important;
   box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
   position: relative;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .pause-btn *,
-.pause-btn svg {
-  color: #1f2937 !important;
-  fill: #1f2937 !important;
+.pause-btn svg,
+.pause-button *,
+.pause-button svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
 }
 
-.pause-btn:hover {
+.pause-btn:hover,
+.pause-button:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 30px rgba(245, 158, 11, 0.5);
   background: linear-gradient(45deg, #d97706, #b45309);
 }
 
-.stop-btn {
+.stop-btn,
+.stop-button {
   background: linear-gradient(45deg, #ef4444, #dc2626);
-  color: #1f2937 !important;
+  color: #ffffff !important;
   box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
   position: relative;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .stop-btn *,
-.stop-btn svg {
-  color: #1f2937 !important;
-  fill: #1f2937 !important;
+.stop-btn svg,
+.stop-button *,
+.stop-button svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
 }
 
-.stop-btn:hover {
+.stop-btn:hover,
+.stop-button:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 30px rgba(239, 68, 68, 0.5);
   background: linear-gradient(45deg, #dc2626, #b91c1c);
@@ -461,21 +527,21 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .recording-controls {
-    padding: 1.5rem;
+    padding: 1rem;
   }
   
   .time {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
   
   .control-buttons {
     flex-direction: column;
-    align-items: center;
+    width: 100%;
   }
   
   .control-btn {
     width: 100%;
-    max-width: 300px;
+    max-width: 100%;
     justify-content: center;
   }
 }

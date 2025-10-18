@@ -1,17 +1,18 @@
 /* File Manager Styles */
 .file-manager {
-  background: var(--bg-glass);
+  background: rgba(30, 41, 59, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: var(--shadow-glass);
-  border: 1px solid var(--border-glass);
-  color: var(--text-primary);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
   height: fit-content;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
   transition: var(--theme-transition);
+  overflow: hidden;
 }
 
 .file-manager-header {
@@ -20,7 +21,7 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid var(--border-primary);
+  border-bottom: 2px solid rgba(51, 65, 85, 0.8);
   transition: var(--theme-transition);
 }
 
@@ -28,7 +29,7 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #f8fafc;
   transition: var(--theme-transition);
 }
 
@@ -142,7 +143,7 @@
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: var(--text-muted);
+  color: #94a3b8;
   transition: var(--theme-transition);
 }
 
@@ -174,13 +175,13 @@
 }
 
 .file-item:hover {
-  background: var(--bg-tertiary);
+  background: rgba(51, 65, 85, 0.5);
   transform: translateY(-1px);
 }
 
 .file-item.active {
-  background: var(--bg-secondary);
-  border-color: var(--brand-primary);
+  background: rgba(30, 41, 59, 0.8);
+  border-color: #818cf8;
 }
 
 .file-thumbnail {
@@ -230,7 +231,7 @@
 
 .file-name {
   font-weight: 500;
-  color: var(--text-primary);
+  color: #f8fafc;
   margin-bottom: 0.25rem;
   white-space: nowrap;
   overflow: hidden;
@@ -242,14 +243,14 @@
 .file-meta {
   display: flex;
   gap: 0.5rem;
-  color: var(--text-tertiary);
+  color: #cbd5e1;
   font-size: 0.8rem;
   margin-bottom: 0.25rem;
   transition: var(--theme-transition);
 }
 
 .file-date {
-  color: var(--text-muted);
+  color: #94a3b8;
   font-size: 0.75rem;
   transition: var(--theme-transition);
 }
@@ -275,12 +276,12 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: #f3f4f6;
-  color: #6b7280;
+  background: rgba(51, 65, 85, 0.6);
+  color: #e2e8f0;
 }
 
 .file-action-btn:hover {
-  background: #e5e7eb;
+  background: rgba(71, 85, 105, 0.8);
   transform: scale(1.05);
 }
 
@@ -289,7 +290,7 @@
 }
 
 .file-action-btn.delete:hover {
-  background: #fef2f2;
+  background: rgba(239, 68, 68, 0.2);
 }
 
 .file-action-btn svg {

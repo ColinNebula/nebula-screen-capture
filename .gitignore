@@ -128,6 +128,15 @@ ios/
 functions/node_modules/
 functions/.env
 
+# Emscripten SDK (very large - can be reinstalled)
+emsdk/
+
+# Large dist/build folders
+dist/
+build/
+.cache/
+.parcel-cache/
+
 # Signing keys (CRITICAL - NEVER COMMIT THESE!)
 *.keystore
 *.jks
@@ -138,15 +147,44 @@ GoogleService-Info.plist
 android/key.properties
 android/app/keystore/
 
-# App bundles
+# App bundles (large binary files)
 *.apk
 *.aab
 *.ipa
 
-# Graphics working files
+# Graphics working files (often large)
 graphics/
 *.psd
 *.ai
 *.sketch
 *.fig
 *.xcf
+
+# Video and media files (can be very large)
+*.mp4
+*.mov
+*.avi
+*.webm
+*.mkv
+*.flv
+*.wmv
+*.m4v
+*.mpg
+*.mpeg
+*.3gp
+*.ogv
+
+# Audio files
+*.wav
+*.mp3
+*.ogg
+*.flac
+*.aac
+*.wma
+*.m4a
+
+# Large image files
+*.tiff
+*.tif
+*.raw
+*.bmp

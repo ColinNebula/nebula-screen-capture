@@ -13,6 +13,9 @@ export const CSP_DIRECTIVES = {
     "'self'",
     "'unsafe-inline'", // Required for React inline scripts
     "blob:", // Required for service worker
+    "https://js.stripe.com", // Stripe SDK
+    "https://www.paypal.com", // PayPal SDK
+    "https://www.paypalobjects.com", // PayPal resources
   ],
   "style-src": [
     "'self'",
@@ -37,10 +40,16 @@ export const CSP_DIRECTIVES = {
     "'self'",
     "https://*.github.io", // For GitHub Pages deployment
     "https://api.github.com", // If needed for updates
+    "https://api.stripe.com", // Stripe API
+    "https://www.paypal.com", // PayPal API
   ],
   "worker-src": [
     "'self'",
     "blob:", // For service workers
+  ],
+  "frame-src": [
+    "https://js.stripe.com", // Stripe payment frames
+    "https://www.paypal.com", // PayPal payment frames
   ],
   "frame-ancestors": ["'none'"], // Prevent clickjacking - no iframes
   "base-uri": ["'self'"],
