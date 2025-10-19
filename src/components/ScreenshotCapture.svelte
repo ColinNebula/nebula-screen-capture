@@ -3,6 +3,7 @@
   import { screenshots, deletePersistedScreenshot } from '../stores/recording.js';
   
   export let onCapture = () => {};
+  export let onSelect = () => {}; // Add onSelect prop
   export let disabled = false;
   
   const dispatch = createEventDispatcher();
@@ -162,6 +163,7 @@
           <div 
             class="screenshot-card"
             class:selected={selectedScreenshots.includes(screenshot.id)}
+            on:click={() => onSelect(screenshot)}
           >
             <div class="screenshot-image-container">
               <img 

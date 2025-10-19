@@ -1,6 +1,16 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
+  import { get } from 'svelte/store';
   import './VideoEditor.css';
+  import { 
+    saveSessionToIndexedDB, 
+    getAllSessions, 
+    getSessionById,
+    deleteSessionById,
+    exportSessionToFile,
+    base64ToFile 
+  } from '../utils/sessionManager.js';
+  import { recordedVideos, screenshots } from '../stores/recording.js';
 
   export let video = null;
   export let onClose = () => {};
@@ -98,6 +108,7 @@
   let rippleEdit = false;
   let sequencerPixelsPerSecond = 100; // Pixels per second for sequencer timeline
   let horizontalZoom = 1; // Horizontal zoom multiplier (0.25x to 4x)
+  let fadeOpacity = 1; // Combined opacity from global and per-clip transitions
   
   // Computed pixels per second based on horizontal zoom
   $: effectivePixelsPerSecond = sequencerPixelsPerSecond * horizontalZoom;
@@ -136,14 +147,54 @@
     videoName = video.name || 'Untitled Recording';
     trimStart = 0;
     trimEnd = duration;
-    clips = [{
+    
+    // Detect if it's a screenshot or image based on type or mimeType
+    const isScreenshot = video.type === 'screenshot' || video.mimeType === 'image/png' || video.mimeType?.startsWith('image/');
+    const clipType = isScreenshot ? 'screenshot' : 'video';
+    
+    const newClip = {
       id: video.id || Date.now(),
       name: video.name || 'Untitled Recording',
-      url: video.url,
-      duration: 0,
+      url: video.url || video.dataUrl,
+      duration: isScreenshot ? 5 : 0,
       thumbnail: video.thumbnail || null,
-      type: 'video'
-    }];
+      type: clipType,
+      dataUrl: video.dataUrl || video.url
+    };
+    
+    // Generate thumbnail for screenshots
+    if (isScreenshot && !newClip.thumbnail) {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 160;
+        canvas.height = 90;
+        const ctx = canvas.getContext('2d');
+        
+        // Calculate aspect ratio for thumbnail
+        const aspectRatio = img.width / img.height;
+        const targetAspect = 160 / 90;
+        let drawWidth = canvas.width;
+        let drawHeight = canvas.height;
+        let offsetX = 0;
+        let offsetY = 0;
+        
+        if (aspectRatio > targetAspect) {
+          drawWidth = canvas.height * aspectRatio;
+          offsetX = (canvas.width - drawWidth) / 2;
+        } else {
+          drawHeight = canvas.width / aspectRatio;
+          offsetY = (canvas.height - drawHeight) / 2;
+        }
+        
+        ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+        newClip.thumbnail = canvas.toDataURL();
+        clips = clips; // trigger reactivity
+      };
+      img.src = newClip.url || newClip.dataUrl;
+    }
+    
+    clips = [newClip];
   }
   
   // Apply all filters and effects to video element
@@ -191,16 +242,58 @@
   $: trimDuration = trimEnd - trimStart;
   $: trimmedPercent = duration > 0 ? (trimDuration / duration) * 100 : 100;
   
-  // Transition calculations
+  // Transition calculations (global)
   $: fadeInDuration = Math.min(transitions.fadeIn, trimDuration);
   $: fadeOutDuration = Math.min(transitions.fadeOut, trimDuration);
   $: isInFadeIn = currentTime < trimStart + fadeInDuration;
   $: isInFadeOut = currentTime > trimEnd - fadeOutDuration;
-  $: fadeOpacity = isInFadeIn 
-    ? (currentTime - trimStart) / fadeInDuration 
-    : isInFadeOut 
-    ? (trimEnd - currentTime) / fadeOutDuration 
-    : 1;
+  
+  // Calculate combined opacity from global and per-clip transitions
+  $: {
+    let opacity = 1;
+    
+    // Apply global transitions
+    if (isInFadeIn && fadeInDuration > 0) {
+      opacity = (currentTime - trimStart) / fadeInDuration;
+    } else if (isInFadeOut && fadeOutDuration > 0) {
+      opacity = (trimEnd - currentTime) / fadeOutDuration;
+    }
+    
+    // Apply per-clip transitions (only if tracks are initialized)
+    if (tracks && tracks.length > 0) {
+      let activeClip = null;
+      for (const track of tracks) {
+        if (!track.visible || track.type !== 'video') continue;
+        
+        for (const clip of (track.clips || [])) {
+          if (!clip) continue;
+          const clipEnd = clip.startTime + clip.duration;
+          if (currentTime >= clip.startTime && currentTime < clipEnd) {
+            activeClip = clip;
+            break;
+          }
+        }
+        if (activeClip) break;
+      }
+      
+      if (activeClip && (activeClip.fadeIn > 0 || activeClip.fadeOut > 0)) {
+        const clipLocalTime = currentTime - activeClip.startTime;
+        const clipTimeRemaining = activeClip.duration - clipLocalTime;
+        
+        // Apply clip-specific fade in
+        if (activeClip.fadeIn > 0 && clipLocalTime < activeClip.fadeIn) {
+          opacity = Math.min(opacity, clipLocalTime / activeClip.fadeIn);
+        }
+        
+        // Apply clip-specific fade out
+        if (activeClip.fadeOut > 0 && clipTimeRemaining < activeClip.fadeOut) {
+          opacity = Math.min(opacity, clipTimeRemaining / activeClip.fadeOut);
+        }
+      }
+    }
+    
+    fadeOpacity = opacity;
+  }
 
   onMount(() => {
     if (videoElement) {
@@ -216,6 +309,9 @@
     // Load saved clips and tracks from localStorage
     loadFromLocalStorage();
     
+    // Load all user assets (videos and screenshots) into media bin
+    loadAllUserAssets();
+    
     // Initialize sequencer with current video (if not already loaded from localStorage)
     if (video && video.url) {
       const hasInitialVideo = tracks.some(t => 
@@ -223,18 +319,29 @@
       );
       
       if (!hasInitialVideo) {
+        // Detect if it's a screenshot or image
+        const isScreenshot = video.type === 'screenshot' || video.mimeType === 'image/png' || video.mimeType?.startsWith('image/');
+        const clipType = isScreenshot ? 'screenshot' : 'video';
+        const clipDuration = isScreenshot ? 5 : (duration || 10);
+        
         const initialClip = {
           id: `clip-${Date.now()}`,
           startTime: 0,
-          duration: duration || 10,
+          duration: clipDuration,
           file: null,
-          name: video.name || 'Main Video',
-          thumbnail: null,
+          name: video.name || (isScreenshot ? 'Screenshot' : 'Main Video'),
+          thumbnail: video.thumbnail || null,
           trimStart: 0,
-          trimEnd: duration || 10,
+          trimEnd: clipDuration,
           color: '#3b82f6',
-          type: 'video',
-          url: video.url,
+          type: clipType,
+          url: video.url || video.dataUrl,
+          dataUrl: video.dataUrl || video.url,
+          // Per-clip transitions
+          fadeIn: 0,
+          fadeOut: 0,
+          fadeInType: 'black',
+          fadeOutType: 'black',
         };
         tracks = tracks.map((t, index) => 
           index === 0 ? {...t, clips: [initialClip]} : t
@@ -273,7 +380,7 @@
     const activeClip = getActiveClipAtTime(time);
     
     if (activeClip) {
-      if (activeClip.type === 'image') {
+      if (activeClip.type === 'image' || activeClip.type === 'screenshot') {
         activeClipType = 'image';
         renderImageToCanvas(activeClip);
       } else {
@@ -285,7 +392,8 @@
 
   // Render image clip to canvas
   function renderImageToCanvas(clip) {
-    if (!imagePreviewCanvas || !clip.url) return;
+    const imageUrl = clip.url || clip.dataUrl;
+    if (!imagePreviewCanvas || !imageUrl) return;
     
     const img = new Image();
     img.onload = () => {
@@ -294,7 +402,7 @@
       imagePreviewCanvas.height = img.height;
       ctx.drawImage(img, 0, 0);
     };
-    img.src = clip.url;
+    img.src = imageUrl;
   }
 
   function handleLoadedMetadata() {
@@ -366,14 +474,14 @@
         const activeClip = getActiveClipAtTime(currentTime);
         
         if (activeClip) {
-          if (activeClip.type === 'image') {
-            // Switch to image display
+          if (activeClip.type === 'image' || activeClip.type === 'screenshot') {
+            // Switch to image/screenshot display
             activeClipType = 'image';
             // Pause video if it's playing
             if (videoElement && !videoElement.paused) {
               videoElement.pause();
             }
-            // Render the image
+            // Render the image or screenshot
             renderImageToCanvas(activeClip);
           } else if (activeClip.type === 'video') {
             // Switch to video display
@@ -606,7 +714,7 @@
           // Clear canvas
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           
-          // Calculate fade effect
+          // Calculate fade effect from global transitions
           const timeSinceTrimStart = currentExportTime - trimStart;
           const timeUntilTrimEnd = trimEnd - currentExportTime;
           let opacity = 1;
@@ -616,6 +724,23 @@
           }
           if (transitions.fadeOut > 0 && timeUntilTrimEnd < transitions.fadeOut) {
             opacity = Math.min(opacity, timeUntilTrimEnd / transitions.fadeOut);
+          }
+          
+          // Check for per-clip transitions
+          const activeClip = getActiveClipAtTime(currentExportTime);
+          if (activeClip && (activeClip.fadeIn > 0 || activeClip.fadeOut > 0)) {
+            const clipLocalTime = currentExportTime - activeClip.startTime;
+            const clipTimeRemaining = activeClip.duration - clipLocalTime;
+            
+            // Apply clip-specific fade in
+            if (activeClip.fadeIn > 0 && clipLocalTime < activeClip.fadeIn) {
+              opacity = Math.min(opacity, clipLocalTime / activeClip.fadeIn);
+            }
+            
+            // Apply clip-specific fade out
+            if (activeClip.fadeOut > 0 && clipTimeRemaining < activeClip.fadeOut) {
+              opacity = Math.min(opacity, clipTimeRemaining / activeClip.fadeOut);
+            }
           }
           
           // Apply fade background if needed
@@ -899,6 +1024,433 @@
     onSave(editedVideo);
     onClose();
   }
+  
+  // Save editor session to JSON file
+  // Auto-save to localStorage
+  function autoSaveToLocalStorage() {
+    try {
+      const sessionData = {
+        version: '3.0',
+        name: videoName || 'Auto-saved Project',
+        timestamp: new Date().toISOString(),
+        videoName,
+        trimStart,
+        trimEnd,
+        duration,
+        filters,
+        effects,
+        transitions,
+        watermark,
+        volume,
+        playbackSpeed,
+        audioNormalize,
+        audioEnhance,
+        // Only save structure, not file data for auto-save
+        clips: clips.map(clip => ({
+          id: clip.id,
+          name: clip.name,
+          duration: clip.duration,
+          type: clip.type,
+          thumbnail: clip.thumbnail,
+          fileName: clip.file?.name,
+          fileType: clip.file?.type
+        })),
+        tracks: tracks.map(track => ({
+          ...track,
+          clips: track.clips.map(clip => ({
+            id: clip.id,
+            name: clip.name,
+            startTime: clip.startTime,
+            duration: clip.duration,
+            trimStart: clip.trimStart,
+            trimEnd: clip.trimEnd,
+            color: clip.color,
+            type: clip.type,
+            fadeIn: clip.fadeIn,
+            fadeOut: clip.fadeOut,
+            fadeInType: clip.fadeInType,
+            fadeOutType: clip.fadeOutType,
+            thumbnail: clip.thumbnail,
+            fileName: clip.file?.name,
+            fileType: clip.file?.type
+          }))
+        })),
+        sequencerSettings: {
+          horizontalZoom,
+          timelineZoom,
+          magneticSnapping,
+          rippleEdit,
+          showFrameNumbers,
+          snapToFrames
+        }
+      };
+      
+      localStorage.setItem('nebula_autosave', JSON.stringify(sessionData));
+      console.log('Auto-saved to localStorage');
+    } catch (error) {
+      console.error('Auto-save failed:', error);
+    }
+  }
+
+  // Debounced auto-save
+  let autoSaveTimeout;
+  function scheduleAutoSave() {
+    if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
+    autoSaveTimeout = setTimeout(() => {
+      autoSaveToLocalStorage();
+    }, 2000); // Auto-save after 2 seconds of inactivity
+  }
+
+  // Watch for changes and trigger auto-save
+  $: if (tracks || clips || filters || effects || transitions) {
+    scheduleAutoSave();
+  }
+
+  // Save session (quick save to IndexedDB)
+  async function saveSession() {
+    const sessionName = prompt('Enter session name:', videoName || 'My Project');
+    if (!sessionName) return;
+
+    try {
+      const sessionData = {
+        name: sessionName,
+        timestamp: new Date().toISOString(),
+        videoName,
+        trimStart,
+        trimEnd,
+        duration,
+        filters,
+        effects,
+        transitions,
+        watermark,
+        volume,
+        playbackSpeed,
+        audioNormalize,
+        audioEnhance,
+        clips: clips.map(clip => ({
+          id: clip.id,
+          name: clip.name,
+          duration: clip.duration,
+          type: clip.type,
+          thumbnail: clip.thumbnail,
+          file: clip.file, // IndexedDB can store File objects directly
+          fileName: clip.file?.name,
+          fileType: clip.file?.type
+        })),
+        tracks: tracks.map(track => ({
+          ...track,
+          clips: track.clips.map(clip => ({
+            id: clip.id,
+            name: clip.name,
+            startTime: clip.startTime,
+            duration: clip.duration,
+            trimStart: clip.trimStart,
+            trimEnd: clip.trimEnd,
+            color: clip.color,
+            type: clip.type,
+            fadeIn: clip.fadeIn,
+            fadeOut: clip.fadeOut,
+            fadeInType: clip.fadeInType,
+            fadeOutType: clip.fadeOutType,
+            thumbnail: clip.thumbnail,
+            file: clip.file, // IndexedDB can store File objects directly
+            fileName: clip.file?.name,
+            fileType: clip.file?.type
+          }))
+        })),
+        sequencerSettings: {
+          horizontalZoom,
+          timelineZoom,
+          magneticSnapping,
+          rippleEdit,
+          showFrameNumbers,
+          snapToFrames
+        }
+      };
+      
+      await saveSessionToIndexedDB(sessionData);
+      alert(`✅ Session "${sessionName}" saved to browser storage!\n\nYou can also export it to a file for backup.`);
+    } catch (error) {
+      console.error('Failed to save session:', error);
+      alert('❌ Failed to save session: ' + error.message);
+    }
+  }
+
+  // Export session to file
+  async function exportSession() {
+    const sessionName = prompt('Enter file name for export:', videoName || 'my-project');
+    if (!sessionName) return;
+
+    try {
+      const sessionData = {
+        version: '3.0',
+        name: sessionName,
+        timestamp: new Date().toISOString(),
+        videoName,
+        trimStart,
+        trimEnd,
+        duration,
+        filters,
+        effects,
+        transitions,
+        watermark,
+        volume,
+        playbackSpeed,
+        audioNormalize,
+        audioEnhance,
+        clips: clips.map(clip => ({
+          id: clip.id,
+          name: clip.name,
+          duration: clip.duration,
+          type: clip.type,
+          thumbnail: clip.thumbnail,
+          file: clip.file,
+          fileName: clip.file?.name,
+          fileType: clip.file?.type
+        })),
+        tracks: tracks.map(track => ({
+          ...track,
+          clips: track.clips.map(clip => ({
+            id: clip.id,
+            name: clip.name,
+            startTime: clip.startTime,
+            duration: clip.duration,
+            trimStart: clip.trimStart,
+            trimEnd: clip.trimEnd,
+            color: clip.color,
+            type: clip.type,
+            fadeIn: clip.fadeIn,
+            fadeOut: clip.fadeOut,
+            fadeInType: clip.fadeInType,
+            fadeOutType: clip.fadeOutType,
+            thumbnail: clip.thumbnail,
+            file: clip.file,
+            fileName: clip.file?.name,
+            fileType: clip.file?.type
+          }))
+        })),
+        sequencerSettings: {
+          horizontalZoom,
+          timelineZoom,
+          magneticSnapping,
+          rippleEdit,
+          showFrameNumbers,
+          snapToFrames
+        }
+      };
+      
+      // Convert files to base64 for export
+      const sessionWithBase64 = {
+        ...sessionData,
+        clips: await Promise.all(sessionData.clips.map(async clip => {
+          const fileData = clip.file ? await fileToBase64(clip.file) : null;
+          return { ...clip, file: undefined, fileData };
+        })),
+        tracks: await Promise.all(sessionData.tracks.map(async track => ({
+          ...track,
+          clips: await Promise.all(track.clips.map(async clip => {
+            const fileData = clip.file ? await fileToBase64(clip.file) : null;
+            return { ...clip, file: undefined, fileData };
+          }))
+        })))
+      };
+      
+      const jsonString = JSON.stringify(sessionWithBase64, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${sessionName.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.nsp`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      alert(`✅ Session exported as .nsp file!`);
+    } catch (error) {
+      console.error('Failed to export session:', error);
+      alert('❌ Failed to export session: ' + error.message);
+    }
+  }
+  
+  // Helper function to convert File to base64
+  async function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        resolve(null);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+  
+  // Load auto-saved session from localStorage
+  function loadAutoSave() {
+    try {
+      const saved = localStorage.getItem('nebula_autosave');
+      if (saved) {
+        const sessionData = JSON.parse(saved);
+        restoreSessionData(sessionData);
+        alert('✅ Auto-saved session restored!');
+      } else {
+        alert('No auto-saved session found.');
+      }
+    } catch (error) {
+      console.error('Failed to load auto-save:', error);
+      alert('❌ Failed to load auto-save: ' + error.message);
+    }
+  }
+  
+  // Load session from IndexedDB or file
+  async function loadSession() {
+    const choice = confirm('Load from browser storage?\n\nOK = Browser Storage (IndexedDB)\nCancel = File (.nsp)');
+    
+    if (choice) {
+      // Load from IndexedDB
+      try {
+        const sessions = await getAllSessions();
+        if (sessions.length === 0) {
+          alert('No saved sessions found in browser storage.');
+          return;
+        }
+        
+        const sessionList = sessions
+          .map((s, i) => `${i + 1}. ${s.name} (${new Date(s.timestamp).toLocaleString()})`)
+          .join('\n');
+        const selection = prompt(`Select a session to load:\n\n${sessionList}\n\nEnter number:`);
+        
+        if (!selection) return;
+        
+        const index = parseInt(selection) - 1;
+        if (index < 0 || index >= sessions.length) {
+          alert('Invalid selection');
+          return;
+        }
+        
+        const sessionData = sessions[index];
+        restoreSessionData(sessionData);
+      } catch (error) {
+        console.error('Failed to load session:', error);
+        alert('❌ Failed to load session: ' + error.message);
+      }
+    } else {
+      // Load from file
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.nsp,.neb,.json';
+      
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        try {
+          if (file.name.endsWith('.nsp') || file.name.endsWith('.json')) {
+            // Legacy JSON format
+            const text = await file.text();
+            const sessionData = JSON.parse(text);
+            
+            if (!sessionData.version) {
+              throw new Error('Invalid session file format');
+            }
+
+            // Convert old base64 format if present
+            if (sessionData.clips) {
+              sessionData.clips = sessionData.clips.map(clipData => ({
+                ...clipData,
+                file: clipData.fileData ? base64ToFile(clipData.fileData, clipData.fileName, clipData.fileType) : null
+              }));
+            }
+            
+            if (sessionData.tracks) {
+              sessionData.tracks = sessionData.tracks.map(track => ({
+                ...track,
+                clips: track.clips.map(clipData => ({
+                  ...clipData,
+                  file: clipData.fileData ? base64ToFile(clipData.fileData, clipData.fileName, clipData.fileType) : null
+                }))
+              }));
+            }
+            
+            restoreSessionData(sessionData);
+          } else if (file.name.endsWith('.neb')) {
+            alert('⚠️ Legacy .neb format detected. Please use the newer .nsp format.');
+          } else {
+            alert('⚠️ Unsupported file format. Please use .nsp files.');
+          }
+        } catch (error) {
+          console.error('Failed to load session from file:', error);
+          alert('❌ Failed to load session: ' + error.message);
+        }
+      };
+      
+      input.click();
+    }
+  }
+
+  // Helper function to restore session data
+  function restoreSessionData(sessionData) {
+    try {
+      if (sessionData.videoName !== undefined) videoName = sessionData.videoName;
+      if (sessionData.trimStart !== undefined) trimStart = sessionData.trimStart;
+      if (sessionData.trimEnd !== undefined) trimEnd = sessionData.trimEnd;
+      
+      if (sessionData.filters) filters = { ...filters, ...sessionData.filters };
+      if (sessionData.effects) effects = { ...effects, ...sessionData.effects };
+      if (sessionData.transitions) transitions = { ...transitions, ...sessionData.transitions };
+      if (sessionData.watermark) watermark = { ...watermark, ...sessionData.watermark };
+      
+      if (sessionData.volume !== undefined) volume = sessionData.volume;
+      if (sessionData.playbackSpeed !== undefined) playbackSpeed = sessionData.playbackSpeed;
+      if (sessionData.audioNormalize !== undefined) audioNormalize = sessionData.audioNormalize;
+      if (sessionData.audioEnhance !== undefined) audioEnhance = sessionData.audioEnhance;
+
+      if (sessionData.clips) {
+        clips = sessionData.clips.map(clipData => ({
+          id: clipData.id,
+          name: clipData.name,
+          duration: clipData.duration,
+          type: clipData.type,
+          thumbnail: clipData.thumbnail,
+          file: clipData.file,
+          url: clipData.file ? URL.createObjectURL(clipData.file) : ''
+        }));
+      }
+      
+      if (sessionData.tracks) {
+        tracks = sessionData.tracks.map(track => ({
+          ...track,
+          clips: track.clips.map(clipData => ({
+            ...clipData,
+            file: clipData.file,
+            url: clipData.file ? URL.createObjectURL(clipData.file) : '',
+            fadeIn: clipData.fadeIn || 0,
+            fadeOut: clipData.fadeOut || 0,
+            fadeInType: clipData.fadeInType || 'black',
+            fadeOutType: clipData.fadeOutType || 'black'
+          }))
+        }));
+      }
+      
+      if (sessionData.sequencerSettings) {
+        const settings = sessionData.sequencerSettings;
+        if (settings.horizontalZoom !== undefined) horizontalZoom = settings.horizontalZoom;
+        if (settings.timelineZoom !== undefined) timelineZoom = settings.timelineZoom;
+        if (settings.magneticSnapping !== undefined) magneticSnapping = settings.magneticSnapping;
+        if (settings.rippleEdit !== undefined) rippleEdit = settings.rippleEdit;
+        if (settings.showFrameNumbers !== undefined) showFrameNumbers = settings.showFrameNumbers;
+        if (settings.snapToFrames !== undefined) snapToFrames = settings.snapToFrames;
+      }
+      
+      alert(`✅ Session "${sessionData.name || 'Untitled'}" loaded successfully!`);
+    } catch (error) {
+      console.error('Failed to restore session:', error);
+      alert('❌ Failed to restore session: ' + error.message);
+    }
+  }
 
   function handleJumpToStart() {
     if (videoElement) {
@@ -1035,7 +1587,14 @@
             clips: track.clips.filter(clip => {
               // Keep clips that don't use blob URLs or have data URLs  
               return !clip.url || !clip.url.startsWith('blob:');
-            })
+            }).map(clip => ({
+              // Ensure all clips have transition properties
+              fadeIn: 0,
+              fadeOut: 0,
+              fadeInType: 'black',
+              fadeOutType: 'black',
+              ...clip
+            }))
           }));
           // Only set tracks if we have valid clips
           const hasValidClips = validTracks.some(t => t.clips.length > 0);
@@ -1046,6 +1605,105 @@
       }
     } catch (e) {
       console.error('Failed to load from localStorage:', e);
+    }
+  }
+  
+  // Load all user assets (videos and screenshots) into media bin
+  function loadAllUserAssets() {
+    const allAssets = [];
+    
+    // Add all recorded videos
+    const videos = get(recordedVideos) || [];
+    videos.forEach(video => {
+      // Skip if already in clips
+      if (clips.some(c => c.id === video.id)) return;
+      
+      const videoClip = {
+        id: video.id,
+        name: video.name,
+        url: video.url,
+        duration: 0, // Will be set when metadata loads
+        thumbnail: video.thumbnail || null,
+        type: 'video',
+        file: video.blob
+      };
+      
+      // Generate thumbnail for video
+      if (video.url && !videoClip.thumbnail) {
+        const videoEl = document.createElement('video');
+        videoEl.src = video.url;
+        videoEl.addEventListener('loadedmetadata', () => {
+          videoClip.duration = videoEl.duration;
+          videoEl.currentTime = Math.min(1, videoEl.duration / 2);
+        });
+        videoEl.addEventListener('seeked', () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 160;
+          canvas.height = 90;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+          videoClip.thumbnail = canvas.toDataURL();
+          clips = clips; // trigger reactivity
+        });
+      }
+      
+      allAssets.push(videoClip);
+    });
+    
+    // Add all screenshots
+    const shots = get(screenshots) || [];
+    shots.forEach(screenshot => {
+      // Skip if already in clips
+      if (clips.some(c => c.id === screenshot.id)) return;
+      
+      const screenshotClip = {
+        id: screenshot.id,
+        name: screenshot.name,
+        url: screenshot.url || screenshot.dataUrl,
+        dataUrl: screenshot.dataUrl,
+        duration: 5, // Default 5 seconds for screenshots
+        thumbnail: null,
+        type: 'screenshot'
+      };
+      
+      // Generate thumbnail for screenshot
+      if (screenshot.dataUrl || screenshot.url) {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 160;
+          canvas.height = 90;
+          const ctx = canvas.getContext('2d');
+          
+          // Calculate aspect ratio
+          const aspectRatio = img.width / img.height;
+          const targetAspect = 160 / 90;
+          let drawWidth = canvas.width;
+          let drawHeight = canvas.height;
+          let offsetX = 0;
+          let offsetY = 0;
+          
+          if (aspectRatio > targetAspect) {
+            drawWidth = canvas.height * aspectRatio;
+            offsetX = (canvas.width - drawWidth) / 2;
+          } else {
+            drawHeight = canvas.width / aspectRatio;
+            offsetY = (canvas.height - drawHeight) / 2;
+          }
+          
+          ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+          screenshotClip.thumbnail = canvas.toDataURL();
+          clips = clips; // trigger reactivity
+        };
+        img.src = screenshot.dataUrl || screenshot.url;
+      }
+      
+      allAssets.push(screenshotClip);
+    });
+    
+    // Add all assets to clips array if we have any
+    if (allAssets.length > 0) {
+      clips = [...clips, ...allAssets];
     }
   }
   
@@ -1208,6 +1866,56 @@
             });
           };
           img.src = url;
+        } else if (file.type.startsWith('audio/')) {
+          const url = URL.createObjectURL(file);
+          const newClip = {
+            id: Date.now() + Math.random(),
+            name: file.name,
+            url: url,
+            duration: 0,
+            thumbnail: null,
+            type: 'audio',
+            file: file
+          };
+          clips = [...clips, newClip];
+          
+          // Load audio to get duration
+          const audio = document.createElement('audio');
+          audio.src = url;
+          audio.addEventListener('loadedmetadata', () => {
+            newClip.duration = audio.duration;
+            clips = clips; // trigger reactivity
+            
+            // Find an audio track or create a new one
+            let targetTrack = tracks.find(t => t.type === 'audio');
+            if (!targetTrack) {
+              // Create a new audio track
+              const newTrackId = Math.max(...tracks.map(t => t.id), 0) + 1;
+              const newTrack = {
+                id: newTrackId,
+                type: 'audio',
+                name: 'Audio 1',
+                clips: [],
+                muted: false,
+                solo: false,
+                locked: false,
+                visible: true,
+                height: 60
+              };
+              tracks = [...tracks, newTrack];
+              targetTrack = newTrack;
+            }
+            
+            // Add clip to the audio track
+            addClipToTrack(targetTrack.id, {
+              file: file,
+              name: file.name,
+              duration: audio.duration,
+              thumbnail: null,
+              type: 'audio',
+              url: url
+            });
+          });
         }
       });
     }
@@ -1265,10 +1973,11 @@
   function addTrack(type = 'video') {
     const newId = Math.max(...tracks.map(t => t.id), 0) + 1;
     const height = type === 'video' ? 80 : type === 'audio' ? 60 : 50;
+    const trackName = type === 'video' ? 'Video' : type === 'audio' ? 'Audio' : 'Effects';
     tracks = [...tracks, {
       id: newId,
       type,
-      name: `${type.charAt(0).toUpperCase() + type.slice(1)} ${newId}`,
+      name: `${trackName} ${newId}`,
       clips: [],
       muted: false,
       solo: false,
@@ -1276,6 +1985,9 @@
       visible: true,
       height
     }];
+    
+    // Show confirmation feedback
+    console.log(`✅ Added new ${trackName} track`);
   }
   
   function removeTrack(trackId) {
@@ -1309,6 +2021,11 @@
       color: getRandomClipColor(),
       type: clipData.type || 'video',
       url: clipData.url || (clipData.file ? URL.createObjectURL(clipData.file) : ''),
+      // Per-clip transitions
+      fadeIn: 0,
+      fadeOut: 0,
+      fadeInType: 'black',
+      fadeOutType: 'black',
     };
     
     tracks = tracks.map(t => 
@@ -1385,6 +2102,27 @@
   function selectClipInSequencer(trackId, clipId) {
     selectedTrackId = trackId;
     selectedClipId = clipId;
+  }
+  
+  // Get the currently selected clip object
+  function getSelectedClip() {
+    if (!selectedClipId) return null;
+    const track = tracks.find(t => t.id === selectedTrackId);
+    if (!track) return null;
+    return track.clips.find(c => c.id === selectedClipId);
+  }
+  
+  // Update selected clip transitions
+  function updateClipTransition(property, value) {
+    if (!selectedClipId) return;
+    tracks = tracks.map(t => 
+      t.id === selectedTrackId ? {
+        ...t,
+        clips: t.clips.map(c => 
+          c.id === selectedClipId ? {...c, [property]: value} : c
+        )
+      } : t
+    );
   }
   
   function splitClipAtPlayhead(trackId, clipId) {
@@ -1538,12 +2276,12 @@
 
     <!-- Content -->
     <div class="editor-content">
-      <!-- Hidden file input for importing videos and images -->
+      <!-- Hidden file input for importing videos, images, and audio -->
       <input 
         type="file" 
         bind:this={fileInputElement}
         on:change={handleFileSelect}
-        accept="video/*,image/*"
+        accept="video/*,image/*,audio/*"
         multiple
         style="display: none;"
       />
@@ -1590,9 +2328,22 @@
                     <img src={clip.thumbnail} alt={clip.name} />
                   {:else}
                     <div class="thumbnail-placeholder">
-                      <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
-                      </svg>
+                      {#if clip.type === 'image' || clip.type === 'screenshot'}
+                        <!-- Image icon -->
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                        </svg>
+                      {:else if clip.type === 'audio'}
+                        <!-- Audio icon -->
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                        </svg>
+                      {:else}
+                        <!-- Video icon -->
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                        </svg>
+                      {/if}
                     </div>
                   {/if}
                   {#if clip.duration}
@@ -1643,14 +2394,14 @@
         <video
           bind:this={videoElement}
           class="preview-video"
-          style="display: {activeClipType === 'video' ? 'block' : 'none'}"
+          style="display: {activeClipType === 'video' ? 'block' : 'none'}; opacity: {fadeOpacity};"
         />
         
         <!-- Image Preview (for image clips in sequencer) -->
         <canvas
           bind:this={imagePreviewCanvas}
           class="preview-video"
-          style="display: {activeClipType === 'image' ? 'block' : 'none'}"
+          style="display: {activeClipType === 'image' ? 'block' : 'none'}; opacity: {fadeOpacity};"
         />
         
         <!-- Play/Pause Overlay -->
@@ -1862,6 +2613,21 @@
                           {#if clip.thumbnail}
                             <div class="clip-thumbnail-bg" style="background-image: url({clip.thumbnail})"></div>
                           {/if}
+                          
+                          <!-- Transition indicators -->
+                          {#if clip.fadeIn > 0}
+                            <div class="clip-transition-indicator fade-in" 
+                                 style="width: {Math.min(clip.fadeIn / clip.duration * 100, 50)}%"
+                                 title="Fade In: {clip.fadeIn.toFixed(1)}s">
+                            </div>
+                          {/if}
+                          {#if clip.fadeOut > 0}
+                            <div class="clip-transition-indicator fade-out" 
+                                 style="width: {Math.min(clip.fadeOut / clip.duration * 100, 50)}%"
+                                 title="Fade Out: {clip.fadeOut.toFixed(1)}s">
+                            </div>
+                          {/if}
+                          
                           <div class="clip-content">
                             <div class="clip-name-label">{clip.name}</div>
                             <div class="clip-duration-label">{formatTime(clip.duration)}</div>
@@ -2419,6 +3185,7 @@
                 max="4" 
                 step="0.25" 
                 bind:value={horizontalZoom}
+                on:input={(e) => horizontalZoom = parseFloat(e.target.value)}
                 class="zoom-slider-vertical"
               />
               <button 
@@ -2515,6 +3282,88 @@
               placeholder="Enter video name..."
             />
           </div>
+          
+          <!-- Clip Transitions Section -->
+          {#if selectedClipId}
+            {@const selectedClip = getSelectedClip()}
+            {#if selectedClip}
+              <div class="property-section">
+                <h4>🎬 Clip Transitions</h4>
+                <p style="font-size: 12px; color: var(--text-secondary); margin: 8px 0;">Add fade effects to this clip's beginning and end</p>
+                
+                <!-- Fade In -->
+                <div class="property-control">
+                  <label style="font-size: 13px; font-weight: 500;">📈 Fade In: {selectedClip.fadeIn?.toFixed(1) || '0.0'}s</label>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max={Math.min(5, selectedClip.duration / 2)} 
+                    step="0.1" 
+                    value={selectedClip.fadeIn || 0}
+                    on:input={(e) => updateClipTransition('fadeIn', parseFloat(e.target.value))}
+                    style="width: 100%;"
+                  />
+                </div>
+                
+                <div class="property-control">
+                  <label style="font-size: 13px; font-weight: 500;">🎨 Fade In Type:</label>
+                  <select 
+                    value={selectedClip.fadeInType || 'black'}
+                    on:change={(e) => updateClipTransition('fadeInType', e.target.value)}
+                    style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-secondary);"
+                  >
+                    <option value="black">From Black</option>
+                    <option value="white">From White</option>
+                    <option value="transparent">From Transparent</option>
+                  </select>
+                </div>
+                
+                <!-- Fade Out -->
+                <div class="property-control" style="margin-top: 12px;">
+                  <label style="font-size: 13px; font-weight: 500;">📉 Fade Out: {selectedClip.fadeOut?.toFixed(1) || '0.0'}s</label>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max={Math.min(5, selectedClip.duration / 2)} 
+                    step="0.1" 
+                    value={selectedClip.fadeOut || 0}
+                    on:input={(e) => updateClipTransition('fadeOut', parseFloat(e.target.value))}
+                    style="width: 100%;"
+                  />
+                </div>
+                
+                <div class="property-control">
+                  <label style="font-size: 13px; font-weight: 500;">🎨 Fade Out Type:</label>
+                  <select 
+                    value={selectedClip.fadeOutType || 'black'}
+                    on:change={(e) => updateClipTransition('fadeOutType', e.target.value)}
+                    style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-secondary);"
+                  >
+                    <option value="black">To Black</option>
+                    <option value="white">To White</option>
+                    <option value="transparent">To Transparent</option>
+                  </select>
+                </div>
+                
+                <button 
+                  class="property-btn"
+                  on:click={() => {
+                    updateClipTransition('fadeIn', 0);
+                    updateClipTransition('fadeOut', 0);
+                  }}
+                  style="margin-top: 8px; width: 100%; padding: 6px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; border-radius: 4px; cursor: pointer;"
+                >
+                  Reset Clip Transitions
+                </button>
+              </div>
+            {/if}
+          {:else}
+            <div class="property-section">
+              <p style="font-size: 12px; color: var(--text-secondary); text-align: center; padding: 20px;">
+                💡 Select a clip in the timeline to edit its transitions
+              </p>
+            </div>
+          {/if}
         </div>
       </div>
     {:else}
@@ -2556,16 +3405,47 @@
       </div>
       
       <div class="action-buttons">
-        <button class="action-btn reset-all-btn" on:click={resetAll} title="Reset all changes" style="min-width: 120px; height: 48px;">
+        <button class="action-btn session-btn" on:click={saveSession} title="Quick save to browser storage" style="min-width: 90px; height: 36px; font-size: 13px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Save
+        </button>
+        <button class="action-btn session-btn" on:click={exportSession} title="Export session to .nsp file" style="min-width: 90px; height: 36px; font-size: 13px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export
+        </button>
+        <button class="action-btn session-btn" on:click={loadSession} title="Load from storage or .nsp file" style="min-width: 90px; height: 36px; font-size: 13px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Load
+        </button>
+        <button class="action-btn session-btn" on:click={loadAutoSave} title="Restore auto-saved session" style="min-width: 90px; height: 36px; font-size: 13px; background: linear-gradient(135deg, #10b981, #059669);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"/>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          Auto-Save
+        </button>
+        <button class="action-btn reset-all-btn" on:click={resetAll} title="Reset all changes" style="min-width: 90px; height: 36px; font-size: 13px;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/><path d="M3 21v-5h5"/>
           </svg>
           Reset All
         </button>
-        <button class="action-btn cancel-btn" on:click={onClose} style="min-width: 120px; height: 48px;">
+        <button class="action-btn cancel-btn" on:click={onClose} style="min-width: 80px; height: 36px; font-size: 13px;">
           Cancel
         </button>
-        <button class="action-btn save-btn" on:click={handleSave} disabled={isProcessing} style="min-width: 120px; height: 48px;">
+        <button class="action-btn save-btn" on:click={handleSave} disabled={isProcessing} style="min-width: 80px; height: 36px; font-size: 13px;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
             <polyline points="17 21 17 13 7 13 7 21"/>

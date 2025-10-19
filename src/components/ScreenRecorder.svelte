@@ -278,11 +278,18 @@
           id: Date.now(),
           name: `Screenshot ${new Date().toLocaleString()}`,
           dataUrl: dataUrl, // Store data URL for screenshots (works after reload)
+          url: dataUrl, // Also set url for VideoPreview compatibility
+          blob: blob,
           timestamp: Date.now(),
-          size: blob.size
+          size: blob.size,
+          type: 'screenshot', // Mark as screenshot for preview detection
+          mimeType: 'image/png'
         };
         
         screenshots.update(shots => [...shots, screenshot]);
+        
+        // Set as current recording to show in preview
+        currentRecording = screenshot;
         
         // Persist to IndexedDB
         persistScreenshot(screenshot);
@@ -377,6 +384,7 @@
       {:else}
         <ScreenshotCapture
           onCapture={handleCapture}
+          onSelect={(screenshot) => currentRecording = screenshot}
           disabled={$isRecording}
         />
       {/if}

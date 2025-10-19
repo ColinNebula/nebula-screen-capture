@@ -132,10 +132,6 @@
     <button type="submit" disabled={loading}>
       {loading ? 'Logging in...' : 'Login'}
     </button>
-
-    <button type="button" on:click={() => showAdminLogin = !showAdminLogin} class="admin-toggle">
-      {showAdminLogin ? 'Hide' : 'Show'} Admin Login (Alt+O)
-    </button>
   </form>
 
   {#if showAdminLogin}
@@ -167,8 +163,7 @@
 
       <div class="admin-info">
         <small>
-          Username: <code>{ADMIN_CREDENTIALS.username}</code> or <code>{ADMIN_CREDENTIALS.email}</code><br>
-          Password: <code>Nebula@Admin2025!</code>
+          Press <kbd>Alt+O</kbd> to toggle admin login
         </small>
       </div>
     </div>
@@ -247,27 +242,6 @@
     cursor: not-allowed;
   }
 
-  .demo-btn {
-    background: var(--bg-tertiary, #f1f5f9);
-    color: var(--text-primary, #1a202c);
-    margin-top: 0.75rem;
-  }
-
-  .demo-btn:hover:not(:disabled) {
-    background: var(--border-primary, #e2e8f0);
-  }
-
-  .admin-toggle {
-    background: var(--bg-tertiary, #f1f5f9);
-    color: var(--text-secondary, #2d3748);
-    margin-top: 0.75rem;
-    font-size: 0.85rem;
-  }
-
-  .admin-toggle:hover {
-    background: var(--border-primary, #e2e8f0);
-  }
-
   .admin-login-section {
     margin-top: 2rem;
     padding-top: 2rem;
@@ -295,13 +269,15 @@
     background: var(--bg-secondary, #f8fafc);
     border-radius: 6px;
     color: var(--text-secondary, #2d3748);
+    text-align: center;
   }
 
-  .admin-info code {
+  .admin-info kbd {
     background: var(--bg-tertiary, #f1f5f9);
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 0.85rem;
+    border: 1px solid var(--border-primary, #e2e8f0);
   }
 
   .login-header {

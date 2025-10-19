@@ -16,8 +16,14 @@ export default defineConfig({
           'wasm-transitions': ['./src/services/wasmTransitions.js'],
           'wasm-audio': ['./src/services/wasmAudioProcessor.js']
         }
-      }
-    }
+      },
+      external: [
+        // Mark WASM files as external (they'll be loaded at runtime)
+        /\/wasm\/.*\.js$/
+      ]
+    },
+    // Copy WASM files to build directory
+    copyPublicDir: true
   },
   server: {
     port: 3001,

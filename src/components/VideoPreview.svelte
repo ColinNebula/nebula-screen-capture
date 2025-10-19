@@ -17,8 +17,16 @@
   let showControls = true;
   let controlsTimeout;
   
+  // Check if recording is an image/screenshot
+  $: isImage = recording && (
+    recording.type === 'screenshot' || 
+    recording.type === 'image' ||
+    recording.mimeType?.startsWith('image/') ||
+    (recording.url && (recording.url.endsWith('.png') || recording.url.endsWith('.jpg') || recording.url.endsWith('.jpeg') || recording.url.endsWith('.gif') || recording.url.endsWith('.webp')))
+  );
+  
   function handlePlayPause() {
-    if (!videoElement) return;
+    if (!videoElement || isImage) return;
     
     if (isPlaying) {
       videoElement.pause();
@@ -119,40 +127,30 @@
     </div>
     
     <div class="video-container">
-      <video
-        bind:this={videoElement}
-        src={recording.url || recording.blob}
-        class="video-player"
-        on:play={handleVideoPlay}
-        on:pause={handleVideoPause}
-        on:timeupdate={handleTimeUpdate}
-        on:loadedmetadata={handleLoadedMetadata}
-        on:click={handlePlayPause}
-      >
-        <track kind="captions" />
-      </video>
-      
-      <div class="video-overlay" class:visible={showControls}>
-        <button class="play-pause-button" on:click={handlePlayPause}>
-          {#if isPlaying}
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-            </svg>
-          {:else}
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          {/if}
-        </button>
-      </div>
-      
-      <div class="video-controls" class:visible={showControls}>
-        <div class="progress-bar" on:click={handleSeek}>
-          <div class="progress-filled" style="width: {(currentTime / duration) * 100}%"></div>
-        </div>
+      {#if isImage}
+        <!-- Image/Screenshot Preview -->
+        <img
+          src={recording.url || recording.blob}
+          alt={recording.name || 'Screenshot'}
+          class="image-player"
+        />
+      {:else}
+        <!-- Video Preview -->
+        <video
+          bind:this={videoElement}
+          src={recording.url || recording.blob}
+          class="video-player"
+          on:play={handleVideoPlay}
+          on:pause={handleVideoPause}
+          on:timeupdate={handleTimeUpdate}
+          on:loadedmetadata={handleLoadedMetadata}
+          on:click={handlePlayPause}
+        >
+          <track kind="captions" />
+        </video>
         
-        <div class="controls-row">
-          <button class="control-btn" on:click={handlePlayPause}>
+        <div class="video-overlay" class:visible={showControls}>
+          <button class="play-pause-button" on:click={handlePlayPause}>
             {#if isPlaying}
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
@@ -163,27 +161,47 @@
               </svg>
             {/if}
           </button>
+        </div>
+        
+        <div class="video-controls" class:visible={showControls}>
+          <div class="progress-bar" on:click={handleSeek}>
+            <div class="progress-filled" style="width: {(currentTime / duration) * 100}%"></div>
+          </div>
           
-          <span class="time-display">
-            {formatTime(currentTime)} / {formatTime(duration)}
-          </span>
-          
-          <div class="volume-control">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
-            </svg>
-            <input 
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={volume}
-              on:input={handleVolumeChange}
-              class="volume-slider"
-            />
+          <div class="controls-row">
+            <button class="control-btn" on:click={handlePlayPause}>
+              {#if isPlaying}
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                </svg>
+              {:else}
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              {/if}
+            </button>
+            
+            <span class="time-display">
+              {formatTime(currentTime)} / {formatTime(duration)}
+            </span>
+            
+            <div class="volume-control">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+              </svg>
+              <input 
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                value={volume}
+                on:input={handleVolumeChange}
+                class="volume-slider"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      {/if}
     </div>
     
     <div class="video-actions">
@@ -227,6 +245,15 @@
 
 <style>
   @import './VideoPreview.css';
+  
+  /* Image player styling */
+  .image-player {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+    border-radius: 8px;
+  }
   
   /* Fix button icon sizing */
   :global(.action-button svg) {
