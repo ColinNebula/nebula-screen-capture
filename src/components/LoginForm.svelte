@@ -160,12 +160,6 @@
       <button type="button" on:click={handleAdminSubmit} class="admin-submit">
         Sign In as Admin
       </button>
-
-      <div class="admin-info">
-        <small>
-          Press <kbd>Alt+O</kbd> to toggle admin login
-        </small>
-      </div>
     </div>
   {/if}
 </div>
