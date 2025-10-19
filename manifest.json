@@ -1,6 +1,7 @@
 {
   "short_name": "Nebula",
   "name": "Nebula Screen Capture",
+  "version": "2.0.1",
   "description": "Professional screen recording made simple. Capture your screen with high-quality video and audio, customize recording settings, and manage your recordings with ease.",
   "icons": [
     {
@@ -21,7 +22,7 @@
       "purpose": "any maskable"
     }
   ],
-  "start_url": "/nebula-screen-capture/",
+  "start_url": "/nebula-screen-capture/?v=2.0.1",
   "display": "standalone",
   "theme_color": "#667eea",
   "background_color": "#1a1a2e",
