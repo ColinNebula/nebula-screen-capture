@@ -107,7 +107,7 @@
   let magneticSnapping = true;
   let rippleEdit = false;
   let sequencerPixelsPerSecond = 100; // Pixels per second for sequencer timeline
-  let horizontalZoom = 1; // Horizontal zoom multiplier (0.25x to 4x)
+  let horizontalZoom = 0.25; // Horizontal zoom multiplier (0.25x to 4x) - Start zoomed out
   let fadeOpacity = 1; // Combined opacity from global and per-clip transitions
   
   // Computed pixels per second based on horizontal zoom
@@ -310,7 +310,10 @@
     loadFromLocalStorage();
     
     // Load all user assets (videos and screenshots) into media bin
-    loadAllUserAssets();
+    // Use setTimeout to ensure stores are fully initialized
+    setTimeout(() => {
+      loadAllUserAssets();
+    }, 100);
     
     // Initialize sequencer with current video (if not already loaded from localStorage)
     if (video && video.url) {
@@ -1536,9 +1539,11 @@
           id: clip.id,
           name: clip.name,
           url: clip.url,
+          dataUrl: clip.dataUrl, // Preserve dataUrl for screenshots
           duration: clip.duration,
           thumbnail: clip.thumbnail,
-          type: clip.type
+          type: clip.type,
+          mimeType: clip.mimeType // Preserve mimeType
         })),
         tracks: tracks.map(track => ({
           ...track,
@@ -1550,7 +1555,15 @@
             thumbnail: clip.thumbnail,
             trimStart: clip.trimStart,
             trimEnd: clip.trimEnd,
-            color: clip.color
+            color: clip.color,
+            type: clip.type, // Preserve clip type
+            url: clip.url,
+            dataUrl: clip.dataUrl, // Preserve dataUrl for screenshots
+            // Preserve transition properties
+            fadeIn: clip.fadeIn,
+            fadeOut: clip.fadeOut,
+            fadeInType: clip.fadeInType,
+            fadeOutType: clip.fadeOutType
           }))
         }))
       };
@@ -1614,6 +1627,7 @@
     
     // Add all recorded videos
     const videos = get(recordedVideos) || [];
+    console.log('📹 Loading videos:', videos.length);
     videos.forEach(video => {
       // Skip if already in clips
       if (clips.some(c => c.id === video.id)) return;
@@ -1652,9 +1666,13 @@
     
     // Add all screenshots
     const shots = get(screenshots) || [];
+    console.log('📸 Loading screenshots:', shots.length, shots);
     shots.forEach(screenshot => {
       // Skip if already in clips
-      if (clips.some(c => c.id === screenshot.id)) return;
+      if (clips.some(c => c.id === screenshot.id)) {
+        console.log('⏭️ Skipping screenshot (already in clips):', screenshot.id);
+        return;
+      }
       
       const screenshotClip = {
         id: screenshot.id,
@@ -1665,6 +1683,8 @@
         thumbnail: null,
         type: 'screenshot'
       };
+      
+      console.log('✅ Adding screenshot clip:', screenshotClip.name);
       
       // Generate thumbnail for screenshot
       if (screenshot.dataUrl || screenshot.url) {
@@ -1703,7 +1723,11 @@
     
     // Add all assets to clips array if we have any
     if (allAssets.length > 0) {
+      console.log('📦 Adding', allAssets.length, 'assets to clips panel');
       clips = [...clips, ...allAssets];
+      console.log('📦 Total clips now:', clips.length);
+    } else {
+      console.log('⚠️ No assets to add');
     }
   }
   
@@ -2504,7 +2528,29 @@
           >
             <!-- Sequencer Header with Time Ruler -->
             <div class="sequencer-header">
-              <div class="track-header-spacer">Tracks</div>
+              <div class="track-header-spacer">
+                <span>Tracks ({tracks.length})</span>
+                <div class="track-count-controls">
+                  <button 
+                    class="track-count-btn" 
+                    on:click={() => addTrack('video')}
+                    title="Add Track"
+                  >
+                    +
+                  </button>
+                  <button 
+                    class="track-count-btn" 
+                    on:click={() => {
+                      const lastTrack = tracks[tracks.length - 1];
+                      if (lastTrack && tracks.length > 1) removeTrack(lastTrack.id);
+                    }}
+                    disabled={tracks.length <= 1}
+                    title="Remove Last Track"
+                  >
+                    −
+                  </button>
+                </div>
+              </div>
               <div 
                 class="sequencer-time-ruler"
                 on:mousedown={handleTimeRulerClick}
@@ -3286,76 +3332,78 @@
           <!-- Clip Transitions Section -->
           {#if selectedClipId}
             {@const selectedClip = getSelectedClip()}
-            {#if selectedClip}
-              <div class="property-section">
-                <h4>🎬 Clip Transitions</h4>
-                <p style="font-size: 12px; color: var(--text-secondary); margin: 8px 0;">Add fade effects to this clip's beginning and end</p>
-                
-                <!-- Fade In -->
-                <div class="property-control">
-                  <label style="font-size: 13px; font-weight: 500;">📈 Fade In: {selectedClip.fadeIn?.toFixed(1) || '0.0'}s</label>
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max={Math.min(5, selectedClip.duration / 2)} 
-                    step="0.1" 
-                    value={selectedClip.fadeIn || 0}
-                    on:input={(e) => updateClipTransition('fadeIn', parseFloat(e.target.value))}
-                    style="width: 100%;"
-                  />
-                </div>
-                
-                <div class="property-control">
-                  <label style="font-size: 13px; font-weight: 500;">🎨 Fade In Type:</label>
-                  <select 
-                    value={selectedClip.fadeInType || 'black'}
-                    on:change={(e) => updateClipTransition('fadeInType', e.target.value)}
-                    style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-secondary);"
+            {#if selectedClip && selectedClip.duration}
+              {#key selectedClipId}
+                <div class="property-section">
+                  <h4>🎬 Clip Transitions</h4>
+                  <p style="font-size: 12px; color: var(--text-secondary); margin: 8px 0;">Add fade effects to this clip's beginning and end</p>
+                  
+                  <!-- Fade In -->
+                  <div class="property-control">
+                    <label style="font-size: 13px; font-weight: 500;">📈 Fade In: {selectedClip.fadeIn?.toFixed(1) || '0.0'}s</label>
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max={Math.min(5, selectedClip.duration / 2)} 
+                      step="0.1" 
+                      value={selectedClip.fadeIn || 0}
+                      on:input={(e) => updateClipTransition('fadeIn', parseFloat(e.target.value))}
+                      style="width: 100%;"
+                    />
+                  </div>
+                  
+                  <div class="property-control">
+                    <label style="font-size: 13px; font-weight: 500;">🎨 Fade In Type:</label>
+                    <select 
+                      value={selectedClip.fadeInType || 'black'}
+                      on:change={(e) => updateClipTransition('fadeInType', e.target.value)}
+                      style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-secondary);"
+                    >
+                      <option value="black">From Black</option>
+                      <option value="white">From White</option>
+                      <option value="transparent">From Transparent</option>
+                    </select>
+                  </div>
+                  
+                  <!-- Fade Out -->
+                  <div class="property-control" style="margin-top: 12px;">
+                    <label style="font-size: 13px; font-weight: 500;">📉 Fade Out: {selectedClip.fadeOut?.toFixed(1) || '0.0'}s</label>
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max={Math.min(5, selectedClip.duration / 2)} 
+                      step="0.1" 
+                      value={selectedClip.fadeOut || 0}
+                      on:input={(e) => updateClipTransition('fadeOut', parseFloat(e.target.value))}
+                      style="width: 100%;"
+                    />
+                  </div>
+                  
+                  <div class="property-control">
+                    <label style="font-size: 13px; font-weight: 500;">🎨 Fade Out Type:</label>
+                    <select 
+                      value={selectedClip.fadeOutType || 'black'}
+                      on:change={(e) => updateClipTransition('fadeOutType', e.target.value)}
+                      style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-secondary);"
+                    >
+                      <option value="black">To Black</option>
+                      <option value="white">To White</option>
+                      <option value="transparent">To Transparent</option>
+                    </select>
+                  </div>
+                  
+                  <button 
+                    class="property-btn"
+                    on:click={() => {
+                      updateClipTransition('fadeIn', 0);
+                      updateClipTransition('fadeOut', 0);
+                    }}
+                    style="margin-top: 8px; width: 100%; padding: 6px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; border-radius: 4px; cursor: pointer;"
                   >
-                    <option value="black">From Black</option>
-                    <option value="white">From White</option>
-                    <option value="transparent">From Transparent</option>
-                  </select>
+                    Reset Clip Transitions
+                  </button>
                 </div>
-                
-                <!-- Fade Out -->
-                <div class="property-control" style="margin-top: 12px;">
-                  <label style="font-size: 13px; font-weight: 500;">📉 Fade Out: {selectedClip.fadeOut?.toFixed(1) || '0.0'}s</label>
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max={Math.min(5, selectedClip.duration / 2)} 
-                    step="0.1" 
-                    value={selectedClip.fadeOut || 0}
-                    on:input={(e) => updateClipTransition('fadeOut', parseFloat(e.target.value))}
-                    style="width: 100%;"
-                  />
-                </div>
-                
-                <div class="property-control">
-                  <label style="font-size: 13px; font-weight: 500;">🎨 Fade Out Type:</label>
-                  <select 
-                    value={selectedClip.fadeOutType || 'black'}
-                    on:change={(e) => updateClipTransition('fadeOutType', e.target.value)}
-                    style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-secondary);"
-                  >
-                    <option value="black">To Black</option>
-                    <option value="white">To White</option>
-                    <option value="transparent">To Transparent</option>
-                  </select>
-                </div>
-                
-                <button 
-                  class="property-btn"
-                  on:click={() => {
-                    updateClipTransition('fadeIn', 0);
-                    updateClipTransition('fadeOut', 0);
-                  }}
-                  style="margin-top: 8px; width: 100%; padding: 6px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; border-radius: 4px; cursor: pointer;"
-                >
-                  Reset Clip Transitions
-                </button>
-              </div>
+              {/key}
             {/if}
           {:else}
             <div class="property-section">
