@@ -75,6 +75,8 @@
 .recorder-sidebar {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  max-height: calc(100vh - 120px);
 }
 
 /* Responsive Design */

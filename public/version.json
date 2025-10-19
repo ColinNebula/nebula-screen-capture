@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "releaseDate": "2025-10-18",
+  "releaseNotes": [
+    "Initial release with advanced video editing",
+    "Screenshot management and editing",
+    "Multi-track timeline with transitions",
+    "Export with filters and effects"
+  ]
+}

@@ -4,6 +4,7 @@
   import AuthContainer from './components/AuthContainer.svelte';
   import SplashScreen from './components/SplashScreen.svelte';
   import LoadingState from './components/LoadingState.svelte';
+  import UpdatePrompt from './components/UpdatePrompt.svelte';
   import { user } from './stores/user.js';
   import { theme } from './stores/theme.js';
 
@@ -62,6 +63,9 @@
     {/if}
   </div>
 {/if}
+
+<!-- Update notification prompt -->
+<UpdatePrompt />
 
 <style>
   :global(body) {

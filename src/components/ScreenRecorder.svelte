@@ -26,6 +26,8 @@
   import SettingsModal from './SettingsModal.svelte';
   import HelpSupportModal from './HelpSupportModal.svelte';
   import AdminPanel from './AdminPanel.svelte';
+  import RecordingNamePrompt from './RecordingNamePrompt.svelte';
+  import OnboardingTutorial from './OnboardingTutorial.svelte';
 
   export let onLogout = () => {};
 
@@ -36,11 +38,13 @@
   let showSettings = false;
   let showEditor = false;
   let showAdmin = false;
+  let showNamePrompt = false;
   let videoToEdit = null;
   let notifications = [];
   let mediaRecorder = null;
   let recordedChunks = [];
   let timerInterval = null;
+  let pendingRecordingMetadata = null;
   
   let recordingOptions = {
     videoQuality: '1080p',
@@ -72,9 +76,25 @@
   }
 
   // Recording functions
-  async function startRecording() {
+  async function promptForRecordingName() {
+    showNamePrompt = true;
+  }
+  
+  function handleNameConfirm(metadata) {
+    pendingRecordingMetadata = metadata;
+    showNamePrompt = false;
+    actuallyStartRecording();
+  }
+  
+  function handleNameCancel() {
+    showNamePrompt = false;
+    pendingRecordingMetadata = null;
+  }
+  
+  async function actuallyStartRecording() {
     try {
       console.log('Starting recording with options:', recordingOptions);
+      console.log('Recording metadata:', pendingRecordingMetadata);
       
       // Request screen capture
       const displayMediaOptions = {
@@ -117,16 +137,21 @@
         const url = URL.createObjectURL(blob);
         const newRecording = {
           id: Date.now(),
-          name: `Recording ${new Date().toLocaleString()}`,
+          name: pendingRecordingMetadata?.name || `Recording ${new Date().toLocaleString()}`,
           url: url,
           blob: blob,
           timestamp: Date.now(),
           duration: $recordingTime,
-          size: blob.size
+          size: blob.size,
+          category: pendingRecordingMetadata?.category || 'Other',
+          tags: pendingRecordingMetadata?.tags || []
         };
         
         recordedVideos.update(videos => [...videos, newRecording]);
         currentRecording = newRecording;
+        
+        // Clear metadata for next recording
+        pendingRecordingMetadata = null;
         
         // Persist to IndexedDB
         persistRecording(newRecording);
@@ -329,7 +354,7 @@
   });
 </script>
 
-<div class="screen-recorder">
+<div class="screen-recorder" role="main" aria-label="Screen recorder application">
   <DynamicHeader 
     onLogout={handleLogout}
     onShowSettings={() => showSettings = true}
@@ -341,12 +366,16 @@
   <div class="recorder-content">
     <div class="recorder-main">
       <!-- Mode Toggle Tabs -->
-      <div class="mode-toggle-tabs">
+      <div class="mode-toggle-tabs mode-toggle" role="tablist" aria-label="Recording mode selection">
         <button
           class="mode-tab"
           class:active={activeMode === 'record'}
           on:click={() => setMode('record')}
           disabled={$isRecording}
+          role="tab"
+          aria-selected={activeMode === 'record'}
+          aria-controls="recording-panel"
+          aria-label="Video recording mode"
         >
           <svg viewBox="0 0 24 24" fill="currentColor">
             <circle cx="12" cy="12" r="8"/>
@@ -358,8 +387,12 @@
           class:active={activeMode === 'screenshot'}
           on:click={() => setMode('screenshot')}
           disabled={$isRecording}
+          role="tab"
+          aria-selected={activeMode === 'screenshot'}
+          aria-controls="screenshot-panel"
+          aria-label="Screenshot capture mode"
         >
-          <svg viewBox="0 0 24 24" fill="currentColor">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
           </svg>
           Take Screenshot
@@ -368,7 +401,7 @@
 
       {#if activeMode === 'record'}
         <RecordingControls
-          onStart={startRecording}
+          onStart={promptForRecordingName}
           onStop={stopRecording}
           onPause={pauseRecording}
           onResume={resumeRecording}
@@ -400,7 +433,7 @@
       {/if}
     </div>
 
-    <div class="recorder-sidebar">
+    <div class="recorder-sidebar" role="complementary" aria-label="Recordings library">
       <FileManager
         recordings={$recordedVideos}
         onSelect={(rec) => currentRecording = rec}
@@ -433,6 +466,16 @@
   {#if showAdmin && $user?.isAdmin}
     <AdminPanel onClose={closeAdminPanel} />
   {/if}
+
+  {#if showNamePrompt}
+    <RecordingNamePrompt 
+      onConfirm={handleNameConfirm}
+      onCancel={handleNameCancel}
+      defaultName="Recording {new Date().toLocaleDateString()}"
+    />
+  {/if}
+
+  <OnboardingTutorial onComplete={() => {}} />
 </div>
 
 <style>

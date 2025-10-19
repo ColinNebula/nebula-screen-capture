@@ -154,3 +154,146 @@ self.addEventListener('activate', (event) => {
     })
   );
 });
+
+// Push notification handling
+self.addEventListener('push', (event) => {
+  console.log('Push notification received:', event);
+  
+  let notificationData = {
+    title: '🚀 Update Available!',
+    body: 'A new version of Nebula Screen Capture is available!',
+    icon: '/logo192.png',
+    badge: '/logo192.png',
+    tag: 'app-update',
+    requireInteraction: true,
+    data: {
+      url: '/',
+      action: 'update'
+    }
+  };
+
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      notificationData = {
+        ...notificationData,
+        ...data.notification
+      };
+    } catch (e) {
+      console.error('Error parsing push data:', e);
+    }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(notificationData.title, {
+      body: notificationData.body,
+      icon: notificationData.icon,
+      badge: notificationData.badge,
+      tag: notificationData.tag,
+      requireInteraction: notificationData.requireInteraction,
+      data: notificationData.data,
+      actions: [
+        {
+          action: 'update',
+          title: 'Update Now',
+          icon: '/logo192.png'
+        },
+        {
+          action: 'later',
+          title: 'Later'
+        }
+      ]
+    })
+  );
+});
+
+// Handle notification clicks
+self.addEventListener('notificationclick', (event) => {
+  console.log('Notification clicked:', event);
+  
+  event.notification.close();
+
+  if (event.action === 'update') {
+    // Open the app and trigger update
+    event.waitUntil(
+      clients.matchAll({ type: 'window', includeUncontrolled: true })
+        .then((clientList) => {
+          // If app is already open, focus it and send update message
+          for (const client of clientList) {
+            if (client.url.includes(self.location.origin)) {
+              client.focus();
+              client.postMessage({
+                type: 'UPDATE_AVAILABLE',
+                action: 'apply'
+              });
+              return;
+            }
+          }
+          // If app is not open, open it
+          return clients.openWindow('/');
+        })
+    );
+  } else if (event.action === 'later') {
+    // Store reminder for later
+    event.waitUntil(
+      clients.matchAll({ type: 'window' })
+        .then((clientList) => {
+          for (const client of clientList) {
+            client.postMessage({
+              type: 'UPDATE_AVAILABLE',
+              action: 'remind_later'
+            });
+          }
+        })
+    );
+  } else {
+    // Default click - open app
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  }
+});
+
+// Background sync for update checks
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'check-updates') {
+    event.waitUntil(
+      checkForUpdates()
+    );
+  }
+});
+
+// Periodic background sync (if supported)
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === 'update-check') {
+    event.waitUntil(
+      checkForUpdates()
+    );
+  }
+});
+
+// Function to check for updates
+async function checkForUpdates() {
+  try {
+    const response = await fetch('/version.json?' + Date.now(), {
+      cache: 'no-store'
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      
+      // Notify all clients about the version
+      const clients = await self.clients.matchAll();
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'VERSION_CHECK',
+          version: data.version,
+          releaseNotes: data.releaseNotes
+        });
+      });
+    }
+  } catch (error) {
+    console.error('Error checking for updates:', error);
+  }
+}
+

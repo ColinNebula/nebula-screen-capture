@@ -1387,7 +1387,7 @@
 .sequencer-time-ruler {
   position: relative;
   flex: 1;
-  height: 40px;
+  height: 28px;
   overflow-x: auto;
   overflow-y: hidden;
   background: repeating-linear-gradient(
@@ -1409,7 +1409,7 @@
 
 .time-tick {
   width: 2px;
-  height: 12px;
+  height: 10px;
   background: #667eea;
 }
 
@@ -1902,7 +1902,7 @@
 /* Timeline Ruler */
 .timeline-ruler {
   position: relative;
-  height: 30px;
+  height: 24px;
   background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
   border: 1px solid #cbd5e1;
   border-bottom: 2px solid #94a3b8;
@@ -1938,7 +1938,7 @@
 
 .ruler-tick.major {
   width: 2px;
-  height: 18px;
+  height: 14px;
   background: #475569;
 }
 
@@ -1948,7 +1948,7 @@
 
 .ruler-tick.minor {
   width: 1px;
-  height: 10px;
+  height: 8px;
   opacity: 0.5;
 }
 

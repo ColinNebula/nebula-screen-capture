@@ -135,12 +135,16 @@
       </div>
     </div>
 
-    <div class="file-list">
+    <div class="file-list" role="list" aria-label="Recorded videos">
       {#each filteredRecordings as recording (recording.id)}
         <div
           class="file-item"
           class:active={currentRecording?.id === recording.id}
           on:click={() => onSelect(recording)}
+          role="listitem"
+          tabindex="0"
+          aria-label="{recording.name || 'Untitled Recording'}, {formatDuration(recording.duration)}, recorded {formatDate(recording.timestamp || recording.date)}"
+          on:keydown={(e) => e.key === 'Enter' && onSelect(recording)}
         >
           <div class="file-thumbnail">
             {#if recording.thumbnail}
@@ -169,11 +173,12 @@
             <div class="file-date">{formatDate(recording.timestamp || recording.date)}</div>
           </div>
 
-          <div class="file-actions">
+          <div class="file-actions" role="group" aria-label="Recording actions">
             <button
               class="file-action-btn"
               on:click|stopPropagation={() => onEdit(recording)}
               title="Edit"
+              aria-label="Edit {recording.name || 'recording'}"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
@@ -184,6 +189,7 @@
               class="file-action-btn"
               on:click|stopPropagation={() => onDownload(recording)}
               title="Download"
+              aria-label="Download {recording.name || 'recording'}"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
@@ -193,6 +199,7 @@
               class="file-action-btn delete"
               on:click|stopPropagation={() => onDelete(recording)}
               title="Delete"
+              aria-label="Delete {recording.name || 'recording'}"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />

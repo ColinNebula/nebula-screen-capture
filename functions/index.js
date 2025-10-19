@@ -810,3 +810,13 @@ exports.sendWelcomeEmailVerified = functions.https.onRequest((req, res) => {
     }
   });
 });
+
+// =============================================================================
+// UPDATE NOTIFICATION FUNCTIONS
+// =============================================================================
+
+// Export update notification functions
+const updateNotifications = require('./sendUpdateNotifications');
+exports.sendUpdateNotification = updateNotifications.sendUpdateNotification;
+exports.subscribeToUpdates = updateNotifications.subscribeToUpdates;
+exports.checkForUpdates = updateNotifications.checkForUpdates;

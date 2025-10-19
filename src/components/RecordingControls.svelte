@@ -36,13 +36,14 @@
   }
 </script>
 
-<div class="recording-controls">
+<div class="recording-controls" role="toolbar" aria-label="Recording controls">
   {#if !$isRecording}
     <button 
       class="control-button start-button" 
       on:click={handleStart}
       disabled={disabled || isStarting}
       aria-label="Start recording"
+      aria-describedby={isStarting ? 'recording-status' : undefined}
     >
       <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
         <circle cx="12" cy="12" r="8"/>
@@ -53,9 +54,9 @@
     </button>
   {:else}
     <div class="recording-active-controls">
-      <div class="recording-indicator">
-        <span class="recording-dot"></span>
-        <span class="recording-time">{$formattedTime}</span>
+      <div class="recording-indicator" role="status" aria-live="polite">
+        <span class="recording-dot" aria-hidden="true"></span>
+        <span class="recording-time" aria-label="Recording time: {$formattedTime}">{$formattedTime}</span>
       </div>
       
       <div class="control-buttons">

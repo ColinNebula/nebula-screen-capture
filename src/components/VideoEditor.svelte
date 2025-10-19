@@ -11,6 +11,8 @@
     base64ToFile 
   } from '../utils/sessionManager.js';
   import { recordedVideos, screenshots } from '../stores/recording.js';
+  import TextOverlay from './TextOverlay.svelte';
+  import TextOverlayEditor from './TextOverlayEditor.svelte';
 
   export let video = null;
   export let onClose = () => {};
@@ -48,7 +50,36 @@
     shadows: 0, // -100 to 100
     highlights: 0, // -100 to 100
     gamma: 1, // 0.1 to 3
+    // Professional color grading
+    vibrance: 0, // -100 to 100 (smart saturation)
+    clarity: 0, // -100 to 100 (local contrast)
+    // Film looks
+    filmGrain: 0, // 0 to 100
+    bleachBypass: 0, // 0 to 100
+    channelMixer: { red: 100, green: 100, blue: 100 }, // RGB channel control
+    // Creative filters
+    sepia: 0, // 0 to 100
+    grayscale: 0, // 0 to 100
+    invert: 0, // 0 to 100
+    posterize: 0, // 0 to 32 (color levels)
   };
+  
+  // Filter presets
+  let filterPresets = {
+    none: { name: 'None', description: 'Original' },
+    cinematic: { name: 'Cinematic', description: 'Film-like color grading' },
+    vivid: { name: 'Vivid', description: 'Enhanced colors' },
+    vintage: { name: 'Vintage', description: 'Old film look' },
+    dramatic: { name: 'Dramatic', description: 'High contrast B&W' },
+    warm: { name: 'Warm', description: 'Golden hour' },
+    cool: { name: 'Cool', description: 'Blue tones' },
+    dream: { name: 'Dream', description: 'Soft and ethereal' },
+    noir: { name: 'Film Noir', description: 'Classic black & white' },
+    bleach: { name: 'Bleach Bypass', description: 'Desaturated film look' },
+    cyberpunk: { name: 'Cyberpunk', description: 'Neon vibes' },
+    sunset: { name: 'Sunset', description: 'Warm orange glow' },
+  };
+  let selectedFilterPreset = 'none';
   
   // Effects
   let effects = {
@@ -58,6 +89,26 @@
     vignette: 0, // 0 to 100
     noise: 0, // 0 to 100
     sharpen: 0, // 0 to 100
+    // Advanced effects
+    chromaticAberration: 0, // 0 to 100 (RGB shift)
+    glitch: 0, // 0 to 100 (digital glitch)
+    pixelate: 0, // 0 to 50 (pixel size)
+    kaleidoscope: 0, // 0 to 12 (segments)
+    mirror: 'none', // none, horizontal, vertical, both
+    rotation: 0, // -180 to 180 degrees
+    flip: { horizontal: false, vertical: false },
+    // Lens effects
+    fishEye: 0, // 0 to 100
+    bulge: 0, // -100 to 100
+    // Borders and frames
+    border: { enabled: false, width: 0, color: '#000000', style: 'solid' },
+    cornerRadius: 0, // 0 to 50 (rounded corners)
+    // Motion effects
+    motionBlur: 0, // 0 to 100
+    shake: 0, // 0 to 100 (camera shake)
+    // Color effects
+    duotone: { enabled: false, color1: '#000000', color2: '#ffffff' },
+    colorSplash: { enabled: false, hue: 0, tolerance: 30 }, // Keep one color, desaturate rest
   };
   
   // Transitions
@@ -66,7 +117,43 @@
     fadeOut: 0, // seconds
     fadeInType: 'black', // black, white, transparent
     fadeOutType: 'black',
+    // Advanced transitions
+    slideDirection: 'none', // none, left, right, up, down
+    slideIn: 0, // seconds
+    slideOut: 0, // seconds
+    zoom: { in: 0, out: 0 }, // Zoom transitions in seconds
+    wipe: { enabled: false, direction: 'left', duration: 1 }, // left, right, up, down, diagonal
+    dissolve: 0, // Cross-dissolve duration
+    // Creative transitions
+    circularReveal: 0, // Circle wipe duration
+    pageFlip: 0, // 3D page flip duration
+    blur: 0, // Blur transition duration
+    pixelate: 0, // Pixelate transition duration
+    glitch: 0, // Glitch transition duration
+    // Color transitions
+    colorFade: { enabled: false, color: '#000000', duration: 1 },
   };
+  
+  // Transition presets
+  let transitionPresets = {
+    none: { name: 'None', description: 'No transition' },
+    crossfade: { name: 'Cross Fade', description: 'Smooth blend' },
+    fadeBlack: { name: 'Fade to Black', description: 'Classic fade' },
+    fadeWhite: { name: 'Fade to White', description: 'Bright fade' },
+    slideLeft: { name: 'Slide Left', description: 'Push from right' },
+    slideRight: { name: 'Slide Right', description: 'Push from left' },
+    slideUp: { name: 'Slide Up', description: 'Push from bottom' },
+    slideDown: { name: 'Slide Down', description: 'Push from top' },
+    zoomIn: { name: 'Zoom In', description: 'Scale up reveal' },
+    zoomOut: { name: 'Zoom Out', description: 'Scale down reveal' },
+    wipeLeft: { name: 'Wipe Left', description: 'Linear wipe' },
+    wipeRight: { name: 'Wipe Right', description: 'Linear wipe' },
+    circleReveal: { name: 'Circle Reveal', description: 'Radial wipe' },
+    pageFlip: { name: 'Page Flip', description: '3D flip effect' },
+    blurTransition: { name: 'Blur', description: 'Defocus transition' },
+    glitchTransition: { name: 'Glitch', description: 'Digital distortion' },
+  };
+  let selectedTransitionPreset = 'none';
   
   // Audio
   let volume = 100;
@@ -90,6 +177,11 @@
   let fileInputElement = null;
   let showOutliner = true;
   let showPropertiesPanel = true;
+  
+  // Text overlays
+  let textOverlays = [];
+  let selectedOverlayIndex = null;
+  let showTextOverlayEditor = false;
   
   // Multi-track sequencer
   let tracks = [
@@ -1466,6 +1558,30 @@
       videoElement.currentTime = trimEnd;
     }
   }
+
+  function jumpToPreviousFrame() {
+    if (videoElement) {
+      // Pause if playing
+      if (isPlaying) {
+        togglePlayPause();
+      }
+      // Calculate frame duration (assuming 30fps, can be adjusted)
+      const frameDuration = 1 / 30;
+      videoElement.currentTime = Math.max(trimStart, videoElement.currentTime - frameDuration);
+    }
+  }
+
+  function jumpToNextFrame() {
+    if (videoElement) {
+      // Pause if playing
+      if (isPlaying) {
+        togglePlayPause();
+      }
+      // Calculate frame duration (assuming 30fps, can be adjusted)
+      const frameDuration = 1 / 30;
+      videoElement.currentTime = Math.min(trimEnd, videoElement.currentTime + frameDuration);
+    }
+  }
   
   function resetFilters() {
     filters = {
@@ -1480,7 +1596,17 @@
       shadows: 0,
       highlights: 0,
       gamma: 1,
+      vibrance: 0,
+      clarity: 0,
+      filmGrain: 0,
+      bleachBypass: 0,
+      channelMixer: { red: 100, green: 100, blue: 100 },
+      sepia: 0,
+      grayscale: 0,
+      invert: 0,
+      posterize: 0,
     };
+    selectedFilterPreset = 'none';
   }
   
   function resetEffects() {
@@ -1491,6 +1617,21 @@
       vignette: 0,
       noise: 0,
       sharpen: 0,
+      chromaticAberration: 0,
+      glitch: 0,
+      pixelate: 0,
+      kaleidoscope: 0,
+      mirror: 'none',
+      rotation: 0,
+      flip: { horizontal: false, vertical: false },
+      fishEye: 0,
+      bulge: 0,
+      border: { enabled: false, width: 0, color: '#000000', style: 'solid' },
+      cornerRadius: 0,
+      motionBlur: 0,
+      shake: 0,
+      duotone: { enabled: false, color1: '#000000', color2: '#ffffff' },
+      colorSplash: { enabled: false, hue: 0, tolerance: 30 },
     };
   }
   
@@ -1500,7 +1641,118 @@
       fadeOut: 0,
       fadeInType: 'black',
       fadeOutType: 'black',
+      slideDirection: 'none',
+      slideIn: 0,
+      slideOut: 0,
+      zoom: { in: 0, out: 0 },
+      wipe: { enabled: false, direction: 'left', duration: 1 },
+      dissolve: 0,
+      circularReveal: 0,
+      pageFlip: 0,
+      blur: 0,
+      pixelate: 0,
+      glitch: 0,
+      colorFade: { enabled: false, color: '#000000', duration: 1 },
     };
+    selectedTransitionPreset = 'none';
+  }
+  
+  // Apply filter preset
+  function applyFilterPreset(preset) {
+    selectedFilterPreset = preset;
+    
+    switch(preset) {
+      case 'cinematic':
+        filters = { ...filters, temperature: 15, tint: -5, contrast: 110, saturation: 90, clarity: 20, shadows: -10, highlights: -15, filmGrain: 15 };
+        break;
+      case 'vivid':
+        filters = { ...filters, saturation: 140, vibrance: 30, contrast: 115, clarity: 25, temperature: 5 };
+        break;
+      case 'vintage':
+        filters = { ...filters, sepia: 40, temperature: 20, contrast: 90, saturation: 80, filmGrain: 30, vignette: 25 };
+        break;
+      case 'dramatic':
+        filters = { ...filters, grayscale: 100, contrast: 140, clarity: 50, shadows: -30, highlights: 20 };
+        break;
+      case 'warm':
+        filters = { ...filters, temperature: 40, tint: 10, saturation: 110, exposure: 5 };
+        break;
+      case 'cool':
+        filters = { ...filters, temperature: -35, tint: -10, saturation: 95, contrast: 105 };
+        break;
+      case 'dream':
+        filters = { ...filters, blur: 1.5, saturation: 120, temperature: 10, exposure: 10, contrast: 85 };
+        break;
+      case 'noir':
+        filters = { ...filters, grayscale: 100, contrast: 150, shadows: -40, highlights: 30, gamma: 0.9 };
+        break;
+      case 'bleach':
+        filters = { ...filters, bleachBypass: 70, contrast: 125, saturation: 70, temperature: -5 };
+        break;
+      case 'cyberpunk':
+        filters = { ...filters, saturation: 150, vibrance: 50, temperature: -20, tint: 20, contrast: 120, shadows: -20 };
+        break;
+      case 'sunset':
+        filters = { ...filters, temperature: 50, tint: 15, saturation: 120, exposure: 5, highlights: 10 };
+        break;
+      default:
+        resetFilters();
+    }
+  }
+  
+  // Apply transition preset
+  function applyTransitionPreset(preset) {
+    selectedTransitionPreset = preset;
+    
+    switch(preset) {
+      case 'crossfade':
+        transitions = { ...transitions, dissolve: 1, fadeIn: 0, fadeOut: 0 };
+        break;
+      case 'fadeBlack':
+        transitions = { ...transitions, fadeIn: 1, fadeOut: 1, fadeInType: 'black', fadeOutType: 'black' };
+        break;
+      case 'fadeWhite':
+        transitions = { ...transitions, fadeIn: 1, fadeOut: 1, fadeInType: 'white', fadeOutType: 'white' };
+        break;
+      case 'slideLeft':
+        transitions = { ...transitions, slideDirection: 'left', slideIn: 0.8, slideOut: 0.8 };
+        break;
+      case 'slideRight':
+        transitions = { ...transitions, slideDirection: 'right', slideIn: 0.8, slideOut: 0.8 };
+        break;
+      case 'slideUp':
+        transitions = { ...transitions, slideDirection: 'up', slideIn: 0.8, slideOut: 0.8 };
+        break;
+      case 'slideDown':
+        transitions = { ...transitions, slideDirection: 'down', slideIn: 0.8, slideOut: 0.8 };
+        break;
+      case 'zoomIn':
+        transitions = { ...transitions, zoom: { in: 1.2, out: 0 } };
+        break;
+      case 'zoomOut':
+        transitions = { ...transitions, zoom: { in: 0, out: 1.2 } };
+        break;
+      case 'wipeLeft':
+        transitions = { ...transitions, wipe: { enabled: true, direction: 'left', duration: 1 } };
+        break;
+      case 'wipeRight':
+        transitions = { ...transitions, wipe: { enabled: true, direction: 'right', duration: 1 } };
+        break;
+      case 'circleReveal':
+        transitions = { ...transitions, circularReveal: 1 };
+        break;
+      case 'pageFlip':
+        transitions = { ...transitions, pageFlip: 1.5 };
+        break;
+      case 'blurTransition':
+        transitions = { ...transitions, blur: 1 };
+        break;
+      case 'glitchTransition':
+        transitions = { ...transitions, glitch: 0.5 };
+        break;
+      default:
+        resetTransitions();
+    }
   }
   
   function resetAudio() {
@@ -1565,7 +1817,8 @@
             fadeInType: clip.fadeInType,
             fadeOutType: clip.fadeOutType
           }))
-        }))
+        })),
+        textOverlays: textOverlays // Save text overlays
       };
       localStorage.setItem('videoEditor_clips', JSON.stringify(dataToSave));
     } catch (e) {
@@ -1614,6 +1867,11 @@
           if (hasValidClips) {
             tracks = validTracks;
           }
+        }
+        
+        // Load text overlays
+        if (parsed.textOverlays && Array.isArray(parsed.textOverlays)) {
+          textOverlays = parsed.textOverlays;
         }
       }
     } catch (e) {
@@ -2027,6 +2285,58 @@
     tracks = tracks.map(t => t.id === trackId ? {...t, solo: !t.solo} : t);
   }
   
+  // Text overlay management
+  function addTextOverlay() {
+    const newOverlay = {
+      id: Date.now(),
+      text: 'New Text',
+      position: { x: 50, y: 50 },
+      style: {
+        fontSize: 24,
+        fontFamily: 'Arial',
+        color: '#ffffff',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        fontWeight: 'normal',
+        fontStyle: 'normal',
+        textAlign: 'left',
+        padding: 10,
+        borderRadius: 4,
+        textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
+        rotation: 0,
+        opacity: 1
+      }
+    };
+    textOverlays = [...textOverlays, newOverlay];
+    selectedOverlayIndex = textOverlays.length - 1;
+    showTextOverlayEditor = true;
+    saveToLocalStorage();
+  }
+  
+  function updateTextOverlay(index, updates) {
+    textOverlays[index] = { ...textOverlays[index], ...updates };
+    textOverlays = textOverlays; // Trigger reactivity
+    saveToLocalStorage();
+  }
+  
+  function deleteTextOverlay(index) {
+    textOverlays = textOverlays.filter((_, i) => i !== index);
+    if (selectedOverlayIndex === index) {
+      selectedOverlayIndex = null;
+      showTextOverlayEditor = false;
+    }
+    saveToLocalStorage();
+  }
+  
+  function selectTextOverlay(index) {
+    selectedOverlayIndex = index;
+    showTextOverlayEditor = true;
+  }
+  
+  function closeTextOverlayEditor() {
+    showTextOverlayEditor = false;
+    selectedOverlayIndex = null;
+  }
+  
   function toggleTrackLock(trackId) {
     tracks = tracks.map(t => t.id === trackId ? {...t, locked: !t.locked} : t);
   }
@@ -2248,13 +2558,25 @@
       togglePlayPause();
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      if (videoElement) {
-        videoElement.currentTime = Math.max(trimStart, currentTime - 1);
+      if (e.shiftKey) {
+        // Shift + Left Arrow: Jump 1 second back
+        if (videoElement) {
+          videoElement.currentTime = Math.max(trimStart, currentTime - 1);
+        }
+      } else {
+        // Left Arrow: Previous frame
+        jumpToPreviousFrame();
       }
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
-      if (videoElement) {
-        videoElement.currentTime = Math.min(trimEnd, currentTime + 1);
+      if (e.shiftKey) {
+        // Shift + Right Arrow: Jump 1 second forward
+        if (videoElement) {
+          videoElement.currentTime = Math.min(trimEnd, currentTime + 1);
+        }
+      } else {
+        // Right Arrow: Next frame
+        jumpToNextFrame();
       }
     } else if (e.key === '=' || e.key === '+') {
       // Zoom in horizontally (Ctrl/Cmd + = or +)
@@ -2428,6 +2750,22 @@
           style="display: {activeClipType === 'image' ? 'block' : 'none'}; opacity: {fadeOpacity};"
         />
         
+        <!-- Text Overlays -->
+        {#each textOverlays as overlay, index (overlay.id)}
+          <TextOverlay
+            text={overlay.text}
+            position={overlay.position}
+            style={overlay.style}
+            isSelected={selectedOverlayIndex === index}
+            {index}
+            containerWidth={videoElement?.videoWidth || 1920}
+            containerHeight={videoElement?.videoHeight || 1080}
+            on:select={(e) => selectTextOverlay(e.detail.index)}
+            on:update={(e) => updateTextOverlay(e.detail.index, { position: e.detail.position })}
+            on:delete={(e) => deleteTextOverlay(e.detail.index)}
+          />
+        {/each}
+        
         <!-- Play/Pause Overlay -->
         <button class="play-pause-overlay" on:click={togglePlayPause}>
           {#if !isPlaying}
@@ -2515,17 +2853,27 @@
             </svg>
             Watermark
           </button>
+          <button 
+            class="tab-btn" 
+            class:active={activeTab === 'text'}
+            on:click={() => activeTab = 'text'}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="4 7 4 4 20 4 20 7"/>
+              <line x1="9" y1="20" x2="15" y2="20"/>
+              <line x1="12" y1="4" x2="12" y2="20"/>
+            </svg>
+            Text
+          </button>
         </div>
 
-        <!-- Trim Tab -->
-        {#if activeTab === 'trim'}
-          <!-- Multi-Track Sequencer -->
-          <div 
-            class="sequencer-section"
-            on:mousemove={handleMouseMove}
-            on:mouseup={handleMouseUp}
-            on:mouseleave={handleMouseUp}
-          >
+        <!-- Multi-Track Sequencer (Always visible) -->
+        <div 
+          class="sequencer-section"
+          on:mousemove={handleMouseMove}
+          on:mouseup={handleMouseUp}
+          on:mouseleave={handleMouseUp}
+        >
             <!-- Sequencer Header with Time Ruler -->
             <div class="sequencer-header">
               <div class="track-header-spacer">
@@ -2726,351 +3074,7 @@
               </span>
             </div>
           </div>
-        {/if}
         
-        <!-- Filters Tab -->
-        {#if activeTab === 'filters'}
-          <div class="filters-panel">
-            <div class="filters-header">
-              <h3>Color Correction & Filters</h3>
-              <button class="reset-btn" on:click={resetFilters}>Reset All</button>
-            </div>
-            
-            <div class="filter-controls">
-              <h4 style="margin: 10px 0; color: var(--text-secondary);">Basic Adjustments</h4>
-              
-              <div class="filter-control">
-                <label>
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                  </svg>
-                  Brightness: {filters.brightness}%
-                </label>
-                <input type="range" min="0" max="200" bind:value={filters.brightness} />
-              </div>
-              
-              <div class="filter-control">
-                <label>
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                  </svg>
-                  Contrast: {filters.contrast}%
-                </label>
-                <input type="range" min="0" max="200" bind:value={filters.contrast} />
-              </div>
-              
-              <div class="filter-control">
-                <label>
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                  </svg>
-                  Saturation: {filters.saturation}%
-                </label>
-                <input type="range" min="0" max="200" bind:value={filters.saturation} />
-              </div>
-              
-              <div class="filter-control">
-                <label>
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <circle cx="12" cy="12" r="10"/>
-                  </svg>
-                  Blur: {filters.blur}px
-                </label>
-                <input type="range" min="0" max="10" step="0.5" bind:value={filters.blur} />
-              </div>
-              
-              <div class="filter-control">
-                <label>
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                  </svg>
-                  Hue Rotate: {filters.hue}°
-                </label>
-                <input type="range" min="0" max="360" bind:value={filters.hue} />
-              </div>
-              
-              <h4 style="margin: 15px 0 10px; color: var(--text-secondary);">Advanced Color Correction</h4>
-              
-              <div class="filter-control">
-                <label>
-                  🌡️ Temperature: {filters.temperature > 0 ? '+' : ''}{filters.temperature}
-                </label>
-                <input type="range" min="-100" max="100" bind:value={filters.temperature} />
-              </div>
-              
-              <div class="filter-control">
-                <label>
-                  🎨 Tint: {filters.tint > 0 ? '+' : ''}{filters.tint}
-                </label>
-                <input type="range" min="-100" max="100" bind:value={filters.tint} />
-              </div>
-              
-              <div class="filter-control">
-                <label>
-                  ☀️ Exposure: {filters.exposure > 0 ? '+' : ''}{filters.exposure}
-                </label>
-                <input type="range" min="-100" max="100" bind:value={filters.exposure} />
-              </div>
-            </div>
-          </div>
-        {/if}
-        
-        <!-- Effects Tab -->
-        {#if activeTab === 'effects'}
-          <div class="effects-panel">
-            <div class="filters-header">
-              <h3>Visual Effects</h3>
-              <button class="reset-btn" on:click={resetEffects}>Reset All</button>
-            </div>
-            
-            <div class="filter-controls">
-              <h4 style="margin: 10px 0; color: var(--text-secondary);">Zoom & Pan</h4>
-              
-              <div class="filter-control">
-                <label>
-                  🔍 Zoom: {effects.zoom.toFixed(2)}x
-                </label>
-                <input type="range" min="1" max="3" step="0.1" bind:value={effects.zoom} />
-              </div>
-              
-              {#if effects.zoom > 1}
-                <div class="filter-control">
-                  <label>
-                    ↔️ Horizontal Position: {effects.zoomX}%
-                  </label>
-                  <input type="range" min="0" max="100" bind:value={effects.zoomX} />
-                </div>
-                
-                <div class="filter-control">
-                  <label>
-                    ↕️ Vertical Position: {effects.zoomY}%
-                  </label>
-                  <input type="range" min="0" max="100" bind:value={effects.zoomY} />
-                </div>
-              {/if}
-              
-              <h4 style="margin: 15px 0 10px; color: var(--text-secondary);">Artistic Effects</h4>
-              
-              <div class="filter-control">
-                <label>
-                  🎭 Vignette: {effects.vignette}%
-                </label>
-                <input type="range" min="0" max="100" bind:value={effects.vignette} />
-              </div>
-              
-              <div class="filter-control">
-                <label>
-                  ✨ Sharpen: {effects.sharpen}%
-                </label>
-                <input type="range" min="0" max="100" bind:value={effects.sharpen} />
-              </div>
-            </div>
-          </div>
-        {/if}
-        
-        <!-- Transitions Tab -->
-        {#if activeTab === 'transitions'}
-          <div class="transitions-panel">
-            <div class="filters-header">
-              <h3>Transition Effects</h3>
-              <button class="reset-btn" on:click={resetTransitions}>Reset All</button>
-            </div>
-            
-            <div class="filter-controls">
-              <!-- Info message -->
-              <div style="background: rgba(102, 126, 234, 0.1); border-left: 3px solid #667eea; padding: 12px; margin-bottom: 15px; border-radius: 6px;">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                  <svg viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px; color: #667eea;">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-                  </svg>
-                  <strong style="color: #667eea;">How to Apply Transitions</strong>
-                </div>
-                <p style="margin: 0; font-size: 13px; line-height: 1.5; color: var(--text-secondary);">
-                  Transitions are applied automatically as you adjust the sliders. Changes take effect immediately when you play or export your video.
-                </p>
-              </div>
-              
-              <h4 style="margin: 10px 0; color: var(--text-secondary);">Fade In</h4>
-              
-              <div class="filter-control">
-                <label>
-                  📈 Fade In Duration: {transitions.fadeIn.toFixed(1)}s
-                </label>
-                <input type="range" min="0" max="5" step="0.1" bind:value={transitions.fadeIn} />
-              </div>
-              
-              <div class="filter-control">
-                <label>
-                  🎨 Fade In Type:
-                </label>
-                <select bind:value={transitions.fadeInType} style="padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; width: 100%;">
-                  <option value="black">From Black</option>
-                  <option value="white">From White</option>
-                  <option value="transparent">From Transparent</option>
-                </select>
-              </div>
-              
-              <h4 style="margin: 15px 0 10px; color: var(--text-secondary);">Fade Out</h4>
-              
-              <div class="filter-control">
-                <label>
-                  📉 Fade Out Duration: {transitions.fadeOut.toFixed(1)}s
-                </label>
-                <input type="range" min="0" max="5" step="0.1" bind:value={transitions.fadeOut} />
-              </div>
-              
-              <div class="filter-control">
-                <label>
-                  🎨 Fade Out Type:
-                </label>
-                <select bind:value={transitions.fadeOutType} style="padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; width: 100%;">
-                  <option value="black">To Black</option>
-                  <option value="white">To White</option>
-                  <option value="transparent">To Transparent</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        {/if}
-        
-        <!-- Audio Tab -->
-        {#if activeTab === 'audio'}
-          <div class="audio-panel">
-            <div class="audio-header">
-              <h3>Audio & Playback</h3>
-              <button class="reset-btn" on:click={resetAudio}>Reset</button>
-            </div>
-            
-            <div class="audio-controls">
-              <h4 style="margin: 10px 0; color: var(--text-secondary);">Volume Control</h4>
-              
-              <div class="audio-control">
-                <label>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                    <path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/>
-                  </svg>
-                  Volume: {volume}%
-                </label>
-                <input type="range" min="0" max="100" bind:value={volume} />
-              </div>
-              
-              <div class="audio-control">
-                <label class="checkbox-label">
-                  <input type="checkbox" bind:checked={audioNormalize} />
-                  <span>🎚️ Audio Normalization (Balance levels)</span>
-                </label>
-              </div>
-              
-              <div class="audio-control">
-                <label class="checkbox-label">
-                  <input type="checkbox" bind:checked={audioEnhance} />
-                  <span>🎵 Audio Enhancement (Improve quality)</span>
-                </label>
-              </div>
-              
-              <h4 style="margin: 15px 0 10px; color: var(--text-secondary);">Playback Speed</h4>
-              
-              <div class="audio-control">
-                <label>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
-                  </svg>
-                  Playback Speed: {playbackSpeed}x
-                </label>
-                <input type="range" min="0.25" max="2" step="0.25" bind:value={playbackSpeed} />
-                <div class="speed-presets">
-                  <button class="preset-btn" on:click={() => playbackSpeed = 0.5}>0.5x</button>
-                  <button class="preset-btn" on:click={() => playbackSpeed = 0.75}>0.75x</button>
-                  <button class="preset-btn" on:click={() => playbackSpeed = 1}>1x</button>
-                  <button class="preset-btn" on:click={() => playbackSpeed = 1.25}>1.25x</button>
-                  <button class="preset-btn" on:click={() => playbackSpeed = 1.5}>1.5x</button>
-                  <button class="preset-btn" on:click={() => playbackSpeed = 2}>2x</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        {/if}
-        
-        <!-- Watermark Tab -->
-        {#if activeTab === 'watermark'}
-          <div class="watermark-panel">
-            <div class="filters-header">
-              <h3>Watermark Settings</h3>
-              <button class="reset-btn" on:click={resetWatermark}>Reset</button>
-            </div>
-            
-            <div class="filter-controls">
-              <div class="audio-control">
-                <label class="checkbox-label">
-                  <input type="checkbox" bind:checked={watermark.enabled} />
-                  <span>✨ Enable Watermark</span>
-                </label>
-              </div>
-              
-              {#if watermark.enabled}
-                <div class="filter-control">
-                  <label>
-                    📝 Watermark Text:
-                  </label>
-                  <input 
-                    type="text" 
-                    bind:value={watermark.text} 
-                    placeholder="Enter your watermark text..."
-                    style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff;"
-                  />
-                </div>
-                
-                <div class="filter-control">
-                  <label>
-                    📍 Position:
-                  </label>
-                  <select bind:value={watermark.position} style="padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; width: 100%;">
-                    <option value="top-left">Top Left</option>
-                    <option value="top-right">Top Right</option>
-                    <option value="bottom-left">Bottom Left</option>
-                    <option value="bottom-right">Bottom Right</option>
-                    <option value="center">Center</option>
-                  </select>
-                </div>
-                
-                <div class="filter-control">
-                  <label>
-                    📏 Size: {watermark.size}px
-                  </label>
-                  <input type="range" min="12" max="72" bind:value={watermark.size} />
-                </div>
-                
-                <div class="filter-control">
-                  <label>
-                    👁️ Opacity: {watermark.opacity}%
-                  </label>
-                  <input type="range" min="0" max="100" bind:value={watermark.opacity} />
-                </div>
-                
-                <div class="filter-control">
-                  <label>
-                    🎨 Color:
-                  </label>
-                  <div style="display: flex; gap: 10px; align-items: center;">
-                    <input 
-                      type="color" 
-                      bind:value={watermark.color} 
-                      style="width: 60px; height: 40px; border: none; border-radius: 6px; cursor: pointer;"
-                    />
-                    <input 
-                      type="text" 
-                      bind:value={watermark.color} 
-                      style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff;"
-                    />
-                  </div>
-                </div>
-              {/if}
-            </div>
-          </div>
-        {/if}
-
         <!-- Video Name -->
         <div class="name-section">
           <label for="video-name">
@@ -3110,15 +3114,740 @@
         </div>
         
         <div class="properties-content">
-          <!-- Playback Controls Section -->
-          <div class="property-section">
-            <h4>Playback Controls</h4>
-            <div class="playback-controls-grid">
-              <button class="control-btn" on:click={handleJumpToStart} title="Jump to Trim Start">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-                </svg>
-              </button>
+          <!-- Filters Tab in Properties Panel -->
+          {#if activeTab === 'filters'}
+            <div class="property-section">
+              <h4>Color Correction & Filters</h4>
+              <button class="reset-btn" on:click={resetFilters} style="margin-bottom: 12px;">Reset All</button>
+              
+              <div class="filter-controls">
+                <h5 style="margin: 10px 0; color: var(--text-secondary); font-size: 12px;">🎬 Presets</h5>
+                
+                <div class="preset-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px;">
+                  {#each Object.entries(filterPresets) as [key, preset]}
+                    <button 
+                      class="preset-btn" 
+                      class:active={selectedFilterPreset === key}
+                      on:click={() => applyFilterPreset(key)}
+                      style="padding: 8px; border-radius: 6px; border: 1px solid {selectedFilterPreset === key ? 'var(--primary)' : '#444'}; background: {selectedFilterPreset === key ? 'var(--primary-transparent)' : '#2a2a2a'}; color: #fff; cursor: pointer; font-size: 11px; text-align: center;"
+                      title={preset.description}
+                    >
+                      {preset.name}
+                    </button>
+                  {/each}
+                </div>
+                
+                <h5 style="margin: 10px 0; color: var(--text-secondary); font-size: 12px;">Basic Adjustments</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    Brightness: {filters.brightness}%
+                  </label>
+                  <input type="range" min="0" max="200" bind:value={filters.brightness} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    Contrast: {filters.contrast}%
+                  </label>
+                  <input type="range" min="0" max="200" bind:value={filters.contrast} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    Saturation: {filters.saturation}%
+                  </label>
+                  <input type="range" min="0" max="200" bind:value={filters.saturation} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    Blur: {filters.blur}px
+                  </label>
+                  <input type="range" min="0" max="10" step="0.5" bind:value={filters.blur} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    Hue Rotate: {filters.hue}°
+                  </label>
+                  <input type="range" min="0" max="360" bind:value={filters.hue} />
+                </div>
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">Advanced Color Correction</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    🌡️ Temperature: {filters.temperature > 0 ? '+' : ''}{filters.temperature}
+                  </label>
+                  <input type="range" min="-100" max="100" bind:value={filters.temperature} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    🎨 Tint: {filters.tint > 0 ? '+' : ''}{filters.tint}
+                  </label>
+                  <input type="range" min="-100" max="100" bind:value={filters.tint} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    ☀️ Exposure: {filters.exposure > 0 ? '+' : ''}{filters.exposure}
+                  </label>
+                  <input type="range" min="-100" max="100" bind:value={filters.exposure} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    💎 Vibrance: {filters.vibrance > 0 ? '+' : ''}{filters.vibrance}
+                  </label>
+                  <input type="range" min="-100" max="100" bind:value={filters.vibrance} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    ✨ Clarity: {filters.clarity > 0 ? '+' : ''}{filters.clarity}
+                  </label>
+                  <input type="range" min="-100" max="100" bind:value={filters.clarity} />
+                </div>
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">🎞️ Film Effects</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    📽️ Film Grain: {filters.filmGrain}%
+                  </label>
+                  <input type="range" min="0" max="100" bind:value={filters.filmGrain} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    🎬 Bleach Bypass: {filters.bleachBypass}%
+                  </label>
+                  <input type="range" min="0" max="100" bind:value={filters.bleachBypass} />
+                </div>
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">🎨 Creative Filters</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    📷 Sepia: {filters.sepia}%
+                  </label>
+                  <input type="range" min="0" max="100" bind:value={filters.sepia} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    ⚫ Grayscale: {filters.grayscale}%
+                  </label>
+                  <input type="range" min="0" max="100" bind:value={filters.grayscale} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    🔄 Invert: {filters.invert}%
+                  </label>
+                  <input type="range" min="0" max="100" bind:value={filters.invert} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    🎨 Posterize: {filters.posterize} levels
+                  </label>
+                  <input type="range" min="0" max="32" bind:value={filters.posterize} />
+                </div>
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">RGB Channel Mixer</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    🔴 Red: {filters.channelMixer.red}%
+                  </label>
+                  <input type="range" min="0" max="200" bind:value={filters.channelMixer.red} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    🟢 Green: {filters.channelMixer.green}%
+                  </label>
+                  <input type="range" min="0" max="200" bind:value={filters.channelMixer.green} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    🔵 Blue: {filters.channelMixer.blue}%
+                  </label>
+                  <input type="range" min="0" max="200" bind:value={filters.channelMixer.blue} />
+                </div>
+              </div>
+            </div>
+          {:else if activeTab === 'effects'}
+            <!-- Effects Tab in Properties Panel -->
+            <div class="property-section">
+              <h4>Visual Effects</h4>
+              <button class="reset-btn" on:click={resetEffects} style="margin-bottom: 12px;">Reset All</button>
+              
+              <div class="filter-controls">
+                <div class="filter-control">
+                  <label>
+                    🔍 Zoom: {effects.zoom.toFixed(2)}x
+                  </label>
+                  <input type="range" min="1" max="3" step="0.1" bind:value={effects.zoom} />
+                </div>
+                
+                {#if effects.zoom > 1}
+                  <div class="filter-control">
+                    <label>
+                      ↔️ Zoom Center X: {effects.zoomX}%
+                    </label>
+                    <input type="range" min="0" max="100" bind:value={effects.zoomX} />
+                  </div>
+                  
+                  <div class="filter-control">
+                    <label>
+                      ↕️ Zoom Center Y: {effects.zoomY}%
+                    </label>
+                    <input type="range" min="0" max="100" bind:value={effects.zoomY} />
+                  </div>
+                {/if}
+                
+                <div class="filter-control">
+                  <label>
+                    🌑 Vignette: {effects.vignette}%
+                  </label>
+                  <input type="range" min="0" max="100" bind:value={effects.vignette} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    📺 Noise/Grain: {effects.noise}%
+                  </label>
+                  <input type="range" min="0" max="100" bind:value={effects.noise} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    ✨ Sharpen: {effects.sharpen}%
+                  </label>
+                  <input type="range" min="0" max="100" bind:value={effects.sharpen} />
+                </div>
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">🌈 Creative Effects</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    👁️ Chromatic Aberration: {effects.chromaticAberration}%
+                  </label>
+                  <input type="range" min="0" max="100" bind:value={effects.chromaticAberration} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    📱 Glitch: {effects.glitch}%
+                  </label>
+                  <input type="range" min="0" max="100" bind:value={effects.glitch} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    🎮 Pixelate: {effects.pixelate}px
+                  </label>
+                  <input type="range" min="0" max="50" bind:value={effects.pixelate} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    🔮 Kaleidoscope: {effects.kaleidoscope} segments
+                  </label>
+                  <input type="range" min="0" max="12" bind:value={effects.kaleidoscope} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    🪞 Mirror:
+                  </label>
+                  <select bind:value={effects.mirror} style="padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; width: 100%;">
+                    <option value="none">None</option>
+                    <option value="horizontal">Horizontal</option>
+                    <option value="vertical">Vertical</option>
+                    <option value="both">Both</option>
+                  </select>
+                </div>
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">🔄 Transform</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    🔄 Rotation: {effects.rotation}°
+                  </label>
+                  <input type="range" min="-180" max="180" bind:value={effects.rotation} />
+                </div>
+                
+                <div class="audio-control">
+                  <label class="checkbox-label">
+                    <input type="checkbox" bind:checked={effects.flip.horizontal} />
+                    <span>↔️ Flip Horizontal</span>
+                  </label>
+                </div>
+                
+                <div class="audio-control">
+                  <label class="checkbox-label">
+                    <input type="checkbox" bind:checked={effects.flip.vertical} />
+                    <span>↕️ Flip Vertical</span>
+                  </label>
+                </div>
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">🔭 Lens Effects</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    🐟 Fish Eye: {effects.fishEye}%
+                  </label>
+                  <input type="range" min="0" max="100" bind:value={effects.fishEye} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    🎈 Bulge: {effects.bulge > 0 ? '+' : ''}{effects.bulge}
+                  </label>
+                  <input type="range" min="-100" max="100" bind:value={effects.bulge} />
+                </div>
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">📐 Borders & Frames</h5>
+                
+                <div class="audio-control">
+                  <label class="checkbox-label">
+                    <input type="checkbox" bind:checked={effects.border.enabled} />
+                    <span>🖼️ Enable Border</span>
+                  </label>
+                </div>
+                
+                {#if effects.border.enabled}
+                  <div class="filter-control">
+                    <label>
+                      Border Width: {effects.border.width}px
+                    </label>
+                    <input type="range" min="0" max="50" bind:value={effects.border.width} />
+                  </div>
+                  
+                  <div class="filter-control">
+                    <label>
+                      Border Color:
+                    </label>
+                    <input type="color" bind:value={effects.border.color} style="width: 100%; height: 40px; border-radius: 6px; cursor: pointer;" />
+                  </div>
+                {/if}
+                
+                <div class="filter-control">
+                  <label>
+                    🔲 Corner Radius: {effects.cornerRadius}px
+                  </label>
+                  <input type="range" min="0" max="50" bind:value={effects.cornerRadius} />
+                </div>
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">🎬 Motion Effects</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    💨 Motion Blur: {effects.motionBlur}%
+                  </label>
+                  <input type="range" min="0" max="100" bind:value={effects.motionBlur} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    📳 Camera Shake: {effects.shake}%
+                  </label>
+                  <input type="range" min="0" max="100" bind:value={effects.shake} />
+                </div>
+              </div>
+            </div>
+          {:else if activeTab === 'transitions'}
+            <!-- Transitions Tab in Properties Panel -->
+            <div class="property-section">
+              <h4>Transitions</h4>
+              <button class="reset-btn" on:click={resetTransitions} style="margin-bottom: 12px;">Reset All</button>
+              
+              <div class="filter-controls">
+                <h5 style="margin: 10px 0; color: var(--text-secondary); font-size: 12px;">🎞️ Presets</h5>
+                
+                <div class="preset-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px;">
+                  {#each Object.entries(transitionPresets) as [key, preset]}
+                    <button 
+                      class="preset-btn" 
+                      class:active={selectedTransitionPreset === key}
+                      on:click={() => applyTransitionPreset(key)}
+                      style="padding: 8px; border-radius: 6px; border: 1px solid {selectedTransitionPreset === key ? 'var(--primary)' : '#444'}; background: {selectedTransitionPreset === key ? 'var(--primary-transparent)' : '#2a2a2a'}; color: #fff; cursor: pointer; font-size: 11px; text-align: center;"
+                      title={preset.description}
+                    >
+                      {preset.name}
+                    </button>
+                  {/each}
+                </div>
+                
+                <h5 style="margin: 10px 0; color: var(--text-secondary); font-size: 12px;">Fade In</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    ⏱️ Duration: {transitions.fadeIn.toFixed(1)}s
+                  </label>
+                  <input type="range" min="0" max="3" step="0.1" bind:value={transitions.fadeIn} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    🎨 Fade Type:
+                  </label>
+                  <select bind:value={transitions.fadeInType} style="padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; width: 100%;">
+                    <option value="black">Fade from Black</option>
+                    <option value="white">Fade from White</option>
+                    <option value="transparent">Fade from Transparent</option>
+                  </select>
+                </div>
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">Fade Out</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    ⏱️ Duration: {transitions.fadeOut.toFixed(1)}s
+                  </label>
+                  <input type="range" min="0" max="3" step="0.1" bind:value={transitions.fadeOut} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    🎨 Fade Type:
+                  </label>
+                  <select bind:value={transitions.fadeOutType} style="padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; width: 100%;">
+                    <option value="black">Fade to Black</option>
+                    <option value="white">Fade to White</option>
+                    <option value="transparent">Fade to Transparent</option>
+                  </select>
+                </div>
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">🚀 Slide Transitions</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    Direction:
+                  </label>
+                  <select bind:value={transitions.slideDirection} style="padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; width: 100%;">
+                    <option value="none">None</option>
+                    <option value="left">← Left</option>
+                    <option value="right">Right →</option>
+                    <option value="up">↑ Up</option>
+                    <option value="down">↓ Down</option>
+                  </select>
+                </div>
+                
+                {#if transitions.slideDirection !== 'none'}
+                  <div class="filter-control">
+                    <label>
+                      Slide In: {transitions.slideIn.toFixed(1)}s
+                    </label>
+                    <input type="range" min="0" max="3" step="0.1" bind:value={transitions.slideIn} />
+                  </div>
+                  
+                  <div class="filter-control">
+                    <label>
+                      Slide Out: {transitions.slideOut.toFixed(1)}s
+                    </label>
+                    <input type="range" min="0" max="3" step="0.1" bind:value={transitions.slideOut} />
+                  </div>
+                {/if}
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">🔍 Zoom Transitions</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    Zoom In: {transitions.zoom.in.toFixed(1)}s
+                  </label>
+                  <input type="range" min="0" max="3" step="0.1" bind:value={transitions.zoom.in} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    Zoom Out: {transitions.zoom.out.toFixed(1)}s
+                  </label>
+                  <input type="range" min="0" max="3" step="0.1" bind:value={transitions.zoom.out} />
+                </div>
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">🎬 Advanced Transitions</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    🔄 Dissolve: {transitions.dissolve.toFixed(1)}s
+                  </label>
+                  <input type="range" min="0" max="3" step="0.1" bind:value={transitions.dissolve} />
+                </div>
+                
+                <div class="audio-control">
+                  <label class="checkbox-label">
+                    <input type="checkbox" bind:checked={transitions.wipe.enabled} />
+                    <span>🎭 Enable Wipe</span>
+                  </label>
+                </div>
+                
+                {#if transitions.wipe.enabled}
+                  <div class="filter-control">
+                    <label>
+                      Wipe Direction:
+                    </label>
+                    <select bind:value={transitions.wipe.direction} style="padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; width: 100%;">
+                      <option value="left">← Left</option>
+                      <option value="right">Right →</option>
+                      <option value="up">↑ Up</option>
+                      <option value="down">↓ Down</option>
+                      <option value="diagonal">⤡ Diagonal</option>
+                    </select>
+                  </div>
+                  
+                  <div class="filter-control">
+                    <label>
+                      Wipe Duration: {transitions.wipe.duration.toFixed(1)}s
+                    </label>
+                    <input type="range" min="0.1" max="3" step="0.1" bind:value={transitions.wipe.duration} />
+                  </div>
+                {/if}
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">✨ Creative Transitions</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    ⭕ Circular Reveal: {transitions.circularReveal.toFixed(1)}s
+                  </label>
+                  <input type="range" min="0" max="3" step="0.1" bind:value={transitions.circularReveal} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    📖 Page Flip: {transitions.pageFlip.toFixed(1)}s
+                  </label>
+                  <input type="range" min="0" max="3" step="0.1" bind:value={transitions.pageFlip} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    💫 Blur: {transitions.blur.toFixed(1)}s
+                  </label>
+                  <input type="range" min="0" max="3" step="0.1" bind:value={transitions.blur} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    🎮 Pixelate: {transitions.pixelate.toFixed(1)}s
+                  </label>
+                  <input type="range" min="0" max="3" step="0.1" bind:value={transitions.pixelate} />
+                </div>
+                
+                <div class="filter-control">
+                  <label>
+                    📱 Glitch: {transitions.glitch.toFixed(1)}s
+                  </label>
+                  <input type="range" min="0" max="3" step="0.1" bind:value={transitions.glitch} />
+                </div>
+                
+                <div class="audio-control">
+                  <label class="checkbox-label">
+                    <input type="checkbox" bind:checked={transitions.colorFade.enabled} />
+                    <span>🌈 Color Fade</span>
+                  </label>
+                </div>
+                
+                {#if transitions.colorFade.enabled}
+                  <div class="filter-control">
+                    <label>
+                      Fade Color:
+                    </label>
+                    <input type="color" bind:value={transitions.colorFade.color} style="width: 100%; height: 40px; border-radius: 6px; cursor: pointer;" />
+                  </div>
+                  
+                  <div class="filter-control">
+                    <label>
+                      Duration: {transitions.colorFade.duration.toFixed(1)}s
+                    </label>
+                    <input type="range" min="0.1" max="3" step="0.1" bind:value={transitions.colorFade.duration} />
+                  </div>
+                {/if}
+              </div>
+            </div>
+          {:else if activeTab === 'audio'}
+            <!-- Audio Tab in Properties Panel -->
+            <div class="property-section">
+              <h4>Audio Settings</h4>
+              <button class="reset-btn" on:click={resetAudio} style="margin-bottom: 12px;">Reset All</button>
+              
+              <div class="filter-controls">
+                <div class="filter-control">
+                  <label>
+                    🔊 Volume: {volume}%
+                  </label>
+                  <input type="range" min="0" max="200" bind:value={volume} />
+                </div>
+                
+                <div class="audio-control">
+                  <label class="checkbox-label">
+                    <input type="checkbox" bind:checked={audioNormalize} />
+                    <span>🎚️ Audio Normalization</span>
+                  </label>
+                </div>
+                
+                <div class="audio-control">
+                  <label class="checkbox-label">
+                    <input type="checkbox" bind:checked={audioEnhance} />
+                    <span>🎵 Audio Enhancement</span>
+                  </label>
+                </div>
+                
+                <h5 style="margin: 15px 0 10px; color: var(--text-secondary); font-size: 12px;">Playback Speed</h5>
+                
+                <div class="filter-control">
+                  <label>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;">
+                      <circle cx="12" cy="12" r="10"/>
+                      <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    Speed: {playbackSpeed}x
+                  </label>
+                  <input type="range" min="0.25" max="2" step="0.25" bind:value={playbackSpeed} />
+                  <div class="speed-presets">
+                    <button class="preset-btn" on:click={() => playbackSpeed = 0.5}>0.5x</button>
+                    <button class="preset-btn" on:click={() => playbackSpeed = 0.75}>0.75x</button>
+                    <button class="preset-btn" on:click={() => playbackSpeed = 1}>1x</button>
+                    <button class="preset-btn" on:click={() => playbackSpeed = 1.25}>1.25x</button>
+                    <button class="preset-btn" on:click={() => playbackSpeed = 1.5}>1.5x</button>
+                    <button class="preset-btn" on:click={() => playbackSpeed = 2}>2x</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {:else if activeTab === 'watermark'}
+            <!-- Watermark Tab in Properties Panel -->
+            <div class="property-section">
+              <h4>Watermark Settings</h4>
+              <button class="reset-btn" on:click={resetWatermark} style="margin-bottom: 12px;">Reset</button>
+              
+              <div class="filter-controls">
+                <div class="audio-control">
+                  <label class="checkbox-label">
+                    <input type="checkbox" bind:checked={watermark.enabled} />
+                    <span>✨ Enable Watermark</span>
+                  </label>
+                </div>
+                
+                {#if watermark.enabled}
+                  <div class="filter-control">
+                    <label>
+                      📝 Watermark Text:
+                    </label>
+                    <input 
+                      type="text" 
+                      bind:value={watermark.text} 
+                      placeholder="Enter your watermark text..."
+                      style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff;"
+                    />
+                  </div>
+                  
+                  <div class="filter-control">
+                    <label>
+                      📍 Position:
+                    </label>
+                    <select bind:value={watermark.position} style="padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; width: 100%;">
+                      <option value="top-left">Top Left</option>
+                      <option value="top-right">Top Right</option>
+                      <option value="bottom-left">Bottom Left</option>
+                      <option value="bottom-right">Bottom Right</option>
+                      <option value="center">Center</option>
+                    </select>
+                  </div>
+                  
+                  <div class="filter-control">
+                    <label>
+                      📏 Size: {watermark.size}px
+                    </label>
+                    <input type="range" min="12" max="72" bind:value={watermark.size} />
+                  </div>
+                  
+                  <div class="filter-control">
+                    <label>
+                      👁️ Opacity: {watermark.opacity}%
+                    </label>
+                    <input type="range" min="0" max="100" bind:value={watermark.opacity} />
+                  </div>
+                  
+                  <div class="filter-control">
+                    <label>
+                      🎨 Color:
+                    </label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                      <input 
+                        type="color" 
+                        bind:value={watermark.color} 
+                        style="width: 60px; height: 40px; border: none; border-radius: 6px; cursor: pointer;"
+                      />
+                      <input 
+                        type="text" 
+                        bind:value={watermark.color} 
+                        style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff;"
+                      />
+                    </div>
+                  </div>
+                {/if}
+              </div>
+            </div>
+          {:else if activeTab === 'text'}
+            <!-- Text Overlay Controls -->
+            <div class="property-section">
+              <h4>Text Overlays</h4>
+              <button class="reset-btn" on:click={addTextOverlay} style="margin-bottom: 12px;">+ Add Text</button>
+              
+              {#if textOverlays.length > 0}
+                <div class="text-overlay-list">
+                  {#each textOverlays as overlay, index (overlay.id)}
+                    <div class="text-overlay-item" class:selected={selectedOverlayIndex === index}>
+                      <button class="text-overlay-select" on:click={() => selectTextOverlay(index)}>
+                        <span>{overlay.text || 'Text ' + (index + 1)}</span>
+                      </button>
+                      <button class="text-overlay-delete" on:click={() => deleteTextOverlay(index)} title="Delete">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="18" y1="6" x2="6" y2="18"/>
+                          <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                      </button>
+                    </div>
+                  {/each}
+                </div>
+                
+                {#if selectedOverlayIndex !== null && textOverlays[selectedOverlayIndex]}
+                  <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                    <TextOverlayEditor
+                      textOverlay={textOverlays[selectedOverlayIndex]}
+                      on:update={(e) => updateTextOverlay(selectedOverlayIndex, e.detail)}
+                    />
+                  </div>
+                {/if}
+              {:else}
+                <p style="color: var(--text-secondary); font-size: 13px; margin-top: 12px;">
+                  No text overlays yet. Click "Add Text" to create one.
+                </p>
+              {/if}
+            </div>
+          {:else}
+            <!-- Playback Controls Section -->
+            <div class="property-section">
+              <h4>Playback Controls</h4>
+              <div class="playback-controls-grid">
+                <button class="control-btn" on:click={handleJumpToStart} title="Jump to Trim Start">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                  </svg>
+                </button>
+
+                <button class="control-btn" on:click={jumpToPreviousFrame} title="Previous Frame (←)">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                  </svg>
+                </button>
               
               <button class="play-pause-btn" on:click={togglePlayPause} title="{isPlaying ? 'Pause' : 'Play'} (Space)">
                 {#if !isPlaying}
@@ -3132,6 +3861,12 @@
                   </svg>
                 {/if}
               </button>
+
+                <button class="control-btn" on:click={jumpToNextFrame} title="Next Frame (→)">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                  </svg>
+                </button>
 
               <button class="control-btn" on:click={handleJumpToEnd} title="Jump to Trim End">
                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -3412,6 +4147,7 @@
               </p>
             </div>
           {/if}
+          {/if} <!-- Close else block for activeTab conditions -->
         </div>
       </div>
     {:else}
