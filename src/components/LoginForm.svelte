@@ -53,10 +53,21 @@
     }
   }
 
-  function handleAdminSubmit() {
+  function handleAdminSubmit(e) {
+    console.log('Admin submit triggered - Event:', e); // Debug log
+    console.log('Admin credentials:', { adminUsername, adminPassword }); // Debug log
+    
+    if (!adminUsername || !adminPassword) {
+      console.log('Missing credentials');
+      addNotification('Please enter both username and password', 'error');
+      return;
+    }
+    
     const isValidUsername = adminUsername === ADMIN_CREDENTIALS.username || 
                            adminUsername === ADMIN_CREDENTIALS.email;
     const isValidPassword = adminPassword === ADMIN_CREDENTIALS.password;
+    
+    console.log('Validation results:', { isValidUsername, isValidPassword }); // Debug log
     
     if (isValidUsername && isValidPassword) {
       const adminData = {
@@ -77,14 +88,17 @@
         maxStorage: Infinity,
       };
       
+      console.log('Setting admin user data:', adminData); // Debug log
       user.set(adminData);
       addNotification('Admin login successful!', 'success');
       showAdminLogin = false;
       
+      console.log('Calling onLogin callback with admin data'); // Debug log
       if (onLogin) {
         onLogin(adminData);
       }
     } else {
+      console.log('Invalid admin credentials'); // Debug log
       addNotification('Invalid admin credentials', 'error');
     }
   }

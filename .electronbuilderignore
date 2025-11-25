@@ -1,0 +1,52 @@
+# Electron Builder Ignore File
+# Files and directories to exclude from the Electron package
+
+# Development files
+src/
+public/
+docs/
+scripts/
+emsdk/
+
+# Build scripts
+build-wasm.ps1
+build-wasm.sh
+vite.config.js
+svelte.config.js
+
+# Documentation
+*.md
+!README.md
+
+# Git
+.git
+.github
+.gitignore
+.gitattributes
+
+# CI/CD
+.firebaserc
+firebase.json
+
+# Environment
+.env
+.env.example
+.npmrc
+
+# Android
+android/
+
+# Functions
+functions/
+
+# Development dependencies cache
+.vite
+.svelte-kit
+node_modules/.cache
+
+# Test files
+*.test.js
+*.spec.js
+
+# Source maps
+*.map

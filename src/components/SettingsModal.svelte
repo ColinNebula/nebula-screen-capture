@@ -1,59 +1,28 @@
 <script>
   import { theme } from '../stores/theme.js';
   import { user } from '../stores/user.js';
+  import { settings, resetSettings } from '../stores/settings.js';
   import './SettingsModal.css';
 
   export let onClose = () => {};
+  export let onOpenDonation = () => {};
 
   let activeTab = 'general';
-  let settings = {
-    general: {
-      language: 'en',
-      timezone: 'auto',
-      autoSave: true,
-      notifications: true,
-    },
-    recording: {
-      defaultQuality: '1080p',
-      defaultFPS: 30,
-      systemAudio: true,
-      microphone: false,
-      countdown: 3,
-      showCursor: true,
-    },
-    advanced: {
-      hardwareAcceleration: true,
-      autoDelete: false,
-      autoDeleteDays: 30,
-      cloudSync: false,
-    },
-  };
 
   function handleSave() {
-    // Save settings to localStorage
-    localStorage.setItem('nebulaSettings', JSON.stringify(settings));
+    // Settings are auto-saved via store subscription
     onClose();
   }
 
   function handleReset() {
     if (confirm('Are you sure you want to reset all settings to default?')) {
-      localStorage.removeItem('nebulaSettings');
-      location.reload();
-    }
-  }
-
-  function loadSettings() {
-    const saved = localStorage.getItem('nebulaSettings');
-    if (saved) {
-      try {
-        settings = { ...settings, ...JSON.parse(saved) };
-      } catch (e) {
-        console.error('Failed to load settings:', e);
+      resetSettings();
+      const isTauri = typeof window !== 'undefined' && window.__TAURI__ !== undefined;
+      if (!isTauri) {
+        location.reload();
       }
     }
   }
-
-  loadSettings();
 </script>
 
 <div class="modal-overlay" on:click={onClose}>
@@ -106,7 +75,7 @@
           <div class="setting-group">
             <label class="setting-label">
               <span class="setting-title">Language</span>
-              <select bind:value={settings.general.language} class="setting-select">
+              <select bind:value={$settings.general.language} class="setting-select">
                 <option value="en">English</option>
                 <option value="es">Español</option>
                 <option value="fr">Français</option>
@@ -118,7 +87,7 @@
           <div class="setting-group">
             <label class="setting-label">
               <span class="setting-title">Timezone</span>
-              <select bind:value={settings.general.timezone} class="setting-select">
+              <select bind:value={$settings.general.timezone} class="setting-select">
                 <option value="auto">Auto-detect</option>
                 <option value="utc">UTC</option>
                 <option value="est">Eastern (EST)</option>
@@ -133,7 +102,7 @@
                 <span class="setting-title">Auto-save recordings</span>
                 <span class="setting-description">Automatically save recordings to your library</span>
               </span>
-              <input type="checkbox" bind:checked={settings.general.autoSave} />
+              <input type="checkbox" bind:checked={$settings.general.autoSave} />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -144,7 +113,7 @@
                 <span class="setting-title">Desktop notifications</span>
                 <span class="setting-description">Show notifications for recording events</span>
               </span>
-              <input type="checkbox" bind:checked={settings.general.notifications} />
+              <input type="checkbox" bind:checked={$settings.general.notifications} />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -156,7 +125,7 @@
           <div class="setting-group">
             <label class="setting-label">
               <span class="setting-title">Default video quality</span>
-              <select bind:value={settings.recording.defaultQuality} class="setting-select">
+              <select bind:value={$settings.recording.defaultQuality} class="setting-select">
                 <option value="720p">720p HD</option>
                 <option value="1080p">1080p Full HD</option>
                 <option value="1440p">1440p 2K</option>
@@ -168,7 +137,7 @@
           <div class="setting-group">
             <label class="setting-label">
               <span class="setting-title">Frame rate</span>
-              <select bind:value={settings.recording.defaultFPS} class="setting-select">
+              <select bind:value={$settings.recording.defaultFPS} class="setting-select">
                 <option value={24}>24 FPS</option>
                 <option value={30}>30 FPS</option>
                 <option value={60}>60 FPS</option>
@@ -179,7 +148,7 @@
           <div class="setting-group">
             <label class="setting-label">
               <span class="setting-title">Countdown timer</span>
-              <select bind:value={settings.recording.countdown} class="setting-select">
+              <select bind:value={$settings.recording.countdown} class="setting-select">
                 <option value={0}>No countdown</option>
                 <option value={3}>3 seconds</option>
                 <option value={5}>5 seconds</option>
@@ -194,7 +163,7 @@
                 <span class="setting-title">System audio</span>
                 <span class="setting-description">Record computer audio by default</span>
               </span>
-              <input type="checkbox" bind:checked={settings.recording.systemAudio} />
+              <input type="checkbox" bind:checked={$settings.recording.systemAudio} />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -205,7 +174,7 @@
                 <span class="setting-title">Microphone</span>
                 <span class="setting-description">Record microphone audio by default</span>
               </span>
-              <input type="checkbox" bind:checked={settings.recording.microphone} />
+              <input type="checkbox" bind:checked={$settings.recording.microphone} />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -216,7 +185,29 @@
                 <span class="setting-title">Show cursor</span>
                 <span class="setting-description">Display mouse cursor in recordings</span>
               </span>
-              <input type="checkbox" bind:checked={settings.recording.showCursor} />
+              <input type="checkbox" bind:checked={$settings.recording.showCursor} />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-group">
+            <label class="setting-toggle">
+              <span class="setting-info">
+                <span class="setting-title">Minimize to taskbar</span>
+                <span class="setting-description">Hide window completely during recording (recommended for screen captures)</span>
+              </span>
+              <input type="checkbox" bind:checked={$settings.recording.minimizeToTaskbar} />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-group">
+            <label class="setting-toggle">
+              <span class="setting-info">
+                <span class="setting-title">System tray icon</span>
+                <span class="setting-description">Show icon in system tray for quick access during recording</span>
+              </span>
+              <input type="checkbox" bind:checked={$settings.recording.showSystemTrayIcon} />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -231,7 +222,7 @@
                 <span class="setting-title">Hardware acceleration</span>
                 <span class="setting-description">Use GPU for faster video encoding</span>
               </span>
-              <input type="checkbox" bind:checked={settings.advanced.hardwareAcceleration} />
+              <input type="checkbox" bind:checked={$settings.advanced.hardwareAcceleration} />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -242,16 +233,16 @@
                 <span class="setting-title">Auto-delete old recordings</span>
                 <span class="setting-description">Automatically remove recordings after a set period</span>
               </span>
-              <input type="checkbox" bind:checked={settings.advanced.autoDelete} />
+              <input type="checkbox" bind:checked={$settings.advanced.autoDelete} />
               <span class="toggle-slider"></span>
             </label>
           </div>
 
-          {#if settings.advanced.autoDelete}
+          {#if $settings.advanced.autoDelete}
             <div class="setting-group">
               <label class="setting-label">
                 <span class="setting-title">Delete after</span>
-                <select bind:value={settings.advanced.autoDeleteDays} class="setting-select">
+                <select bind:value={$settings.advanced.autoDeleteDays} class="setting-select">
                   <option value={7}>7 days</option>
                   <option value={14}>14 days</option>
                   <option value={30}>30 days</option>
@@ -270,7 +261,7 @@
               </span>
               <input 
                 type="checkbox" 
-                bind:checked={settings.advanced.cloudSync}
+                bind:checked={$settings.advanced.cloudSync}
                 disabled={!$user?.plan || $user.plan === 'Free'}
               />
               <span class="toggle-slider"></span>
@@ -291,8 +282,16 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn-cancel" on:click={onClose}>Cancel</button>
-      <button class="btn-save" on:click={handleSave}>Save Changes</button>
+      <button class="btn-support" on:click={onOpenDonation}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        Support Us
+      </button>
+      <div class="footer-actions">
+        <button class="btn-cancel" on:click={onClose}>Cancel</button>
+        <button class="btn-save" on:click={handleSave}>Save Changes</button>
+      </div>
     </div>
   </div>
 </div>
@@ -441,10 +440,51 @@
   .modal-footer {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 1rem;
     padding: 1.5rem;
     border-top: 1px solid #e5e7eb;
+  }
+
+  .footer-actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .btn-support {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  }
+
+  .btn-support:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-support svg {
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% {
+      transform: scale(1);
+    }
+    10%, 30% {
+      transform: scale(1.1);
+    }
+    20%, 40% {
+      transform: scale(1.05);
+    }
   }
 
   .btn-cancel,

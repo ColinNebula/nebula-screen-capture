@@ -1,0 +1,132 @@
+{
+  "appId": "com.nebula.screencapture",
+  "productName": "Nebula Screen Capture",
+  "copyright": "Copyright © 2025 Nebula 3D Dev",
+  "directories": {
+    "output": "dist",
+    "buildResources": "build"
+  },
+  "files": [
+    "build/**/*",
+    "electron.cjs",
+    "preload.cjs",
+    "package.json",
+    "node_modules/**/*"
+  ],
+  "asarUnpack": [
+    "preload.cjs",
+    "build/wasm/**/*",
+    "build/static/**/*"
+  ],
+  "extraMetadata": {
+    "main": "electron.cjs"
+  },
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      },
+      {
+        "target": "portable",
+        "arch": ["x64"]
+      },
+      {
+        "target": "zip",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "build/favicon.ico",
+    "publish": null,
+    "sign": null,
+    "signDlls": false,
+    "requestedExecutionLevel": "asInvoker",
+    "fileAssociations": [
+      {
+        "ext": "webm",
+        "name": "WebM Video",
+        "description": "WebM Video File",
+        "role": "Editor"
+      },
+      {
+        "ext": "mp4",
+        "name": "MP4 Video",
+        "description": "MP4 Video File",
+        "role": "Editor"
+      }
+    ],
+    "protocols": [
+      {
+        "name": "Nebula Screen Capture Protocol",
+        "schemes": ["nebula-screen"]
+      }
+    ]
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "allowElevation": true,
+    "createDesktopShortcut": "always",
+    "createStartMenuShortcut": true,
+    "shortcutName": "Nebula Screen Capture",
+    "installerIcon": "build/favicon.ico",
+    "uninstallerIcon": "build/favicon.ico",
+    "deleteAppDataOnUninstall": false,
+    "runAfterFinish": true,
+    "menuCategory": true,
+    "displayLanguageSelector": true,
+    "multiLanguageInstaller": true,
+    "language": "1033",
+    "perMachine": false,
+    "warningsAsErrors": false,
+    "packElevateHelper": true,
+    "artifactName": "${productName}-Setup-${version}.${ext}",
+    "license": "LICENSE"
+  },
+  "mac": {
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["x64", "arm64"]
+      },
+      {
+        "target": "zip",
+        "arch": ["x64", "arm64"]
+      }
+    ],
+    "category": "public.app-category.productivity",
+    "icon": "build/icon.icns",
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "entitlements": "build/entitlements.mac.plist",
+    "entitlementsInherit": "build/entitlements.mac.plist"
+  },
+  "dmg": {
+    "contents": [
+      {
+        "x": 130,
+        "y": 220
+      },
+      {
+        "x": 410,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ],
+    "window": {
+      "width": 540,
+      "height": 380
+    }
+  },
+  "linux": {
+    "target": [
+      "AppImage",
+      "deb",
+      "rpm"
+    ],
+    "category": "Utility",
+    "icon": "build/logo512.png"
+  },
+  "publish": null
+}

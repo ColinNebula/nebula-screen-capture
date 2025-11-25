@@ -1,8 +1,13 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.1",
   "releaseDate": "2025-10-18",
+  "buildTimestamp": 1729267200000,
   "releaseNotes": [
-    "Initial release with advanced video editing",
+    "🎨 Enhanced elegant Nebula logo with vibrant gradients",
+    "✨ Improved visual effects and animations",
+    "🔄 Updated caching system for better updates",
+    "🚀 Performance improvements",
+    "Advanced video editing features",
     "Screenshot management and editing",
     "Multi-track timeline with transitions",
     "Export with filters and effects"

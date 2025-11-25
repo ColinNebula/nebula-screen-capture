@@ -4,11 +4,8 @@
     <meta charset="utf-8" />
     
     <!-- Security Headers -->
-    <!-- Content Security Policy: Prevent XSS attacks -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.paypal.com https://www.paypalobjects.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; media-src 'self' data: blob: mediastream:; connect-src 'self' https://api.github.com https://api.stripe.com https://www.paypal.com; frame-src https://js.stripe.com https://www.paypal.com; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;" />
-    
-    <!-- X-Frame-Options: Prevent clickjacking -->
-    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <!-- Content Security Policy: Relaxed for Electron media capture and payment processing -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' file: blob: data: mediastream:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.stripe.com https://www.paypal.com https://www.paypalobjects.com file:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com file:; font-src 'self' https://fonts.gstatic.com data: file:; img-src 'self' data: https: blob: file: mediastream:; media-src 'self' data: blob: mediastream: file:; connect-src 'self' https://api.github.com https://api.stripe.com https://*.stripe.com https://www.paypal.com file: blob:; frame-src https://js.stripe.com https://*.stripe.com https://www.paypal.com; base-uri 'self'; form-action 'self';" />
     
     <!-- X-Content-Type-Options: Prevent MIME sniffing -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
@@ -17,7 +14,7 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     
     <!-- Permissions Policy: Control browser features -->
-    <meta http-equiv="Permissions-Policy" content="camera=(self), microphone=(self), geolocation=(), payment=(self), usb=(), interest-cohort=()" />
+    <meta http-equiv="Permissions-Policy" content="camera=*, microphone=*, display-capture=*, geolocation=(), payment=(self), usb=(), interest-cohort=()" />
     
     <!-- X-XSS-Protection: Enable XSS filter (legacy browsers) -->
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
@@ -25,22 +22,67 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' stroke='%23667eea' stroke-width='1.5' fill='none' stroke-dasharray='3 1.5' opacity='0.8'/><path d='M8 13 Q11 8 16 10 Q21 11 24 14 Q22 19 18 21 Q13 22 10 18 Q6 16 8 13 Z' fill='%23667eea' opacity='0.9'/><ellipse cx='15' cy='15' rx='6' ry='4' fill='%23667eea' opacity='0.5'/><circle cx='16' cy='16' r='3' fill='%23ffffff'/><rect x='5' y='5' width='3' height='3' fill='%23667eea' opacity='0.8'/><rect x='24' y='5' width='3' height='3' fill='%23667eea' opacity='0.8'/><rect x='5' y='24' width='3' height='3' fill='%23667eea' opacity='0.8'/><rect x='24' y='24' width='3' height='3' fill='%23667eea' opacity='0.8'/></svg>" />
     
     <!-- Mobile Optimization -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover" />
     <meta name="theme-color" content="#667eea" />
     <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="HandheldFriendly" content="true" />
     
     <!-- iOS Specific Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Nebula" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="%PUBLIC_URL%/logo192.png" />
     <link rel="apple-touch-icon" sizes="152x152" href="%PUBLIC_URL%/logo192.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/logo192.png" />
     <link rel="apple-touch-icon" sizes="167x167" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/logo512.png" />
     
     <!-- Android Chrome -->
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#667eea" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a2e" />
+    
+    <!-- Microsoft Tiles -->
+    <meta name="msapplication-TileColor" content="#667eea" />
+    <meta name="msapplication-TileImage" content="%PUBLIC_URL%/logo192.png" />
+    <meta name="msapplication-config" content="%PUBLIC_URL%/browserconfig.xml" />
+    
+    <!-- Samsung Internet -->
+    <meta name="samsung-internet-app-badge" content="true" />
+    
+    <!-- Performance & Resource Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preload" href="%PUBLIC_URL%/logo192.png" as="image" />
+    
+    <!-- Disable tap highlight on mobile -->
+    <style>
+      * {
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        -webkit-touch-callout: none;
+      }
+      
+      /* Prevent pull-to-refresh on mobile */
+      body {
+        overscroll-behavior-y: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* Smooth scrolling for mobile */
+      html {
+        scroll-behavior: smooth;
+      }
+      
+      /* Safe area insets for notched devices */
+      @supports (padding: max(0px)) {
+        body {
+          padding-left: env(safe-area-inset-left);
+          padding-right: env(safe-area-inset-right);
+          padding-top: env(safe-area-inset-top);
+          padding-bottom: env(safe-area-inset-bottom);
+        }
+      }
+    </style>
     
     <meta
       name="description"

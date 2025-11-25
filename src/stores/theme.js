@@ -7,28 +7,25 @@ const savedTheme = typeof window !== 'undefined'
 
 export const theme = writable(savedTheme);
 
-// Function to apply theme to document
-function applyTheme(value) {
-  if (typeof window !== 'undefined') {
-    // Apply to html element (most important)
-    document.documentElement.setAttribute('data-theme', value);
-    
-    // Also apply to body for compatibility
-    document.body.setAttribute('data-theme', value);
-    
-    // Save to localStorage
-    localStorage.setItem('nebulaTheme', value);
-    
-    console.log('Theme applied:', value);
-  }
+// Apply initial theme
+if (typeof window !== 'undefined') {
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  document.body.setAttribute('data-theme', savedTheme);
 }
 
-// Apply theme on initialization
-applyTheme(savedTheme);
-
-// Subscribe to theme changes
+// Subscribe to theme changes (skip initial trigger to prevent reload loop)
+let isInitialThemeLoad = true;
 theme.subscribe(value => {
-  applyTheme(value);
+  if (isInitialThemeLoad) {
+    isInitialThemeLoad = false;
+    return;
+  }
+  
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('nebulaTheme', value);
+    document.documentElement.setAttribute('data-theme', value);
+    document.body.setAttribute('data-theme', value);
+  }
 });
 
 // Helper function to toggle theme

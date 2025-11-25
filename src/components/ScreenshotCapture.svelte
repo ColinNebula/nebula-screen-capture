@@ -4,6 +4,7 @@
   
   export let onCapture = () => {};
   export let onSelect = () => {}; // Add onSelect prop
+  export let onDelete = null; // Add onDelete prop for external deletion handler
   export let disabled = false;
   
   const dispatch = createEventDispatcher();
@@ -49,10 +50,13 @@
   
   function handleDelete(screenshot) {
     if (confirm('Are you sure you want to delete this screenshot?')) {
-      screenshots.update(shots => shots.filter(s => s.id !== screenshot.id));
-      
-      // Delete from IndexedDB
-      deletePersistedScreenshot(screenshot.id);
+      // Use external delete handler if provided, otherwise use local deletion
+      if (onDelete) {
+        onDelete(screenshot);
+      } else {
+        screenshots.update(shots => shots.filter(s => s.id !== screenshot.id));
+        deletePersistedScreenshot(screenshot.id);
+      }
     }
   }
   

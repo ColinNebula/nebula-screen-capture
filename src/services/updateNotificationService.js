@@ -4,20 +4,43 @@
  */
 
 const APP_VERSION = '1.0.0'; // Update this with each release
-const UPDATE_CHECK_INTERVAL = 1000 * 60 * 60; // Check every hour
+const UPDATE_CHECK_INTERVAL = 1000 * 60 * 5; // Check every 5 minutes (very frequent)
 
 class UpdateNotificationService {
   constructor() {
     this.registration = null;
     this.updateAvailable = false;
     this.onUpdateCallback = null;
+    this.initialized = false;
   }
 
   /**
    * Initialize the update notification service
    */
   async initialize() {
+    // Prevent duplicate initialization
+    if (this.initialized) {
+      console.log('Update service already initialized');
+      return true;
+    }
+
     try {
+      // Skip service worker in Electron or development
+      const isElectron = window.electron?.isElectron || 
+                        navigator.userAgent.toLowerCase().includes('electron') ||
+                        window.location.protocol === 'file:';
+      
+      // Also skip in development (localhost)
+      const isDevelopment = window.location.hostname === 'localhost' ||
+                           window.location.hostname === '127.0.0.1' ||
+                           window.location.hostname === '[::1]';
+      
+      if (isElectron || isDevelopment) {
+        console.log('Running in Electron or development mode - Service Worker registration skipped');
+        this.initialized = true;
+        return;
+      }
+
       // Check if service workers are supported
       if (!('serviceWorker' in navigator)) {
         console.warn('Service Workers not supported');
@@ -28,8 +51,13 @@ class UpdateNotificationService {
       this.registration = await navigator.serviceWorker.register('/service-worker.js');
       console.log('✅ Service Worker registered for updates');
 
-      // Check for updates on load
-      await this.checkForUpdates();
+      // Check if there was a pending update from previous session
+      this.checkPendingUpdate();
+
+      // Check for updates immediately on load
+      setTimeout(async () => {
+        await this.checkForUpdates();
+      }, 1000); // Check after 1 second
 
       // Set up periodic update checks
       setInterval(() => this.checkForUpdates(), UPDATE_CHECK_INTERVAL);
@@ -59,9 +87,11 @@ class UpdateNotificationService {
       // Subscribe to push notifications
       await this.subscribeToPushNotifications();
 
+      this.initialized = true;
       return true;
     } catch (error) {
       console.error('Failed to initialize update service:', error);
+      this.initialized = true; // Mark as initialized even on error to prevent retries
       return false;
     }
   }
@@ -200,6 +230,26 @@ class UpdateNotificationService {
     
     return false;
   }
+  
+  /**
+   * Check for pending update from previous session
+   */
+  checkPendingUpdate() {
+    try {
+      const updateInfo = localStorage.getItem('updateAvailable');
+      if (updateInfo) {
+        const data = JSON.parse(updateInfo);
+        if (data.available) {
+          // Show alert about pending update
+          setTimeout(() => {
+            this.showInAppUpdateAlert(data.version);
+          }, 2000); // Wait 2 seconds after app load
+        }
+      }
+    } catch (error) {
+      console.error('Error checking pending update:', error);
+    }
+  }
 
   /**
    * Handle update available
@@ -209,6 +259,9 @@ class UpdateNotificationService {
 
     // Show browser notification
     this.showUpdateNotification(newVersion);
+    
+    // Show in-app alert (more prominent)
+    this.showInAppUpdateAlert(newVersion);
 
     // Call callback if registered
     if (this.onUpdateCallback) {
@@ -221,6 +274,116 @@ class UpdateNotificationService {
       version: newVersion,
       timestamp: Date.now()
     }));
+  }
+  
+  /**
+   * Show in-app update alert (more visible than browser notification)
+   */
+  showInAppUpdateAlert(version) {
+    // Create visible update banner
+    this.createUpdateBanner(version);
+    
+    const message = version 
+      ? `🚀 NEW UPDATE AVAILABLE!\n\nVersion ${version} is ready to install.\n\nCurrent version: ${APP_VERSION}\n\nClick OK to update now and enjoy the latest features!`
+      : '🚀 NEW UPDATE AVAILABLE!\n\nA new version of Nebula Screen Capture is ready!\n\nClick OK to update now.';
+    
+    const shouldUpdate = confirm(message);
+    
+    if (shouldUpdate) {
+      this.applyUpdate();
+    } else {
+      // Show reminder in 15 minutes (more frequent)
+      setTimeout(() => {
+        if (this.updateAvailable) {
+          this.showInAppUpdateAlert(version);
+        }
+      }, 1000 * 60 * 15);
+    }
+  }
+
+  /**
+   * Create persistent update banner at top of page
+   */
+  createUpdateBanner(version) {
+    // Remove existing banner if any
+    const existing = document.getElementById('update-banner');
+    if (existing) existing.remove();
+
+    const banner = document.createElement('div');
+    banner.id = 'update-banner';
+    banner.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 20px;
+      text-align: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 999999;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      animation: slideDown 0.3s ease-out;
+    `;
+
+    const message = document.createElement('span');
+    message.textContent = version 
+      ? `🚀 Update ${version} Available! Click to install now.`
+      : '🚀 New Update Available! Click to install now.';
+    
+    const updateBtn = document.createElement('button');
+    updateBtn.textContent = 'Update Now';
+    updateBtn.style.cssText = `
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    `;
+    updateBtn.onmouseover = () => updateBtn.style.transform = 'scale(1.05)';
+    updateBtn.onmouseout = () => updateBtn.style.transform = 'scale(1)';
+    updateBtn.onclick = () => this.applyUpdate();
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '×';
+    closeBtn.style.cssText = `
+      background: transparent;
+      color: white;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0 8px;
+      line-height: 1;
+    `;
+    closeBtn.onclick = () => banner.remove();
+
+    banner.appendChild(message);
+    banner.appendChild(updateBtn);
+    banner.appendChild(closeBtn);
+
+    // Add animation keyframes
+    if (!document.getElementById('update-banner-style')) {
+      const style = document.createElement('style');
+      style.id = 'update-banner-style';
+      style.textContent = `
+        @keyframes slideDown {
+          from { transform: translateY(-100%); }
+          to { transform: translateY(0); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    document.body.insertBefore(banner, document.body.firstChild);
   }
 
   /**
@@ -265,18 +428,34 @@ class UpdateNotificationService {
    */
   async applyUpdate() {
     try {
+      // Skip reload in development
+      const isDevelopment = window.location.hostname === 'localhost' ||
+                           window.location.hostname === '127.0.0.1' ||
+                           window.location.hostname === '[::1]';
+      
+      if (isDevelopment) {
+        console.log('Update skipped in development mode');
+        return false;
+      }
+
       if (!this.registration || !this.registration.waiting) {
-        // Force reload to get new version
-        window.location.reload();
+        // Force reload to get new version (skip in Tauri)
+        const isTauri = typeof window !== 'undefined' && window.__TAURI__ !== undefined;
+        if (!isTauri) {
+          window.location.reload();
+        }
         return;
       }
 
       // Tell service worker to skip waiting
       this.registration.waiting.postMessage({ type: 'SKIP_WAITING' });
 
-      // Reload when service worker is activated
+      // Reload when service worker is activated (skip in Tauri)
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        window.location.reload();
+        const isTauri = typeof window !== 'undefined' && window.__TAURI__ !== undefined;
+        if (!isTauri) {
+          window.location.reload();
+        }
       });
 
       return true;

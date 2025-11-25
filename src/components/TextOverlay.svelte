@@ -8,7 +8,7 @@
     fontSize: 24,
     fontFamily: 'Arial',
     color: '#ffffff',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'transparent',
     fontWeight: 'normal',
     fontStyle: 'normal',
     textAlign: 'left',

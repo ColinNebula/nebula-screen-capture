@@ -75,6 +75,234 @@
       default: return '#6b7280';
     }
   }
+  
+  // Quick Actions Functions
+  function handleAddUser() {
+    const name = prompt('Enter user name:');
+    if (!name) return;
+    
+    const email = prompt('Enter user email:');
+    if (!email) return;
+    
+    const newUser = {
+      id: Date.now(),
+      name,
+      email,
+      plan: 'Free',
+      status: 'active',
+      recordings: 0,
+      storage: '0 MB',
+      joinDate: new Date().toISOString().split('T')[0]
+    };
+    
+    users = [...users, newUser];
+    stats.totalUsers += 1;
+    stats.activeUsers += 1;
+    
+    alert(`User "${name}" added successfully!`);
+  }
+  
+  async function handleBackupData() {
+    try {
+      // Gather all user data
+      const backupData = {
+        timestamp: new Date().toISOString(),
+        version: '1.0.0',
+        users: users,
+        systemSettings: systemSettings,
+        stats: stats,
+        recordings: $recordedVideos.length,
+        screenshots: $screenshots.length,
+        userData: {
+          currentUser: $user,
+          totalRecordings: $recordedVideos.length,
+          totalScreenshots: $screenshots.length
+        }
+      };
+      
+      // Convert to JSON
+      const jsonData = JSON.stringify(backupData, null, 2);
+      
+      // Create blob and download
+      const blob = new Blob([jsonData], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `nebula-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      alert('Backup completed successfully!');
+    } catch (error) {
+      console.error('Backup error:', error);
+      alert('Failed to create backup. Please try again.');
+    }
+  }
+  
+  async function handleExportReport() {
+    try {
+      // Generate comprehensive report
+      const report = `
+═══════════════════════════════════════════════════════
+        NEBULA SCREEN CAPTURE - ADMIN REPORT
+═══════════════════════════════════════════════════════
+
+Generated: ${new Date().toLocaleString()}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SYSTEM STATISTICS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Total Users:           ${stats.totalUsers}
+Active Users:          ${stats.activeUsers}
+Inactive Users:        ${stats.totalUsers - stats.activeUsers}
+Total Recordings:      ${stats.totalRecordings}
+Storage Used:          ${stats.storageUsed}
+Bandwidth Used:        ${stats.bandwidthUsed}
+System Uptime:         ${stats.systemUptime}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+USER BREAKDOWN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Premium Users:         ${users.filter(u => u.plan === 'Premium').length}
+Pro Users:             ${users.filter(u => u.plan === 'Pro').length}
+Free Users:            ${users.filter(u => u.plan === 'Free').length}
+
+Active Status:         ${users.filter(u => u.status === 'active').length}
+Suspended Status:      ${users.filter(u => u.status === 'suspended').length}
+Inactive Status:       ${users.filter(u => u.status === 'inactive').length}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SYSTEM SETTINGS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Maintenance Mode:      ${systemSettings.maintenanceMode ? 'ON' : 'OFF'}
+Allow Registrations:   ${systemSettings.allowRegistrations ? 'YES' : 'NO'}
+Email Verification:    ${systemSettings.requireEmailVerification ? 'REQUIRED' : 'OPTIONAL'}
+Auto Backups:          ${systemSettings.enableBackups ? 'ENABLED' : 'DISABLED'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOP USERS BY RECORDINGS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${users
+  .sort((a, b) => b.recordings - a.recordings)
+  .slice(0, 5)
+  .map((u, i) => `${i + 1}. ${u.name.padEnd(25)} - ${u.recordings} recordings`)
+  .join('\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DETAILED USER LIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${users.map(u => `
+Name:          ${u.name}
+Email:         ${u.email}
+Plan:          ${u.plan}
+Status:        ${u.status}
+Recordings:    ${u.recordings}
+Storage:       ${u.storage}
+Join Date:     ${u.joinDate}
+${'─'.repeat(55)}
+`).join('')}
+
+═══════════════════════════════════════════════════════
+           END OF REPORT
+═══════════════════════════════════════════════════════
+`.trim();
+      
+      // Create blob and download
+      const blob = new Blob([report], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `nebula-report-${new Date().toISOString().split('T')[0]}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      alert('Report exported successfully!');
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Failed to export report. Please try again.');
+    }
+  }
+  
+  async function handleClearCache() {
+    const confirmed = confirm(
+      'Are you sure you want to clear all cached data?\n\n' +
+      'This will:\n' +
+      '• Clear browser cache\n' +
+      '• Clear IndexedDB data\n' +
+      '• Clear local storage (except user auth)\n' +
+      '• Reload the application\n\n' +
+      'This action cannot be undone.'
+    );
+    
+    if (!confirmed) return;
+    
+    try {
+      let clearedItems = [];
+      
+      // Clear session storage
+      sessionStorage.clear();
+      clearedItems.push('Session Storage');
+      
+      // Clear cache API if available
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+        clearedItems.push(`Cache API (${cacheNames.length} caches)`);
+      }
+      
+      // Clear IndexedDB (except authentication)
+      if ('indexedDB' in window) {
+        const databases = await indexedDB.databases();
+        for (const db of databases) {
+          if (db.name && !db.name.includes('auth') && !db.name.includes('user')) {
+            indexedDB.deleteDatabase(db.name);
+            clearedItems.push(`IndexedDB: ${db.name}`);
+          }
+        }
+      }
+      
+      // Clear specific localStorage items (keep auth tokens)
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && !key.includes('auth') && !key.includes('token') && !key.includes('user')) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      if (keysToRemove.length > 0) {
+        clearedItems.push(`Local Storage (${keysToRemove.length} items)`);
+      }
+      
+      alert(
+        'Cache cleared successfully!\n\n' +
+        'Cleared:\n' +
+        clearedItems.map(item => `• ${item}`).join('\n') +
+        '\n\nThe page will now reload.'
+      );
+      
+      // Reload the page after a short delay (skip in Tauri)
+      const isTauri = typeof window !== 'undefined' && window.__TAURI__ !== undefined;
+      if (!isTauri) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+      
+    } catch (error) {
+      console.error('Cache clear error:', error);
+      alert('Failed to clear cache completely. Some items may not have been cleared.');
+    }
+  }
 </script>
 
 <div class="admin-panel-overlay" on:click={onClose}>
@@ -219,25 +447,25 @@
           <div class="quick-actions">
             <h4>Quick Actions</h4>
             <div class="quick-actions-grid">
-              <button class="quick-action-btn">
+              <button class="quick-action-btn" on:click={handleAddUser}>
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                 </svg>
                 <span>Add User</span>
               </button>
-              <button class="quick-action-btn">
+              <button class="quick-action-btn" on:click={handleBackupData}>
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
                 </svg>
                 <span>Backup Data</span>
               </button>
-              <button class="quick-action-btn">
+              <button class="quick-action-btn" on:click={handleExportReport}>
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
                 </svg>
                 <span>Export Report</span>
               </button>
-              <button class="quick-action-btn">
+              <button class="quick-action-btn" on:click={handleClearCache}>
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>

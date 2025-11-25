@@ -328,18 +328,32 @@ The header dynamically adapts to your recording state:
 
 ---
 
-### ⌨️ **Keyboard Shortcuts**
+### ⌨️ **Keyboard Shortcuts & Command Palette**
 
-Boost your productivity with comprehensive keyboard support:
+Boost your productivity with comprehensive keyboard support and the powerful Command Palette:
 
+#### 🎯 Command Palette (Power User Feature)
+Press `Ctrl/⌘ + K` to open the Command Palette - your instant access to:
+- 🔍 **Search Commands**: Fuzzy search through all available commands
+- 📁 **Quick File Access**: Find and open any recording or screenshot
+- 📦 **Batch Operations**: Select and process multiple files at once
+- 🏷️ **Category Filtering**: Filter by Recording, Files, Editor, Batch, Navigation
+- ⚡ **Lightning Fast**: Execute any action without leaving your keyboard
+
+See [COMMAND_PALETTE_GUIDE.md](COMMAND_PALETTE_GUIDE.md) for full documentation.
+
+#### Essential Shortcuts
 | Shortcut | Action |
 |----------|--------|
+| `Ctrl/⌘ + K` | **Open Command Palette** ⚡ |
 | `Ctrl/⌘ + R` | Start/Stop Recording |
 | `Space` | Pause/Resume Recording |
-| `Escape` | Cancel Recording or Area Selection |
-| `Ctrl/⌘ + D` | Download Current Recording |
-| `Ctrl/⌘ + H` | Open Help Modal |
-| `Ctrl/⌘ + /` | Show Keyboard Shortcuts |
+| `Ctrl/⌘ + Shift + S` | Take Screenshot |
+| `Ctrl/⌘ + E` | Open Video Editor |
+| `Ctrl/⌘ + B` | Toggle Batch Mode |
+| `Ctrl/⌘ + Shift + D` | Batch Download |
+| `Escape` | Cancel/Close |
+| `F1` | Open Help |
 
 ---
 

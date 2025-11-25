@@ -18,7 +18,10 @@
       textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
       rotation: 0,
       opacity: 1
-    }
+    },
+    // Timing properties
+    startTime: 0,
+    duration: 5
   };
 
   const dispatch = createEventDispatcher();
@@ -53,6 +56,18 @@
   function updatePosition(axis, value) {
     textOverlay.position[axis] = parseFloat(value);
     dispatch('update', textOverlay);
+  }
+  
+  function updateTiming(property, value) {
+    textOverlay[property] = parseFloat(value);
+    dispatch('update', textOverlay);
+  }
+  
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    const ms = Math.floor((seconds % 1) * 100);
+    return `${mins}:${String(secs).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
   }
 
   function handleColorChange(property, e) {
@@ -163,6 +178,64 @@
           class="number-input"
         />
       </label>
+    </div>
+  </div>
+
+  <div class="editor-section">
+    <h4>⏱️ Timing</h4>
+    <div class="input-group">
+      <label>
+        Start Time (seconds)
+        <input
+          type="range"
+          min="0"
+          max="300"
+          step="0.1"
+          value={textOverlay.startTime || 0}
+          on:input={(e) => updateTiming('startTime', e.target.value)}
+        />
+        <div class="time-display">
+          <input
+            type="number"
+            min="0"
+            max="300"
+            step="0.1"
+            value={textOverlay.startTime || 0}
+            on:input={(e) => updateTiming('startTime', e.target.value)}
+            class="number-input"
+          />
+          <span class="time-label">{formatTime(textOverlay.startTime || 0)}</span>
+        </div>
+      </label>
+    </div>
+    <div class="input-group">
+      <label>
+        Duration (seconds)
+        <input
+          type="range"
+          min="0.5"
+          max="60"
+          step="0.1"
+          value={textOverlay.duration || 5}
+          on:input={(e) => updateTiming('duration', e.target.value)}
+        />
+        <div class="time-display">
+          <input
+            type="number"
+            min="0.5"
+            max="60"
+            step="0.1"
+            value={textOverlay.duration || 5}
+            on:input={(e) => updateTiming('duration', e.target.value)}
+            class="number-input"
+          />
+          <span class="time-label">{formatTime(textOverlay.duration || 5)}</span>
+        </div>
+      </label>
+    </div>
+    <div class="timing-info">
+      <span>📍 Appears at: {formatTime(textOverlay.startTime || 0)}</span>
+      <span>⏹️ Ends at: {formatTime((textOverlay.startTime || 0) + (textOverlay.duration || 5))}</span>
     </div>
   </div>
 
@@ -584,5 +657,49 @@
 
   .dark .value-display {
     color: #9ca3af;
+  }
+  
+  .time-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .time-label {
+    font-size: 12px;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 4px 8px;
+    border-radius: 4px;
+    min-width: 80px;
+    text-align: center;
+  }
+  
+  .dark .time-label {
+    color: #9ca3af;
+    background: #4b5563;
+  }
+  
+  .timing-info {
+    display: flex;
+    gap: 16px;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 12px;
+  }
+  
+  .dark .timing-info {
+    background: #374151;
+    color: #9ca3af;
+  }
+  
+  .timing-info span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 </style>

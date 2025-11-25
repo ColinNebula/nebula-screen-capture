@@ -5,6 +5,7 @@
   export let onStop = () => {};
   export let onPause = () => {};
   export let onResume = () => {};
+  export let onMinimize = () => {};
   export let disabled = false;
   
   let isStarting = false;
@@ -89,6 +90,19 @@
             <rect x="6" y="6" width="12" height="12"/>
           </svg>
           <span class="button-text">Stop</span>
+        </button>
+        
+        <button 
+          class="control-button minimize-button" 
+          on:click={onMinimize}
+          disabled={disabled}
+          aria-label="Minimize window"
+          title="Minimize window during recording"
+        >
+          <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 13H5v-2h14v2z"/>
+          </svg>
+          <span class="button-text">Minimize</span>
         </button>
       </div>
     </div>

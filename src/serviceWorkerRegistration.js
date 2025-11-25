@@ -111,7 +111,10 @@ function checkValidServiceWorker(swUrl, config) {
         // No service worker found. Probably a different app. Reload the page.
         navigator.serviceWorker.ready.then((registration) => {
           registration.unregister().then(() => {
-            window.location.reload();
+            const isTauri = typeof window !== 'undefined' && window.__TAURI__ !== undefined;
+            if (!isTauri) {
+              window.location.reload();
+            }
           });
         });
       } else {

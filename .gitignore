@@ -27,6 +27,9 @@ src/wasm/*.h
 # Temporary files and scripts
 *.ps1
 !build-wasm.ps1
+!build-tauri-installer.ps1
+!prepare-for-github.ps1
+!test-tauri-installer.ps1
 *.html
 !public/*.html
 
@@ -137,6 +140,10 @@ build/
 .cache/
 .parcel-cache/
 
+# Tauri build artifacts (large binary files)
+src-tauri/target/
+src-tauri/WixTools/
+
 # Signing keys (CRITICAL - NEVER COMMIT THESE!)
 *.keystore
 *.jks
@@ -147,10 +154,20 @@ GoogleService-Info.plist
 android/key.properties
 android/app/keystore/
 
+# Code signing certificates
+*.pvk
+*.spc
+
 # App bundles (large binary files)
 *.apk
 *.aab
 *.ipa
+*.msi
+*.exe
+*.dmg
+*.deb
+*.rpm
+*.AppImage
 
 # Graphics working files (often large)
 graphics/
@@ -188,3 +205,8 @@ graphics/
 *.tif
 *.raw
 *.bmp
+
+.env
+
+# Auto-added by prepare-for-github.ps1
+*.log

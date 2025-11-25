@@ -1,6 +1,7 @@
 {
   "short_name": "Nebula",
   "name": "Nebula Screen Capture",
+  "version": "2.0.1",
   "description": "Professional screen recording made simple. Capture your screen with high-quality video and audio, customize recording settings, and manage your recordings with ease.",
   "icons": [
     {
@@ -12,31 +13,55 @@
       "src": "logo192.png",
       "type": "image/png",
       "sizes": "192x192",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
       "sizes": "512x512",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ],
-  "start_url": "/nebula-screen-capture/",
+  "start_url": "/?v=2.0.1&source=pwa",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "theme_color": "#667eea",
   "background_color": "#1a1a2e",
-  "categories": ["productivity", "utilities", "multimedia"],
-  "scope": "/nebula-screen-capture/",
+  "categories": ["productivity", "utilities", "multimedia", "video", "photo"],
+  "scope": "/",
   "orientation": "any",
   "dir": "ltr",
   "lang": "en-US",
   "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
   "screenshots": [
     {
       "src": "logo512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "form_factor": "wide"
+      "form_factor": "wide",
+      "label": "Nebula Screen Capture on desktop"
+    },
+    {
+      "src": "logo512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Nebula Screen Capture on mobile"
     }
   ],
   "shortcuts": [
@@ -44,24 +69,63 @@
       "name": "Start Recording",
       "short_name": "Record",
       "description": "Start a new screen recording",
-      "url": "/nebula-screen-capture/?action=record",
+      "url": "/?action=record",
       "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     },
     {
       "name": "View Recordings",
       "short_name": "Videos",
       "description": "View your recorded videos",
-      "url": "/nebula-screen-capture/?action=videos",
+      "url": "/?action=videos",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Video Editor",
+      "short_name": "Edit",
+      "description": "Open the video editor",
+      "url": "/?action=editor",
       "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
     }
   ],
   "share_target": {
-    "action": "/nebula-screen-capture/share",
-    "method": "GET",
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
     "params": {
       "title": "title",
       "text": "text",
-      "url": "url"
+      "url": "url",
+      "files": [
+        {
+          "name": "media",
+          "accept": ["video/*", "image/*", "audio/*"]
+        }
+      ]
     }
-  }
+  },
+  "file_handlers": [
+    {
+      "action": "/?file_handler",
+      "accept": {
+        "video/*": [".mp4", ".webm", ".mov", ".avi", ".mkv"],
+        "image/*": [".jpg", ".jpeg", ".png", ".gif", ".webp"],
+        "audio/*": [".mp3", ".wav", ".ogg", ".m4a"]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+nebula",
+      "url": "/?action=%s"
+    }
+  ],
+  "related_applications": [],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "permissions": [
+    "displayCapture",
+    "camera",
+    "microphone",
+    "notifications",
+    "storage"
+  ]
 }
